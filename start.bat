@@ -1,26 +1,48 @@
 @echo off
+setlocal EnableExtensions
 cd /d "%~dp0"
+
+set "PORT=8080"
+set "BACKEND_URL=http://localhost:5036"
 
 echo.
 echo ========================================
 echo   Game Vault - DB Visual Report
 echo ========================================
 echo.
+echo URL:   http://localhost:%PORT%
+echo API:   %BACKEND_URL%
+echo.
 echo Do NOT use: python -m http.server
 echo.
 
-echo Freeing port 8080...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8080" ^| findstr "LISTENING"') do (
+where python >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Python not found. Install Python 3 and add it to PATH.
+    pause
+    exit /b 1
+)
+
+echo Freeing port %PORT%...
+for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":%PORT%" ^| findstr "LISTENING"') do (
     echo   stopping PID %%a
     taskkill /F /PID %%a >nul 2>&1
 )
 timeout /t 1 /nobreak >nul
 
-echo Starting proxy server on http://localhost:8080
-echo API proxy -^> http://localhost:5036
+echo Starting proxy server on http://localhost:%PORT%
 echo.
 
-start "" "http://localhost:8080"
-set PORT=8080
-set BACKEND_URL=http://localhost:5036
+start /b cmd /c "timeout /t 2 /nobreak >nul && start "" http://localhost:%PORT%"
+
+set PORT=%PORT%
+set BACKEND_URL=%BACKEND_URL%
 python server.py
+if errorlevel 1 (
+    echo.
+    echo Server exited with an error.
+    pause
+    exit /b 1
+)
+
+endlocal

@@ -23,6 +23,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
+    def end_headers(self):
+        if self.path == "/" or self.path.startswith("/index.html"):
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        super().end_headers()
+
     def do_GET(self):
         if self.path.startswith("/api/"):
             self._proxy("GET")

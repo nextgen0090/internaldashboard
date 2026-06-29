@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Game Vault 2.0 — Internal Dashboard</title>
   <style>
     :root {
@@ -38,12 +39,35 @@
     }
 
     header {
+      margin-bottom: 1.5rem;
+    }
+
+    .header-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: end;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      border: 1px solid rgba(66, 165, 245, 0.35);
+      background: rgba(35, 47, 62, 0.65);
+    }
+
+    .controls-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     h1 {
@@ -124,17 +148,38 @@
       margin-bottom: 0.35rem;
     }
 
-    input, button {
+    input, select, button {
       font: inherit;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 0.65rem 0.75rem;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: rgba(15, 20, 25, 0.65);
       color: var(--text);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .field-narrow {
+      flex: 0 0 160px;
+      min-width: 160px;
+    }
+
+    #dataSource {
+      font-weight: 600;
+      border-color: rgba(66, 165, 245, 0.5);
+      background: #fff;
+      color: #000;
+    }
+
+    #dataSource option {
+      color: #000;
+      background: #fff;
     }
 
     button {
@@ -410,25 +455,33 @@
 <body>
   <div class="wrap">
     <header>
-      <div>
-        <h1>Game Vault 2.0 — Internal Dashboard</h1>
-        <p class="subtitle">Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code></p>
-        <div class="status-row">
-          <div class="status">
-            <span class="dot" id="connDot"></span>
-            <span id="connText">Not loaded</span>
+      <div class="header-top">
+        <div>
+          <h1>Game Vault 2.0 — Internal Dashboard</h1>
+          <p class="subtitle" id="subtitle">Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code></p>
+          <div class="status-row">
+            <div class="status">
+              <span class="dot" id="connDot"></span>
+              <span id="connText">Not loaded</span>
+            </div>
+            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">15</strong>s</div>
           </div>
-          <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">15</strong>s</div>
         </div>
       </div>
-      <div class="toolbar" style="flex:1; max-width:560px;">
-        <div class="field">
-          <label for="baseUrl">Base URL — leave empty; double-click <code style="color:#b3d9ff">start.bat</code> (not python -m http.server)</label>
-          <input id="baseUrl" value="" placeholder="empty = auto via start.bat on :8080" />
+
+      <div class="controls-bar">
+        <div class="field field-narrow">
+          <label for="dataSource">Data source</label>
+          <select id="dataSource">
+            <option value="api">API </option>
+            <option value="demo">Demo </option>
+          </select>
         </div>
-        <button id="loadBtn" type="button">Load</button>
-        <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
-        <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
+        <div class="controls-actions">
+          <button id="loadBtn" type="button">Load</button>
+          <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
+          <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
+        </div>
       </div>
     </header>
 
@@ -479,9 +532,58 @@
     const $ = (id) => document.getElementById(id);
     let lastResponse = null;
 
+    function isDemoMode() {
+      return $('dataSource').value === 'demo';
+    }
+
+    function updateDataSourceUi() {
+      const demo = isDemoMode();
+      $('subtitle').innerHTML = demo
+        ? 'Demo mode — sample data (no API call)'
+        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code>';
+    }
+
+    const DEMO_SUMMARY = {
+      success: true,
+      message: 'Demo data — not from API',
+      data: {
+        totalRecharged: 125430.50,
+        totalRedeemed: 98210.25,
+        totalGameUsers: 1842,
+        wholeGameRtp: { totalBet: 890120.00, totalWin: 801108.00, rtp: 0.90 },
+        rtpByGame: [
+          { gameName: 'Lucky Slots', totalBet: 320000, totalWin: 288000, totalSpin: 15420, rtp: 0.90, targetRtp: 0.92 },
+          { gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93 },
+          { gameName: 'Vault Poker', totalBet: 180000, totalWin: 153000, totalSpin: 4200, rtp: 0.85, targetRtp: 0.90 },
+          { gameName: 'Mega Wheel', totalBet: 179620, totalWin: 160133, totalSpin: 11200, rtp: 0.8915, targetRtp: 0.88 },
+        ],
+        rtpByUser: [
+          { username: 'player_alpha', totalBet: 45000, totalWin: 40500, totalSpin: 2100, rtp: 0.90 },
+          { username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045 },
+          { username: 'casual_joe', totalBet: 8500, totalWin: 6800, totalSpin: 420, rtp: 0.80 },
+        ],
+        gamesAboveTargetRtp: [
+          { gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93 },
+        ],
+        usersRtpAboveOrEqualOne: [
+          { username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045 },
+        ],
+        gamesTargetRtp: [
+          { gameName: 'Lucky Slots', targetRtp: 0.92 },
+          { gameName: 'Dragon Spin', targetRtp: 0.93 },
+          { gameName: 'Vault Poker', targetRtp: 0.90 },
+          { gameName: 'Mega Wheel', targetRtp: 0.88 },
+        ],
+        userFeedbacks: [
+          { userId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', feedBackCount: 12, avgRating: 4.5 },
+          { userId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901', feedBackCount: 3, avgRating: 2.0 },
+          { userId: 'c3d4e5f6-a7b8-9012-cdef-123456789012', feedBackCount: 8, avgRating: 3.8 },
+        ],
+      },
+    };
+
     function apiOrigin() {
-      const base = $('baseUrl').value.trim().replace(/\/$/, '');
-      return base || window.location.origin;
+      return window.location.origin;
     }
 
     function show(el, visible) {
@@ -674,7 +776,10 @@
 
     function updateRefreshTimer() {
       const el = $('refreshTimer');
-      const sec = $('refreshSeconds');
+      if (isDemoMode()) {
+        el.textContent = 'Demo — auto-refresh off';
+        return;
+      }
       if (isLoading) {
         el.innerHTML = 'Reloading data…';
         return;
@@ -701,18 +806,29 @@
 
     function startRefreshClock() {
       setInterval(() => {
-        if (isLoading) return;
+        if (isDemoMode() || isLoading) return;
         secondsLeft -= 1;
         if (secondsLeft <= 0) {
-          loadSummary(true);
+          loadData(true);
           return;
         }
         updateRefreshTimer();
       }, 1000);
     }
 
-    async function loadSummary(isAutoRefresh = false) {
-      if (isLoading) return;
+    function loadDemoData(isAutoRefresh = false) {
+      setError('');
+      lastResponse = DEMO_SUMMARY;
+      renderDashboard(DEMO_SUMMARY);
+      const time = new Date().toLocaleTimeString();
+      setConn('ok', 'Demo data · ' + time);
+      if (!isAutoRefresh) {
+        showLoadToast('Demo data loaded at ' + time);
+      }
+      updateRefreshTimer();
+    }
+
+    async function loadApiData(isAutoRefresh = false) {
       isLoading = true;
       if (!isAutoRefresh) setError('');
       if (!isAutoRefresh) $('loadBtn').disabled = true;
@@ -725,7 +841,7 @@
         lastResponse = json;
         renderDashboard(json);
         const time = new Date().toLocaleTimeString();
-        setConn('ok', 'Last updated ' + time);
+        setConn('ok', 'API · last updated ' + time);
         showLoadToast((isAutoRefresh ? 'Data reloaded' : 'Data loaded') + ' at ' + time);
         resetRefreshTimer();
       } catch (err) {
@@ -733,13 +849,12 @@
         let msg = err.message || String(err);
         if (msg === 'STATIC_404') {
           msg = 'You started python -m http.server — that cannot proxy /api.\n\n'
-            + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.\n'
-            + 'start.bat will open http://localhost:8080 automatically.';
+            + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.';
         } else if (msg === 'Failed to fetch') {
           msg = 'Cannot reach API.\n\n'
             + '1. .NET backend must run on http://localhost:5036\n'
             + '2. Double-click start.bat (not python -m http.server)\n'
-            + '3. Leave Base URL empty';
+            + '3. Or switch Data source to Demo to preview without the backend';
         }
         if (!isAutoRefresh) {
           setError(msg);
@@ -754,9 +869,23 @@
       }
     }
 
+    async function loadData(isAutoRefresh = false) {
+      if (isLoading) return;
+      updateDataSourceUi();
+      if (isDemoMode()) {
+        loadDemoData(isAutoRefresh);
+        return;
+      }
+      await loadApiData(isAutoRefresh);
+    }
+
     $('loadBtn').addEventListener('click', () => {
       resetRefreshTimer();
-      loadSummary(false);
+      loadData(false);
+    });
+    $('dataSource').addEventListener('change', () => {
+      resetRefreshTimer();
+      loadData(false);
     });
     $('toggleJsonBtn').addEventListener('click', () => {
       const visible = !$('jsonCard').classList.contains('hidden');
@@ -764,8 +893,9 @@
       $('toggleJsonBtn').textContent = visible ? 'Show JSON' : 'Hide JSON';
     });
 
+    updateDataSourceUi();
     startRefreshClock();
-    loadSummary(false);
+    loadData(false);
   </script>
 </body>
 </html>
