@@ -170,6 +170,11 @@
       min-width: 160px;
     }
 
+    .field-history {
+      flex: 0 0 240px;
+      min-width: 240px;
+    }
+
     #dataSource {
       font-weight: 600;
       border-color: rgba(66, 165, 245, 0.5);
@@ -450,6 +455,37 @@
       line-height: 1.5;
       color: #b3d9ff;
     }
+
+    .diff-meta {
+      margin: 0 0 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .diff-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .diff-section h3 {
+      margin: 0 0 0.6rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #b3d9ff;
+    }
+
+    .diff-old {
+      color: #ef9a9a;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .diff-new {
+      color: #81c784;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tr.diff-added td:first-child { border-left: 3px solid var(--ok); }
+    tr.diff-removed td:first-child { border-left: 3px solid var(--err); }
+    tr.diff-changed td:first-child { border-left: 3px solid var(--warn); }
   </style>
 </head>
 <body>
@@ -477,8 +513,16 @@
             <option value="demo">Demo </option>
           </select>
         </div>
+        <div class="field field-history" id="historyField">
+          <label for="responseHistory">Response history</label>
+          <select id="responseHistory" disabled>
+            <option value="0">No history yet</option>
+          </select>
+        </div>
         <div class="controls-actions">
           <button id="loadBtn" type="button">Load</button>
+          <button class="secondary" id="pauseRefreshBtn" type="button">Pause</button>
+          <button class="secondary" id="toggleDiffBtn" type="button">Show Diff</button>
           <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
           <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
         </div>
@@ -490,6 +534,13 @@
     <div class="error hidden" id="fetchError"></div>
 
     <section id="dashboard" class="hidden">
+      <section class="card hidden" id="diffCard">
+        <h2>Changes vs previous response <span class="row-count" id="diffChangeCount"></span></h2>
+        <p class="diff-meta" id="diffMeta"></p>
+        <div id="diffContent"></div>
+      </section>
+
+      <div id="mainDashboard">
       <div class="kpi-grid" id="kpiGrid"></div>
 
       <nav class="section-nav" id="sectionNav"></nav>
@@ -520,6 +571,7 @@
           <div class="table-wrap tall" id="gamesTargetRtpWrap"></div>
         </section>
       </div>
+      </div>
 
       <section class="card hidden" id="jsonCard">
         <h2>Raw JSON</h2>
@@ -530,17 +582,80 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
-    let lastResponse = null;
+    const HISTORY_MAX = 3;
+    let responseHistory = [];
+    let historyViewIndex = 0;
+    let isDiffVisible = false;
 
     function isDemoMode() {
       return $('dataSource').value === 'demo';
+    }
+
+    function historyOptionLabel(index, loadedAt) {
+      const time = loadedAt.toLocaleTimeString();
+      if (index === 0) return 'Latest · ' + time;
+      const n = index + 1;
+      const suffix = n === 2 ? '2nd last' : n === 3 ? '3rd last' : n + 'th last';
+      return suffix + ' · ' + time;
+    }
+
+    function clearResponseHistory() {
+      responseHistory = [];
+      historyViewIndex = 0;
+      updateHistoryDropdown();
+      updateDiffPanel();
+    }
+
+    function pushResponseHistory(response) {
+      const entry = {
+        response: JSON.parse(JSON.stringify(response)),
+        loadedAt: new Date(),
+      };
+      responseHistory.unshift(entry);
+      while (responseHistory.length > HISTORY_MAX) {
+        responseHistory.pop();
+      }
+      historyViewIndex = 0;
+      updateHistoryDropdown();
+      updateDiffPanel();
+    }
+
+    function updateHistoryDropdown() {
+      const sel = $('responseHistory');
+      const hasHistory = responseHistory.length > 0;
+      sel.disabled = !hasHistory || isDemoMode();
+      show($('historyField'), !isDemoMode());
+
+      if (!hasHistory) {
+        sel.innerHTML = '<option value="0">No history yet</option>';
+        sel.value = '0';
+        return;
+      }
+
+      sel.innerHTML = responseHistory.map((entry, i) =>
+        '<option value="' + i + '">' + historyOptionLabel(i, entry.loadedAt) + '</option>'
+      ).join('');
+      sel.value = String(Math.min(historyViewIndex, responseHistory.length - 1));
+    }
+
+    function showHistoryAt(index) {
+      if (!responseHistory.length) return;
+      historyViewIndex = Math.max(0, Math.min(index, responseHistory.length - 1));
+      const entry = responseHistory[historyViewIndex];
+      renderDashboard(entry.response);
+      const label = historyOptionLabel(historyViewIndex, entry.loadedAt);
+      setConn('ok', 'Viewing ' + label);
+      $('responseHistory').value = String(historyViewIndex);
     }
 
     function updateDataSourceUi() {
       const demo = isDemoMode();
       $('subtitle').innerHTML = demo
         ? 'Demo mode — sample data (no API call)'
-        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code>';
+        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses in memory';
+      updateHistoryDropdown();
+      updatePauseButtonUi();
+      updateDiffPanel();
     }
 
     const DEMO_SUMMARY = {
@@ -609,6 +724,266 @@
 
     function fmtInt(n) {
       return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function valuesEqual(a, b) {
+      if (a === b) return true;
+      if (a == null && b == null) return true;
+      if (typeof a === 'number' && typeof b === 'number') {
+        return Math.abs(a - b) < 1e-9;
+      }
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    function formatDiffValue(fieldKey, value) {
+      if (value == null || value === '') return '—';
+      if (fieldKey === 'rtp' || fieldKey === 'targetRtp') return fmtRtp(value);
+      if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed') {
+        return '$' + fmtMoney(value);
+      }
+      if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount' || fieldKey === 'totalGameUsers') return fmtInt(value);
+      if (fieldKey === 'avgRating') return Number(value).toFixed(1);
+      return String(value);
+    }
+
+    const ARRAY_DIFF_CONFIGS = [
+      {
+        title: 'RTP by Game',
+        arrayKey: 'rtpByGame',
+        idKey: 'gameName',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+          { key: 'targetRtp', label: 'Target RTP' },
+        ],
+      },
+      {
+        title: 'RTP by User',
+        arrayKey: 'rtpByUser',
+        idKey: 'username',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+        ],
+      },
+      {
+        title: 'Games Above Target RTP',
+        arrayKey: 'gamesAboveTargetRtp',
+        idKey: 'gameName',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+          { key: 'targetRtp', label: 'Target RTP' },
+        ],
+      },
+      {
+        title: 'Users RTP ≥ 100%',
+        arrayKey: 'usersRtpAboveOrEqualOne',
+        idKey: 'username',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+        ],
+      },
+      {
+        title: 'Game Target RTP',
+        arrayKey: 'gamesTargetRtp',
+        idKey: 'gameName',
+        fields: [{ key: 'targetRtp', label: 'Target RTP' }],
+      },
+      {
+        title: 'User Feedbacks',
+        arrayKey: 'userFeedbacks',
+        idKey: 'userId',
+        fields: [
+          { key: 'feedBackCount', label: 'Feedback Count' },
+          { key: 'avgRating', label: 'Avg Rating' },
+        ],
+      },
+    ];
+
+    function diffArraySection(oldArr, newArr, idKey, fields) {
+      const oldList = Array.isArray(oldArr) ? oldArr : [];
+      const newList = Array.isArray(newArr) ? newArr : [];
+      const oldMap = new Map(oldList.map((r) => [String(r[idKey]), r]));
+      const newMap = new Map(newList.map((r) => [String(r[idKey]), r]));
+      const rows = [];
+      const allIds = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+      for (const id of allIds) {
+        const oldRow = oldMap.get(id);
+        const newRow = newMap.get(id);
+        if (!oldRow && newRow) {
+          for (const f of fields) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: '—',
+              newVal: formatDiffValue(f.key, newRow[f.key]),
+              change: 'added',
+            });
+          }
+          continue;
+        }
+        if (oldRow && !newRow) {
+          for (const f of fields) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: formatDiffValue(f.key, oldRow[f.key]),
+              newVal: '—',
+              change: 'removed',
+            });
+          }
+          continue;
+        }
+        for (const f of fields) {
+          if (!valuesEqual(oldRow[f.key], newRow[f.key])) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: formatDiffValue(f.key, oldRow[f.key]),
+              newVal: formatDiffValue(f.key, newRow[f.key]),
+              change: 'changed',
+            });
+          }
+        }
+      }
+      return rows;
+    }
+
+    function computeFullDiff(previousResponse, latestResponse) {
+      const sections = [];
+      const oldD = previousResponse?.data || {};
+      const newD = latestResponse?.data || {};
+      const summaryRows = [];
+
+      const scalars = [
+        { key: 'totalRecharged', label: 'Total Recharged' },
+        { key: 'totalRedeemed', label: 'Total Redeemed' },
+        { key: 'totalGameUsers', label: 'Game Users' },
+      ];
+      for (const s of scalars) {
+        if (!valuesEqual(oldD[s.key], newD[s.key])) {
+          summaryRows.push({
+            item: 'Summary',
+            field: s.label,
+            oldVal: formatDiffValue(s.key, oldD[s.key]),
+            newVal: formatDiffValue(s.key, newD[s.key]),
+            change: 'changed',
+          });
+        }
+      }
+
+      const wholeFields = [
+        { key: 'totalBet', label: 'Total Bet' },
+        { key: 'totalWin', label: 'Total Win' },
+        { key: 'rtp', label: 'RTP' },
+      ];
+      for (const f of wholeFields) {
+        const oldVal = oldD.wholeGameRtp?.[f.key];
+        const newVal = newD.wholeGameRtp?.[f.key];
+        if (!valuesEqual(oldVal, newVal)) {
+          summaryRows.push({
+            item: 'Whole Game RTP',
+            field: f.label,
+            oldVal: formatDiffValue(f.key, oldVal),
+            newVal: formatDiffValue(f.key, newVal),
+            change: 'changed',
+          });
+        }
+      }
+
+      if (summaryRows.length) {
+        sections.push({ title: 'Summary', rows: summaryRows });
+      }
+
+      for (const cfg of ARRAY_DIFF_CONFIGS) {
+        const rows = diffArraySection(oldD[cfg.arrayKey], newD[cfg.arrayKey], cfg.idKey, cfg.fields);
+        if (rows.length) {
+          sections.push({ title: cfg.title, rows });
+        }
+      }
+
+      return sections;
+    }
+
+    function renderDiffSection(section) {
+      const head = '<tr><th>Item</th><th>Field</th><th>Previous</th><th>New</th></tr>';
+      const body = section.rows.map((r) =>
+        '<tr class="diff-' + r.change + '">' +
+        '<td>' + escHtml(r.item) + '</td>' +
+        '<td>' + escHtml(r.field) + '</td>' +
+        '<td class="diff-old">' + escHtml(r.oldVal) + '</td>' +
+        '<td class="diff-new">' + escHtml(r.newVal) + '</td>' +
+        '</tr>'
+      ).join('');
+      return '<div class="diff-section"><h3>' + escHtml(section.title) + '</h3>' +
+        '<div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></div>';
+    }
+
+    function setDashboardViewMode() {
+      const inDiffMode = isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
+      show($('mainDashboard'), !inDiffMode);
+      show($('diffCard'), inDiffMode);
+      if (inDiffMode) {
+        show($('jsonCard'), false);
+        const jsonBtn = $('toggleJsonBtn');
+        if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      }
+    }
+
+    function updateDiffPanel() {
+      const btn = $('toggleDiffBtn');
+      const canDiff = !isDemoMode() && responseHistory.length >= 2;
+
+      if (btn) {
+        show(btn, !isDemoMode());
+        btn.disabled = !canDiff;
+      }
+
+      if (!canDiff) {
+        isDiffVisible = false;
+        if (btn) btn.textContent = 'Show Diff';
+        setDashboardViewMode();
+        return;
+      }
+
+      const previous = responseHistory[1];
+      const latest = responseHistory[0];
+      const sections = computeFullDiff(previous.response, latest.response);
+      const changeCount = sections.reduce((n, s) => n + s.rows.length, 0);
+
+      $('diffMeta').textContent =
+        'Previous (' + previous.loadedAt.toLocaleTimeString() + ') → Latest (' + latest.loadedAt.toLocaleTimeString() + ')';
+
+      if (btn) {
+        btn.textContent = (isDiffVisible ? 'Hide Diff' : 'Show Diff') +
+          (changeCount ? ' (' + changeCount + ')' : '');
+      }
+
+      if (isDiffVisible) {
+        $('diffChangeCount').textContent = changeCount + ' change' + (changeCount === 1 ? '' : 's');
+        if (!changeCount) {
+          $('diffContent').innerHTML = '<div class="empty">No changes since the previous response — all values are the same.</div>';
+        } else {
+          $('diffContent').innerHTML = sections.map(renderDiffSection).join('');
+        }
+      }
+
+      setDashboardViewMode();
     }
 
     function ratingBadge(rating) {
@@ -734,7 +1109,7 @@
         { id: 'sec-target-rtp', label: 'Game Target RTP', count: (d.gamesTargetRtp || []).length },
       ]);
 
-      $('jsonView').textContent = JSON.stringify(lastResponse, null, 2);
+      $('jsonView').textContent = JSON.stringify(data, null, 2);
       show($('dashboard'), true);
     }
 
@@ -772,7 +1147,26 @@
     const REFRESH_SEC = 15;
     let secondsLeft = REFRESH_SEC;
     let isLoading = false;
+    let isRefreshPaused = false;
     let toastTimer = null;
+
+    function updatePauseButtonUi() {
+      const btn = $('pauseRefreshBtn');
+      if (!btn) return;
+      show(btn, !isDemoMode());
+      btn.textContent = isRefreshPaused ? 'Resume' : 'Pause';
+      btn.setAttribute('aria-pressed', isRefreshPaused ? 'true' : 'false');
+    }
+
+    function setRefreshPaused(paused) {
+      isRefreshPaused = paused;
+      updatePauseButtonUi();
+      updateRefreshTimer();
+    }
+
+    function toggleRefreshPaused() {
+      setRefreshPaused(!isRefreshPaused);
+    }
 
     function updateRefreshTimer() {
       const el = $('refreshTimer');
@@ -782,6 +1176,10 @@
       }
       if (isLoading) {
         el.innerHTML = 'Reloading data…';
+        return;
+      }
+      if (isRefreshPaused) {
+        el.innerHTML = 'Auto-refresh paused · <strong id="refreshSeconds">' + secondsLeft + '</strong>s when resumed';
         return;
       }
       el.innerHTML = 'Next refresh in <strong id="refreshSeconds">' + secondsLeft + '</strong>s';
@@ -806,7 +1204,7 @@
 
     function startRefreshClock() {
       setInterval(() => {
-        if (isDemoMode() || isLoading) return;
+        if (isDemoMode() || isLoading || isRefreshPaused) return;
         secondsLeft -= 1;
         if (secondsLeft <= 0) {
           loadData(true);
@@ -818,7 +1216,7 @@
 
     function loadDemoData(isAutoRefresh = false) {
       setError('');
-      lastResponse = DEMO_SUMMARY;
+      clearResponseHistory();
       renderDashboard(DEMO_SUMMARY);
       const time = new Date().toLocaleTimeString();
       setConn('ok', 'Demo data · ' + time);
@@ -838,10 +1236,11 @@
       try {
         const origin = apiOrigin();
         const { json } = await fetchSummaryFrom(origin);
-        lastResponse = json;
+        pushResponseHistory(json);
         renderDashboard(json);
         const time = new Date().toLocaleTimeString();
         setConn('ok', 'API · last updated ' + time);
+        setError('');
         showLoadToast((isAutoRefresh ? 'Data reloaded' : 'Data loaded') + ' at ' + time);
         resetRefreshTimer();
       } catch (err) {
@@ -855,11 +1254,20 @@
             + '1. .NET backend must run on http://localhost:5036\n'
             + '2. Double-click start.bat (not python -m http.server)\n'
             + '3. Or switch Data source to Demo to preview without the backend';
+        } else if (/Proxy error/i.test(msg) || /WinError 10061/i.test(msg)) {
+          msg = 'Backend not reachable at http://localhost:5036\n\n'
+            + 'Start the .NET API, then click Load or wait for auto-refresh.\n'
+            + 'Showing last successful data if available.';
         }
         if (!isAutoRefresh) {
           setError(msg);
           show($('dashboard'), false);
+        } else if (responseHistory.length > 0) {
+          setError('');
         } else {
+          setError(msg);
+        }
+        if (isAutoRefresh) {
           resetRefreshTimer();
         }
       } finally {
@@ -883,19 +1291,48 @@
       resetRefreshTimer();
       loadData(false);
     });
+    $('pauseRefreshBtn').addEventListener('click', () => {
+      toggleRefreshPaused();
+    });
     $('dataSource').addEventListener('change', () => {
       resetRefreshTimer();
+      if (isDemoMode()) clearResponseHistory();
       loadData(false);
     });
+    $('responseHistory').addEventListener('change', () => {
+      showHistoryAt(Number($('responseHistory').value));
+    });
     $('toggleJsonBtn').addEventListener('click', () => {
+      if (isDiffVisible) return;
       const visible = !$('jsonCard').classList.contains('hidden');
       show($('jsonCard'), !visible);
       $('toggleJsonBtn').textContent = visible ? 'Show JSON' : 'Hide JSON';
     });
+    $('toggleDiffBtn').addEventListener('click', () => {
+      isDiffVisible = !isDiffVisible;
+      updateDiffPanel();
+      if (isDiffVisible) {
+        $('diffCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
 
-    updateDataSourceUi();
-    startRefreshClock();
-    loadData(false);
+    function initPage() {
+      isDiffVisible = false;
+      clearResponseHistory();
+      updateDataSourceUi();
+      startRefreshClock();
+      loadData(false);
+    }
+
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        isDiffVisible = false;
+        clearResponseHistory();
+        loadData(false);
+      }
+    });
+
+    initPage();
   </script>
 </body>
 </html>
