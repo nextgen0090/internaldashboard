@@ -109,6 +109,11 @@
       border-radius: 999px;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.04);
+      transition: opacity 0.28s ease;
+    }
+
+    .row-count.is-updating {
+      opacity: 0.45;
     }
 
     .section-nav {
@@ -170,9 +175,88 @@
       min-width: 160px;
     }
 
-    .field-history {
-      flex: 0 0 240px;
-      min-width: 240px;
+    .section-toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .section-toolbar .field-narrow {
+      flex: 0 0 180px;
+      min-width: 180px;
+    }
+
+    .section-toolbar-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .section-header-row h2 {
+      margin: 0;
+    }
+
+    .section-toolbar-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: nowrap;
+      margin-bottom: 0;
+    }
+
+    .inline-field {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .inline-field label {
+      margin: 0;
+      white-space: nowrap;
+      font-size: 0.8rem;
+    }
+
+    .inline-field select {
+      width: auto;
+      min-width: 150px;
+      padding: 0.55rem 0.65rem;
+    }
+
+    .inline-field input[type="date"] {
+      width: auto;
+      min-width: 150px;
+      padding: 0.55rem 0.65rem;
+    }
+
+    .section-toolbar-inline .section-toolbar-actions {
+      align-items: center;
+    }
+
+    .section-toolbar-inline button {
+      padding: 0.55rem 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .section-toolbar-inline {
+        flex-wrap: wrap;
+        width: 100%;
+      }
+    }
+
+    input[type="date"] {
+      color-scheme: dark;
     }
 
     #dataSource {
@@ -392,6 +476,26 @@
       min-height: 320px;
     }
 
+    .table-wrap.smooth-update {
+      scroll-behavior: smooth;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    .table-wrap.smooth-update.is-updating {
+      opacity: 0.25;
+      transform: translateY(6px);
+    }
+
+    #targetRtpFilter {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #targetRtpFilter:focus {
+      border-color: rgba(66, 165, 245, 0.65);
+      box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.15);
+      outline: none;
+    }
+
     .rtp-bar-wrap {
       display: flex;
       flex-direction: column;
@@ -436,10 +540,30 @@
     .badge.rating-mid { background: rgba(255, 152, 0, 0.15); color: #ffb74d; }
     .badge.rating-high { background: rgba(76, 175, 80, 0.15); color: #81c784; }
 
-    .empty {
+    .feedback-messages {
+      margin: 0;
+      padding-left: 1.1rem;
+      list-style: disc;
+    }
+
+    .feedback-messages li {
+      margin: 0.15rem 0;
+      line-height: 1.35;
+    }
+
+    .feedback-messages li + li {
+      margin-top: 0.35rem;
+    }
+
+    .feedback-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .feedback-entry-date {
+      font-size: 0.74rem;
       color: var(--muted);
-      font-size: 0.9rem;
-      padding: 0.5rem 0;
     }
 
     pre.json-view {
@@ -500,7 +624,7 @@
               <span class="dot" id="connDot"></span>
               <span id="connText">Not loaded</span>
             </div>
-            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">15</strong>s</div>
+            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">40</strong>s</div>
           </div>
         </div>
       </div>
@@ -563,12 +687,41 @@
           <div class="table-wrap" id="usersRtpHighWrap"></div>
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-feedbacks">
-          <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span></h2>
-          <div class="table-wrap tall" id="userFeedbacksWrap"></div>
+          <div class="section-header-row">
+            <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span> <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="feedbackDateFrom">From</label>
+                <input type="date" id="feedbackDateFrom" />
+              </div>
+              <div class="inline-field">
+                <label for="feedbackDateTo">To</label>
+                <input type="date" id="feedbackDateTo" />
+              </div>
+              <div class="section-toolbar-actions">
+                <button type="button" id="feedbackFilterBtn">Filter</button>
+                <button type="button" class="secondary" id="feedbackClearFilterBtn">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap tall smooth-update" id="userFeedbacksWrap"></div>
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-target-rtp">
-          <h2>Game Target RTP <span class="row-count" id="countTargetRtp"></span></h2>
-          <div class="table-wrap tall" id="gamesTargetRtpWrap"></div>
+          <div class="section-header-row">
+            <h2>Game Target RTP <span class="row-count" id="countTargetRtp"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="targetRtpFilter">Filter by Target RTP</label>
+                <select id="targetRtpFilter">
+                  <option value="all">All</option>
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="80">80%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap tall smooth-update" id="gamesTargetRtpWrap"></div>
         </section>
       </div>
       </div>
@@ -586,6 +739,13 @@
     let responseHistory = [];
     let historyViewIndex = 0;
     let isDiffVisible = false;
+    let gamesTargetRtpData = [];
+    let userFeedbacksData = [];
+    let feedbackDateFromActive = '';
+    let feedbackDateToActive = '';
+    let lastSummaryEtag = '';
+    let lastSummaryJson = null;
+    let isTabHidden = document.hidden;
 
     function isDemoMode() {
       return $('dataSource').value === 'demo';
@@ -602,11 +762,27 @@
     function clearResponseHistory() {
       responseHistory = [];
       historyViewIndex = 0;
+      lastSummaryEtag = '';
+      lastSummaryJson = null;
       updateHistoryDropdown();
       updateDiffPanel();
     }
 
+    function summaryFingerprint(response) {
+      return JSON.stringify(response?.data ?? response);
+    }
+
+    function responsesEqual(a, b) {
+      if (!a || !b) return false;
+      return summaryFingerprint(a) === summaryFingerprint(b);
+    }
+
     function pushResponseHistory(response) {
+      if (responseHistory.length && responsesEqual(responseHistory[0].response, response)) {
+        responseHistory[0].loadedAt = new Date();
+        updateHistoryDropdown();
+        return false;
+      }
       const entry = {
         response: JSON.parse(JSON.stringify(response)),
         loadedAt: new Date(),
@@ -618,6 +794,7 @@
       historyViewIndex = 0;
       updateHistoryDropdown();
       updateDiffPanel();
+      return true;
     }
 
     function updateHistoryDropdown() {
@@ -652,7 +829,7 @@
       const demo = isDemoMode();
       $('subtitle').innerHTML = demo
         ? 'Demo mode — sample data (no API call)'
-        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses in memory';
+        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · skips refresh when unchanged';
       updateHistoryDropdown();
       updatePauseButtonUi();
       updateDiffPanel();
@@ -690,9 +867,36 @@
           { gameName: 'Mega Wheel', targetRtp: 0.88 },
         ],
         userFeedbacks: [
-          { userId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', feedBackCount: 12, avgRating: 4.5 },
-          { userId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901', feedBackCount: 3, avgRating: 2.0 },
-          { userId: 'c3d4e5f6-a7b8-9012-cdef-123456789012', feedBackCount: 8, avgRating: 3.8 },
+          {
+            userId: '53935c4c-8511-4acf-a030-7bd263b7355d',
+            username: 'g291sheshe',
+            feedBackCount: 2,
+            avgRating: 3.5,
+            feedbacks: [
+              { ratingStar: 4, message: 'Love it', createdAt: '2026-07-10T14:32:15.1234567Z' },
+              { ratingStar: 3, message: 'Good', createdAt: '2026-07-08T09:15:42.9876543Z' },
+            ],
+          },
+          {
+            userId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+            username: 'player_beta',
+            feedBackCount: 1,
+            avgRating: 2.0,
+            feedbacks: [
+              { ratingStar: 2, message: 'Too slow on mobile', createdAt: '2026-07-05T11:20:00Z' },
+            ],
+          },
+          {
+            userId: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+            username: 'casual_joe',
+            feedBackCount: 3,
+            avgRating: 4.0,
+            feedbacks: [
+              { ratingStar: 5, message: 'Fun slots', createdAt: '2026-07-11T18:45:00Z' },
+              { ratingStar: 4, message: 'Nice UI', createdAt: '2026-07-11T19:10:00Z' },
+              { ratingStar: 3, message: 'More bonuses please', createdAt: '2026-07-11T19:30:00Z' },
+            ],
+          },
         ],
       },
     };
@@ -747,7 +951,198 @@
       }
       if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount' || fieldKey === 'totalGameUsers') return fmtInt(value);
       if (fieldKey === 'avgRating') return Number(value).toFixed(1);
+      if (fieldKey === 'feedbackDate' || fieldKey === 'createdAt' || fieldKey === 'lastFeedbackDate' || fieldKey === 'date') {
+        return fmtFeedbackDate(value);
+      }
+      if (fieldKey === 'feedbackMessages') {
+        if (!Array.isArray(value) || value.length === 0) return '—';
+        return value.join(' · ');
+      }
+      if (fieldKey === 'feedbacks') {
+        if (!Array.isArray(value) || value.length === 0) return '—';
+        return value.map((f) => Number(f.ratingStar || 0) + '/5: ' + (f.message || '')).join(' · ');
+      }
       return String(value);
+    }
+
+    function getUserFeedbacksList(userRow) {
+      if (Array.isArray(userRow.feedbacks) && userRow.feedbacks.length) {
+        return userRow.feedbacks;
+      }
+      if (Array.isArray(userRow.feedbackMessages) && userRow.feedbackMessages.length) {
+        return userRow.feedbackMessages.map((message) => ({
+          ratingStar: null,
+          message,
+          createdAt: userRow.feedbackDate ?? userRow.createdAt ?? userRow.lastFeedbackDate ?? userRow.date,
+        }));
+      }
+      return [];
+    }
+
+    function filterFeedbacksByDate(feedbacks) {
+      if (!Array.isArray(feedbacks)) return [];
+      if (!feedbackDateFromActive && !feedbackDateToActive) return feedbacks;
+      return feedbacks.filter((f) => {
+        const rowDate = parseFeedbackDate(f.createdAt);
+        if (!rowDate) return false;
+        const from = feedbackDateFromActive
+          ? new Date(feedbackDateFromActive + 'T00:00:00')
+          : null;
+        const to = feedbackDateToActive
+          ? new Date(feedbackDateToActive + 'T23:59:59.999')
+          : null;
+        if (from && rowDate < from) return false;
+        if (to && rowDate > to) return false;
+        return true;
+      });
+    }
+
+    function getVisibleFeedbacksForUser(userRow) {
+      return filterFeedbacksByDate(getUserFeedbacksList(userRow));
+    }
+
+    function feedbackDatesCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      if (!items.length) return '<span class="empty">—</span>';
+      const dates = items.map((f) => fmtFeedbackDateTime(f.createdAt)).filter((d) => d !== '—');
+      if (!dates.length) return '<span class="empty">—</span>';
+      return escHtml(dates.join(' · '));
+    }
+
+    function feedbackStarsCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      if (!items.length) return '<span class="empty">—</span>';
+      const stars = items
+        .filter((f) => f.ratingStar != null)
+        .map((f) => Number(f.ratingStar).toFixed(1) + ' / 5');
+      if (!stars.length) return '<span class="empty">—</span>';
+      return stars.map((s) => '<span class="badge rating-mid">' + escHtml(s) + '</span>').join(' <span class="empty">·</span> ');
+    }
+
+    function feedbackMessagesCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      const messages = items.map((f) => f.message).filter(Boolean);
+      if (!messages.length) return '<span class="empty">—</span>';
+      return '<ul class="feedback-messages">' + messages.map((m) =>
+        '<li>' + escHtml(m) + '</li>'
+      ).join('') + '</ul>';
+    }
+
+    function parseFeedbackDate(value) {
+      if (!value) return null;
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtFeedbackDate(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function fmtFeedbackDateTime(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
+    function getFeedbackRowDate(row) {
+      const items = getUserFeedbacksList(row);
+      const dates = items.map((f) => parseFeedbackDate(f.createdAt)).filter(Boolean);
+      if (!dates.length) {
+        return parseFeedbackDate(row.feedbackDate ?? row.createdAt ?? row.lastFeedbackDate ?? row.date);
+      }
+      return dates.sort((a, b) => b - a)[0];
+    }
+
+    function matchesFeedbackDateFilter(row) {
+      if (!feedbackDateFromActive && !feedbackDateToActive) return true;
+      return getVisibleFeedbacksForUser(row).length > 0;
+    }
+
+    function filterUserFeedbacks(rows) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesFeedbackDateFilter(r));
+    }
+
+    function getFilteredFeedbackStars(users) {
+      const stars = [];
+      for (const user of users) {
+        for (const f of getVisibleFeedbacksForUser(user)) {
+          const star = Number(f.ratingStar);
+          if (!Number.isNaN(star)) stars.push(star);
+        }
+      }
+      return stars;
+    }
+
+    function updateFeedbackHeaderStats(filteredUsers) {
+      const avgEl = $('feedbackFilteredAvgRating');
+      if (!avgEl) return;
+      const stars = getFilteredFeedbackStars(filteredUsers);
+      if (!stars.length) {
+        avgEl.textContent = 'Avg —';
+        return;
+      }
+      const avg = stars.reduce((s, n) => s + n, 0) / stars.length;
+      avgEl.innerHTML = 'Avg ' + ratingBadge(avg);
+    }
+
+    function applyFeedbackDateFilter() {
+      feedbackDateFromActive = $('feedbackDateFrom')?.value || '';
+      feedbackDateToActive = $('feedbackDateTo')?.value || '';
+      renderUserFeedbacksTable(true);
+    }
+
+    function clearFeedbackDateFilter() {
+      feedbackDateFromActive = '';
+      feedbackDateToActive = '';
+      if ($('feedbackDateFrom')) $('feedbackDateFrom').value = '';
+      if ($('feedbackDateTo')) $('feedbackDateTo').value = '';
+      renderUserFeedbacksTable(true);
+    }
+
+    function renderUserFeedbacksTable(smooth = false) {
+      const filtered = filterUserFeedbacks(userFeedbacksData);
+      const columns = [
+        { label: 'Date', render: (r) => feedbackDatesCell(r) },
+        { label: 'Username', key: 'username' },
+        { label: 'User ID', render: (r) => '<span title="' + escHtml(r.userId || '') + '">' + escHtml(r.userId || '') + '</span>' },
+        { label: 'Feedback Count', render: (r) => fmtInt(r.feedBackCount) },
+        { label: 'Avg Rating', render: (r) => ratingBadge(r.avgRating) },
+        { label: 'Ratings', render: (r) => feedbackStarsCell(r) },
+        { label: 'Messages', render: (r) => feedbackMessagesCell(r) },
+      ];
+      const wrap = $('userFeedbacksWrap');
+      const countEl = $('countFeedbacks');
+
+      const apply = () => {
+        renderTable('userFeedbacksWrap', filtered, columns);
+        setRowCount('countFeedbacks', filtered);
+        updateFeedbackHeaderStats(filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-feedbacks"]');
+        if (navLink) navLink.textContent = 'User Feedbacks (' + filtered.length + ')';
+      };
+
+      if (!smooth || !wrap) {
+        apply();
+        return;
+      }
+
+      wrap.classList.add('is-updating');
+      if (countEl) countEl.classList.add('is-updating');
+
+      window.setTimeout(() => {
+        apply();
+        wrap.classList.remove('is-updating');
+        if (countEl) countEl.classList.remove('is-updating');
+      }, 160);
     }
 
     const ARRAY_DIFF_CONFIGS = [
@@ -808,8 +1203,10 @@
         arrayKey: 'userFeedbacks',
         idKey: 'userId',
         fields: [
+          { key: 'username', label: 'Username' },
           { key: 'feedBackCount', label: 'Feedback Count' },
           { key: 'avgRating', label: 'Avg Rating' },
+          { key: 'feedbacks', label: 'Feedbacks' },
         ],
       },
     ];
@@ -1014,6 +1411,57 @@
       ).join('');
     }
 
+    function targetRtpToPercent(value) {
+      const n = Number(value);
+      if (Number.isNaN(n)) return null;
+      return n <= 1 ? n * 100 : n;
+    }
+
+    function matchesTargetRtpFilter(targetRtp, filter) {
+      if (filter === 'all') return true;
+      const pct = targetRtpToPercent(targetRtp);
+      const want = Number(filter);
+      if (pct == null || Number.isNaN(want)) return false;
+      return Math.abs(pct - want) < 0.01;
+    }
+
+    function filterGamesTargetRtp(rows) {
+      const filter = $('targetRtpFilter')?.value || 'all';
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesTargetRtpFilter(r.targetRtp, filter));
+    }
+
+    function renderGamesTargetRtpTable(smooth = false) {
+      const filtered = filterGamesTargetRtp(gamesTargetRtpData);
+      const columns = [
+        { label: 'Game', key: 'gameName' },
+        { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
+      ];
+      const wrap = $('gamesTargetRtpWrap');
+      const countEl = $('countTargetRtp');
+
+      const apply = () => {
+        renderTable('gamesTargetRtpWrap', filtered, columns);
+        setRowCount('countTargetRtp', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-target-rtp"]');
+        if (navLink) navLink.textContent = 'Game Target RTP (' + filtered.length + ')';
+      };
+
+      if (!smooth || !wrap) {
+        apply();
+        return;
+      }
+
+      wrap.classList.add('is-updating');
+      if (countEl) countEl.classList.add('is-updating');
+
+      window.setTimeout(() => {
+        apply();
+        wrap.classList.remove('is-updating');
+        if (countEl) countEl.classList.remove('is-updating');
+      }, 160);
+    }
+
     function renderTable(containerId, rows, columns) {
       const el = $(containerId);
       if (!Array.isArray(rows) || rows.length === 0) {
@@ -1083,30 +1531,25 @@
       renderTable('rtpByUserWrap', d.rtpByUser, userRtpCols);
       renderTable('gamesAboveTargetWrap', d.gamesAboveTargetRtp, gameRtpCols);
       renderTable('usersRtpHighWrap', d.usersRtpAboveOrEqualOne, userRtpCols);
-      renderTable('gamesTargetRtpWrap', d.gamesTargetRtp, [
-        { label: 'Game', key: 'gameName' },
-        { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
-      ]);
-      renderTable('userFeedbacksWrap', feedbacks, [
-        { label: 'User ID', render: (r) => '<span title="' + (r.userId || '') + '">' + (r.userId || '') + '</span>' },
-        { label: 'Feedback Count', render: (r) => fmtInt(r.feedBackCount) },
-        { label: 'Avg Rating', render: (r) => ratingBadge(r.avgRating) },
-      ]);
+      gamesTargetRtpData = d.gamesTargetRtp || [];
+      renderGamesTargetRtpTable();
+      userFeedbacksData = feedbacks;
+      renderUserFeedbacksTable();
 
       setRowCount('countRtpGame', d.rtpByGame);
       setRowCount('countRtpUser', d.rtpByUser);
       setRowCount('countAboveTarget', d.gamesAboveTargetRtp);
       setRowCount('countUsersHigh', d.usersRtpAboveOrEqualOne);
-      setRowCount('countFeedbacks', feedbacks);
-      setRowCount('countTargetRtp', d.gamesTargetRtp);
 
+      const filteredTargetRtpCount = filterGamesTargetRtp(gamesTargetRtpData).length;
+      const filteredFeedbacksCount = filterUserFeedbacks(userFeedbacksData).length;
       renderSectionNav([
         { id: 'sec-rtp-game', label: 'RTP by Game', count: (d.rtpByGame || []).length },
         { id: 'sec-rtp-user', label: 'RTP by User', count: (d.rtpByUser || []).length },
         { id: 'sec-above-target', label: 'Above Target', count: (d.gamesAboveTargetRtp || []).length },
         { id: 'sec-users-high', label: 'Users RTP ≥100%', count: (d.usersRtpAboveOrEqualOne || []).length },
-        { id: 'sec-feedbacks', label: 'User Feedbacks', count: feedbacks.length },
-        { id: 'sec-target-rtp', label: 'Game Target RTP', count: (d.gamesTargetRtp || []).length },
+        { id: 'sec-feedbacks', label: 'User Feedbacks', count: filteredFeedbacksCount },
+        { id: 'sec-target-rtp', label: 'Game Target RTP', count: filteredTargetRtpCount },
       ]);
 
       $('jsonView').textContent = JSON.stringify(data, null, 2);
@@ -1139,12 +1582,44 @@
 
     async function fetchSummaryFrom(origin) {
       const url = origin.replace(/\/$/, '') + '/api/dashboard/internal/summary';
-      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const headers = { Accept: 'application/json' };
+      if (lastSummaryEtag) headers['If-None-Match'] = lastSummaryEtag;
+
+      const res = await fetch(url, { headers });
+
+      if (res.status === 304) {
+        return { notModified: true, url, origin, etag: lastSummaryEtag };
+      }
+
       const text = await res.text();
-      return { json: parseSummaryResponse(res, text), url, origin };
+      const json = parseSummaryResponse(res, text);
+      const etag = res.headers.get('ETag') || res.headers.get('etag');
+      if (etag) lastSummaryEtag = etag;
+      return { json, url, origin, notModified: false, etag };
     }
 
-    const REFRESH_SEC = 15;
+    function applySummaryResponse(json, isAutoRefresh) {
+      const changed = !lastSummaryJson || !responsesEqual(lastSummaryJson, json);
+      lastSummaryJson = json;
+
+      if (!changed) {
+        const time = new Date().toLocaleTimeString();
+        setConn('ok', 'API · up to date · ' + time);
+        setError('');
+        if (!isAutoRefresh) showLoadToast('No changes at ' + time);
+        return false;
+      }
+
+      pushResponseHistory(json);
+      renderDashboard(json);
+      const time = new Date().toLocaleTimeString();
+      setConn('ok', 'API · last updated ' + time);
+      setError('');
+      showLoadToast((isAutoRefresh ? 'Data reloaded' : 'Data loaded') + ' at ' + time);
+      return true;
+    }
+
+    const REFRESH_SEC = 40;
     let secondsLeft = REFRESH_SEC;
     let isLoading = false;
     let isRefreshPaused = false;
@@ -1178,6 +1653,10 @@
         el.innerHTML = 'Reloading data…';
         return;
       }
+      if (isTabHidden && !isDemoMode()) {
+        el.textContent = 'Auto-refresh paused (tab hidden)';
+        return;
+      }
       if (isRefreshPaused) {
         el.innerHTML = 'Auto-refresh paused · <strong id="refreshSeconds">' + secondsLeft + '</strong>s when resumed';
         return;
@@ -1204,7 +1683,7 @@
 
     function startRefreshClock() {
       setInterval(() => {
-        if (isDemoMode() || isLoading || isRefreshPaused) return;
+        if (isDemoMode() || isLoading || isRefreshPaused || isTabHidden) return;
         secondsLeft -= 1;
         if (secondsLeft <= 0) {
           loadData(true);
@@ -1235,13 +1714,16 @@
 
       try {
         const origin = apiOrigin();
-        const { json } = await fetchSummaryFrom(origin);
-        pushResponseHistory(json);
-        renderDashboard(json);
-        const time = new Date().toLocaleTimeString();
-        setConn('ok', 'API · last updated ' + time);
-        setError('');
-        showLoadToast((isAutoRefresh ? 'Data reloaded' : 'Data loaded') + ' at ' + time);
+        const result = await fetchSummaryFrom(origin);
+        if (result.notModified) {
+          const time = new Date().toLocaleTimeString();
+          setConn('ok', 'API · up to date · ' + time);
+          setError('');
+          if (!isAutoRefresh) showLoadToast('No changes at ' + time);
+          resetRefreshTimer();
+          return;
+        }
+        applySummaryResponse(result.json, isAutoRefresh);
         resetRefreshTimer();
       } catch (err) {
         setConn('err', isAutoRefresh ? 'Refresh failed' : 'Failed');
@@ -1302,6 +1784,21 @@
     $('responseHistory').addEventListener('change', () => {
       showHistoryAt(Number($('responseHistory').value));
     });
+    $('targetRtpFilter').addEventListener('change', () => {
+      renderGamesTargetRtpTable(true);
+    });
+    $('feedbackFilterBtn').addEventListener('click', () => {
+      applyFeedbackDateFilter();
+    });
+    $('feedbackClearFilterBtn').addEventListener('click', () => {
+      clearFeedbackDateFilter();
+    });
+    $('feedbackDateFrom').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFeedbackDateFilter();
+    });
+    $('feedbackDateTo').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFeedbackDateFilter();
+    });
     $('toggleJsonBtn').addEventListener('click', () => {
       if (isDiffVisible) return;
       const visible = !$('jsonCard').classList.contains('hidden');
@@ -1318,11 +1815,17 @@
 
     function initPage() {
       isDiffVisible = false;
+      isTabHidden = document.hidden;
       clearResponseHistory();
       updateDataSourceUi();
       startRefreshClock();
       loadData(false);
     }
+
+    document.addEventListener('visibilitychange', () => {
+      isTabHidden = document.hidden;
+      updateRefreshTimer();
+    });
 
     window.addEventListener('pageshow', (e) => {
       if (e.persisted) {
