@@ -1,6 +1,6 @@
 """Local static server + API proxy for DB Visual Report.
 
-Serves index.html on http://localhost:8080 and proxies /api/* to the .NET backend.
+Serves index.html on https://gamevault222.com and proxies /api/* to the .NET backend.
 Avoids browser CORS when the page and API run on different ports.
 
 Usage:
@@ -14,7 +14,7 @@ import os
 import urllib.error
 import urllib.request
 
-BACKEND = os.environ.get("BACKEND_URL", "http://localhost:5036").rstrip("/")
+BACKEND = os.environ.get("BACKEND_URL", "https://gamevault222.com").rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
 ROOT = os.path.dirname(os.path.abspath(__file__))
 

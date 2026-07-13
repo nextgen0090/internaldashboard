@@ -285,6 +285,86 @@
       color: var(--muted);
     }
 
+    .kpi-clickable {
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .kpi-clickable:hover {
+      border-color: rgba(66, 165, 245, 0.45);
+      background: rgba(66, 165, 245, 0.08);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+    }
+
+    .modal-dialog {
+      position: relative;
+      width: min(920px, 100%);
+      max-height: min(85vh, 760px);
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      border: 0;
+      border-radius: 8px;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .modal-body {
+      padding: 1rem 1.25rem 1.25rem;
+      overflow: auto;
+    }
+
+    .modal-body .table-wrap {
+      max-height: min(60vh, 560px);
+    }
+
     .section-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -405,6 +485,45 @@
       line-height: 1.5;
       color: #b3d9ff;
     }
+
+    tr.feedback-row {
+      cursor: pointer;
+    }
+
+    tr.feedback-row:hover td {
+      background: rgba(66, 165, 245, 0.08);
+    }
+
+    tr.feedback-row.selected td {
+      background: rgba(66, 165, 245, 0.14);
+    }
+
+    tr.feedback-detail td {
+      padding: 0;
+      background: rgba(15, 20, 25, 0.55);
+    }
+
+    .feedback-detail-inner {
+      padding: 0.75rem 1rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .feedback-detail-inner h3 {
+      margin: 0 0 0.65rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #b3d9ff;
+    }
+
+    .feedback-detail-table th,
+    .feedback-detail-table td {
+      font-size: 0.8rem;
+    }
+
+    .feedback-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   </style>
 </head>
 <body>
@@ -424,7 +543,7 @@
       <div class="toolbar" style="flex:1; max-width:560px;">
         <div class="field">
           <label for="baseUrl">Base URL — leave empty; double-click <code style="color:#b3d9ff">start.bat</code> (not python -m http.server)</label>
-          <input id="baseUrl" value="" placeholder="empty = auto via start.bat on :8080" />
+          <input id="baseUrl" value="" placeholder="empty = auto via start.bat on :5036" />
         </div>
         <button id="loadBtn" type="button">Load</button>
         <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
@@ -475,13 +594,42 @@
     </section>
   </div>
 
+  <div class="modal hidden" id="gameUsersModal" aria-hidden="true">
+    <div class="modal-backdrop" id="gameUsersModalBackdrop"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="gameUsersModalTitle">
+      <div class="modal-header">
+        <h2 id="gameUsersModalTitle">Game Users</h2>
+        <button class="modal-close" id="gameUsersModalClose" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrap" id="gameUsersModalTable"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const $ = (id) => document.getElementById(id);
     let lastResponse = null;
+    let selectedFeedbackUserId = null;
+    let lastGameUsers = [];
 
     function apiOrigin() {
       const base = $('baseUrl').value.trim().replace(/\/$/, '');
       return base || window.location.origin;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fmtDate(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
     }
 
     function show(el, visible) {
@@ -507,6 +655,45 @@
 
     function fmtInt(n) {
       return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    function normalizeGameUsers(value) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return {
+          count: Number(value.count ?? 0),
+          users: Array.isArray(value.users) ? value.users : [],
+        };
+      }
+      return {
+        count: Number(value ?? 0),
+        users: [],
+      };
+    }
+
+    function openGameUsersModal(users) {
+      const rows = Array.isArray(users) ? users : [];
+      const tableEl = $('gameUsersModalTable');
+
+      if (!rows.length) {
+        tableEl.innerHTML = '<div class="empty">No user details available.</div>';
+      } else {
+        const body = rows.map((row) =>
+          '<tr>'
+          + '<td>' + escapeHtml(row.username || '—') + '</td>'
+          + '<td>' + escapeHtml(row.gameName || '—') + '</td>'
+          + '</tr>'
+        ).join('');
+        tableEl.innerHTML = '<table><thead><tr><th>Username</th><th>Game</th></tr></thead><tbody>'
+          + body + '</tbody></table>';
+      }
+
+      show($('gameUsersModal'), true);
+      $('gameUsersModal').setAttribute('aria-hidden', 'false');
+    }
+
+    function closeGameUsersModal() {
+      show($('gameUsersModal'), false);
+      $('gameUsersModal').setAttribute('aria-hidden', 'true');
     }
 
     function ratingBadge(rating) {
@@ -552,18 +739,82 @@
       el.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
     }
 
+    function renderFeedbackDetails(user) {
+      const items = Array.isArray(user.feedbacks) ? user.feedbacks : [];
+      if (!items.length) {
+        return '<div class="empty">No individual feedback entries.</div>';
+      }
+
+      const rows = items.map((item) =>
+        '<tr>'
+        + '<td>' + ratingBadge(item.ratingStar) + '</td>'
+        + '<td class="feedback-text">' + escapeHtml(item.feedback || '—') + '</td>'
+        + '<td>' + escapeHtml(fmtDate(item.createdAt)) + '</td>'
+        + '</tr>'
+      ).join('');
+
+      return '<div class="feedback-detail-inner">'
+        + '<h3>Feedbacks for ' + escapeHtml(user.username || 'Unknown user') + '</h3>'
+        + '<table class="feedback-detail-table"><thead><tr>'
+        + '<th>Rating</th><th>Feedback</th><th>Created</th>'
+        + '</tr></thead><tbody>' + rows + '</tbody></table>'
+        + '</div>';
+    }
+
+    function renderUserFeedbacks(containerId, rows) {
+      const el = $(containerId);
+      if (!Array.isArray(rows) || rows.length === 0) {
+        el.innerHTML = '<div class="empty">No data.</div>';
+        return;
+      }
+
+      const body = rows.map((row) => {
+        const userId = row.userId || '';
+        const isOpen = selectedFeedbackUserId === userId;
+        const mainRow = '<tr class="feedback-row' + (isOpen ? ' selected' : '') + '" data-user-id="' + escapeHtml(userId) + '">'
+          + '<td>' + escapeHtml(row.username || '—') + '</td>'
+          + '<td>' + fmtInt(row.feedBackCount) + '</td>'
+          + '<td>' + ratingBadge(row.avgRating) + '</td>'
+          + '</tr>';
+        const detailRow = '<tr class="feedback-detail' + (isOpen ? '' : ' hidden') + '" data-user-id="' + escapeHtml(userId) + '">'
+          + '<td colspan="3">' + renderFeedbackDetails(row) + '</td>'
+          + '</tr>';
+        return mainRow + detailRow;
+      }).join('');
+
+      el.innerHTML = '<table><thead><tr>'
+        + '<th>Username</th><th>Feedback Count</th><th>Avg Rating</th>'
+        + '</tr></thead><tbody>' + body + '</tbody></table>';
+
+      el.querySelectorAll('tr.feedback-row').forEach((row) => {
+        row.addEventListener('click', () => {
+          const userId = row.getAttribute('data-user-id') || '';
+          selectedFeedbackUserId = selectedFeedbackUserId === userId ? null : userId;
+          renderUserFeedbacks(containerId, rows);
+        });
+      });
+    }
+
     function renderDashboard(data) {
       const d = data?.data || {};
       const feedbacks = d.userFeedbacks || [];
+      const gameUsers = normalizeGameUsers(d.totalGameUsers);
+      lastGameUsers = gameUsers.users;
       const totalFeedbackCount = feedbacks.reduce((s, r) => s + Number(r.feedBackCount || 0), 0);
       const avgFeedbackRating = feedbacks.length
         ? feedbacks.reduce((s, r) => s + Number(r.avgRating || 0), 0) / feedbacks.length
         : 0;
 
-      $('kpiGrid').innerHTML = [
+      const kpis = [
         { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged) },
         { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed) },
-        { label: 'Game Users', value: fmtInt(d.totalGameUsers) },
+        {
+          label: 'Game Users',
+          value: fmtInt(gameUsers.count),
+          id: 'kpiGameUsers',
+          clickable: true,
+          sub: gameUsers.users.length ? 'Click to view users' : null,
+        },
         {
           label: 'Whole Game RTP',
           value: fmtRtp(d.wholeGameRtp?.rtp),
@@ -574,10 +825,17 @@
           value: fmtInt(totalFeedbackCount),
           sub: feedbacks.length ? 'Avg rating ' + avgFeedbackRating.toFixed(1) + ' · ' + feedbacks.length + ' users' : 'No feedback yet',
         },
-      ].map((k) =>
-        '<div class="kpi"><div class="kpi-label">' + k.label + '</div><div class="kpi-value">' + k.value + '</div>' +
-        (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') + '</div>'
-      ).join('');
+      ];
+
+      $('kpiGrid').innerHTML = kpis.map((k) => {
+        const classes = 'kpi' + (k.clickable ? ' kpi-clickable' : '');
+        const idAttr = k.id ? ' id="' + k.id + '"' : '';
+        return '<div class="' + classes + '"' + idAttr + '>'
+          + '<div class="kpi-label">' + k.label + '</div>'
+          + '<div class="kpi-value">' + k.value + '</div>'
+          + (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '')
+          + '</div>';
+      }).join('');
 
       const gameRtpCols = [
         { label: 'Game', key: 'gameName' },
@@ -610,11 +868,10 @@
         { label: 'Game', key: 'gameName' },
         { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
       ]);
-      renderTable('userFeedbacksWrap', feedbacks, [
-        { label: 'User ID', render: (r) => '<span title="' + (r.userId || '') + '">' + (r.userId || '') + '</span>' },
-        { label: 'Feedback Count', render: (r) => fmtInt(r.feedBackCount) },
-        { label: 'Avg Rating', render: (r) => ratingBadge(r.avgRating) },
-      ]);
+      if (selectedFeedbackUserId && !feedbacks.some((row) => row.userId === selectedFeedbackUserId)) {
+        selectedFeedbackUserId = null;
+      }
+      renderUserFeedbacks('userFeedbacksWrap', feedbacks);
 
       setRowCount('countRtpGame', d.rtpByGame);
       setRowCount('countRtpUser', d.rtpByUser);
@@ -734,10 +991,10 @@
         if (msg === 'STATIC_404') {
           msg = 'You started python -m http.server — that cannot proxy /api.\n\n'
             + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.\n'
-            + 'start.bat will open http://localhost:8080 automatically.';
+            + 'start.bat proxies /api to http://localhost:5036 automatically.';
         } else if (msg === 'Failed to fetch') {
-          msg = 'Cannot reach API.\n\n'
-            + '1. .NET backend must run on http://localhost:5036\n'
+          msg = 'Cannot reach API at http://localhost:5036/api/dashboard/internal/summary\n\n'
+            + '1. Start the .NET backend on http://localhost:5036\n'
             + '2. Double-click start.bat (not python -m http.server)\n'
             + '3. Leave Base URL empty';
         }
@@ -758,10 +1015,22 @@
       resetRefreshTimer();
       loadSummary(false);
     });
+    $('kpiGrid').addEventListener('click', (event) => {
+      if (event.target.closest('#kpiGameUsers')) {
+        openGameUsersModal(lastGameUsers);
+      }
+    });
     $('toggleJsonBtn').addEventListener('click', () => {
       const visible = !$('jsonCard').classList.contains('hidden');
       show($('jsonCard'), !visible);
       $('toggleJsonBtn').textContent = visible ? 'Show JSON' : 'Hide JSON';
+    });
+    $('gameUsersModalClose').addEventListener('click', closeGameUsersModal);
+    $('gameUsersModalBackdrop').addEventListener('click', closeGameUsersModal);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !$('gameUsersModal').classList.contains('hidden')) {
+        closeGameUsersModal();
+      }
     });
 
     startRefreshClock();
