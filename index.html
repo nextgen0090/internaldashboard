@@ -781,6 +781,192 @@
 
     .rtp-bar.over > span { background: linear-gradient(90deg, #e65100, #ff9800); }
 
+    .graph-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      padding: 0;
+      border-radius: 9px;
+      background: rgba(66, 165, 245, 0.12);
+      border: 1px solid rgba(66, 165, 245, 0.3);
+      box-shadow: none;
+      color: #90caf9;
+    }
+
+    .graph-btn:hover:not(:disabled) {
+      background: rgba(66, 165, 245, 0.22);
+      box-shadow: 0 6px 16px rgba(66, 165, 245, 0.18);
+    }
+
+    .graph-btn svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .drill-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .drill-toolbar h2 {
+      margin: 0;
+      flex: 1;
+    }
+
+    .chart-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .chart-stat {
+      padding: 0.75rem 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .chart-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .chart-stat strong {
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .spin-chart-panel {
+      position: relative;
+      min-height: 410px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 78% 12%, rgba(76, 175, 80, 0.09), transparent 24%),
+        linear-gradient(180deg, rgba(15, 22, 32, 0.82), rgba(8, 12, 18, 0.86));
+      overflow: hidden;
+    }
+
+    .spin-chart-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+
+    .spin-chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: #c5d4e6;
+      font-size: 0.78rem;
+    }
+
+    .spin-chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .spin-chart-legend i {
+      display: inline-block;
+      width: 12px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .spin-chart-legend .leg-bet { background: #42a5f5; }
+    .spin-chart-legend .leg-win {
+      background: linear-gradient(180deg, rgba(102, 187, 106, 0.95), rgba(102, 187, 106, 0.35));
+      border-top: 2px solid #66bb6a;
+      height: 8px;
+    }
+
+    .spin-chart-zoom {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .spin-chart-zoom button {
+      min-width: 34px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.78rem;
+      line-height: 1;
+    }
+
+    .spin-chart-zoom .zoom-hint {
+      color: var(--muted);
+      font-size: 0.72rem;
+      margin-left: 0.25rem;
+    }
+
+    #spinChart {
+      display: block;
+      width: 100%;
+      height: 380px;
+      cursor: crosshair;
+    }
+
+    #spinChart.is-panning {
+      cursor: grabbing;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      z-index: 4;
+      min-width: 180px;
+      max-width: 240px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 18, 27, 0.97);
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 14px));
+      white-space: nowrap;
+    }
+
+    .chart-tooltip strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #b3d9ff;
+      font-size: 0.82rem;
+    }
+
+    .chart-tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chart-tooltip-row span:first-child {
+      color: var(--muted);
+    }
+
     .badge {
       display: inline-block;
       padding: 0.15rem 0.45rem;
@@ -809,6 +995,59 @@
 
     .feedback-messages li + li {
       margin-top: 0.35rem;
+    }
+
+    .feedback-dates {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .feedback-dates li {
+      margin: 0.15rem 0;
+      line-height: 1.35;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .feedback-dates li + li {
+      margin-top: 0.35rem;
+    }
+
+    .feedback-date-today {
+      color: #a5d6a7;
+      font-weight: 600;
+    }
+
+    .feedback-today-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.12rem 0.4rem;
+      margin-right: 0.35rem;
+      border-radius: 4px;
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      vertical-align: middle;
+    }
+
+    .feedback-date-other {
+      color: var(--muted);
+    }
+
+    .feedback-date-age {
+      font-size: 0.78em;
+      color: var(--muted);
+      opacity: 0.85;
+    }
+
+    .feedback-filter-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+      font-weight: 400;
     }
 
     .feedback-entry {
@@ -949,7 +1188,7 @@
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-feedbacks">
           <div class="section-header-row">
-            <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span> <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span></h2>
+            <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span> <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span> <span class="feedback-filter-hint" id="feedbackFilterHint"></span></h2>
             <div class="section-toolbar section-toolbar-inline">
               <div class="inline-field">
                 <label for="feedbackDateFrom">From</label>
@@ -987,6 +1226,34 @@
       </div>
       </div>
 
+      <section class="card hidden" id="drillDownCard">
+        <div class="drill-toolbar">
+          <button type="button" class="secondary" id="drillBackBtn">← Back</button>
+          <h2 id="drillTitle">Session details</h2>
+          <span class="row-count" id="drillMeta"></span>
+        </div>
+        <div class="table-wrap tall" id="drillTableWrap"></div>
+        <div class="hidden" id="drillChartWrap">
+          <div class="chart-summary" id="chartSummary"></div>
+          <div class="spin-chart-panel">
+            <div class="spin-chart-toolbar">
+              <div class="spin-chart-legend">
+                <span><i class="leg-bet" aria-hidden="true"></i> Bet</span>
+                <span><i class="leg-win" aria-hidden="true"></i> Win</span>
+              </div>
+              <div class="spin-chart-zoom">
+                <button type="button" class="secondary" id="spinZoomOutBtn" title="Zoom out">−</button>
+                <button type="button" class="secondary" id="spinZoomInBtn" title="Zoom in">+</button>
+                <button type="button" class="secondary" id="spinZoomResetBtn" title="Reset zoom">Reset</button>
+                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag to pan</span>
+              </div>
+            </div>
+            <canvas id="spinChart" aria-label="Session spin bet and win chart"></canvas>
+            <div class="chart-tooltip hidden" id="spinChartTooltip"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="card hidden" id="jsonCard">
         <h2>Raw JSON</h2>
         <pre class="json-view" id="jsonView"></pre>
@@ -1007,6 +1274,14 @@
     let lastSummaryEtag = '';
     let lastSummaryJson = null;
     let isTabHidden = document.hidden;
+    let currentDashboardData = null;
+    let drillStack = [];
+    let activeChartSpins = [];
+    let isDrillLoading = false;
+    let hoveredSpinIndex = -1;
+    let chartViewStart = 0;
+    let chartViewEnd = 0;
+    let chartPanState = null;
 
     function isDemoMode() {
       return $('dataSource').value === 'demo';
@@ -1096,24 +1371,89 @@
       updateDiffPanel();
     }
 
+    const DEMO_SPIN_LOGS = [
+      { spinIndex: 1, betAmount: 1, winAmount: 0 },
+      { spinIndex: 2, betAmount: 1, winAmount: 2.5 },
+      { spinIndex: 3, betAmount: 2, winAmount: 0.5 },
+      { spinIndex: 4, betAmount: 1, winAmount: 1 },
+      { spinIndex: 5, betAmount: 2, winAmount: 3 },
+    ];
+
     const DEMO_SUMMARY = {
       success: true,
       message: 'Demo data — not from API',
       data: {
         totalRecharged: 125430.50,
         totalRedeemed: 98210.25,
-        totalGameUsers: 1842,
+        totalGameUsers: { count: 1842, users: [] },
         wholeGameRtp: { totalBet: 890120.00, totalWin: 801108.00, rtp: 0.90 },
         rtpByGame: [
-          { gameName: 'Lucky Slots', totalBet: 320000, totalWin: 288000, totalSpin: 15420, rtp: 0.90, targetRtp: 0.92 },
-          { gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93 },
-          { gameName: 'Vault Poker', totalBet: 180000, totalWin: 153000, totalSpin: 4200, rtp: 0.85, targetRtp: 0.90 },
-          { gameName: 'Mega Wheel', totalBet: 179620, totalWin: 160133, totalSpin: 11200, rtp: 0.8915, targetRtp: 0.88 },
+          {
+            gameId: 'g1111111-1111-1111-1111-111111111101',
+            gameName: 'Lucky Slots',
+            totalBet: 320000,
+            totalWin: 288000,
+            totalSpin: 15420,
+            rtp: 0.90,
+            targetRtp: 0.92,
+            users: [
+              {
+                userId: 'u1111111-1111-1111-1111-111111111101',
+                username: 'player_alpha',
+                totalBet: 7,
+                totalWin: 6.5,
+                totalSpin: 5,
+                rtp: 0.9286,
+                sessions: [
+                  {
+                    sessionId: 'a1111111-1111-1111-1111-111111111101',
+                    userId: 'u1111111-1111-1111-1111-111111111101',
+                    username: 'player_alpha',
+                    gameId: 'g1111111-1111-1111-1111-111111111101',
+                    gameName: 'Lucky Slots',
+                    totalBet: 7,
+                    totalWin: 6.5,
+                    totalSpin: 5,
+                    rtp: 0.9286,
+                    startedAt: '2026-07-14T10:00:00Z',
+                    endedAt: '2026-07-14T10:05:00Z',
+                    spinLogs: DEMO_SPIN_LOGS,
+                  },
+                ],
+              },
+            ],
+          },
+          { gameId: 'g1111111-1111-1111-1111-111111111102', gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93, users: [] },
+          { gameId: 'g1111111-1111-1111-1111-111111111103', gameName: 'Vault Poker', totalBet: 180000, totalWin: 153000, totalSpin: 4200, rtp: 0.85, targetRtp: 0.90, users: [] },
+          { gameId: 'g1111111-1111-1111-1111-111111111104', gameName: 'Mega Wheel', totalBet: 179620, totalWin: 160133, totalSpin: 11200, rtp: 0.8915, targetRtp: 0.88, users: [] },
         ],
         rtpByUser: [
-          { username: 'player_alpha', totalBet: 45000, totalWin: 40500, totalSpin: 2100, rtp: 0.90 },
-          { username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045 },
-          { username: 'casual_joe', totalBet: 8500, totalWin: 6800, totalSpin: 420, rtp: 0.80 },
+          {
+            userId: 'u1111111-1111-1111-1111-111111111101',
+            username: 'player_alpha',
+            totalBet: 45000,
+            totalWin: 40500,
+            totalSpin: 2100,
+            rtp: 0.90,
+            sessions: [
+              {
+                sessionId: 'a1111111-1111-1111-1111-111111111101',
+                userId: 'u1111111-1111-1111-1111-111111111101',
+                username: 'player_alpha',
+                gameId: 'g1111111-1111-1111-1111-111111111101',
+                gameName: 'Lucky Slots',
+                totalBet: 7,
+                totalWin: 6.5,
+                totalSpin: 5,
+                rtp: 0.9286,
+                startedAt: '2026-07-14T10:00:00Z',
+                endedAt: '2026-07-14T10:05:00Z',
+                spinLogs: DEMO_SPIN_LOGS,
+              },
+            ],
+          },
+          { userId: 'u1111111-1111-1111-1111-111111111102', username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045, sessions: [] },
+          { userId: 'u1111111-1111-1111-1111-111111111103', username: 'casual_joe', totalBet: 8500, totalWin: 6800, totalSpin: 420, rtp: 0.80, sessions: [] },
         ],
         gamesAboveTargetRtp: [
           { gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93 },
@@ -1188,11 +1528,25 @@
     }
 
     function fmtInt(n) {
-      return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+      const num = Number(n);
+      const safe = Number.isFinite(num) ? num : 0;
+      return safe.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
 
     function escHtml(s) {
       return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escAttr(s) {
+      return escHtml(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function graphIconButton(kind, id, enabled = true, label = 'View graph') {
+      return '<button type="button" class="graph-btn" data-drill="' + escAttr(kind) +
+        '" data-id="' + escAttr(id) + '" title="' + escAttr(enabled ? label : 'No session spin data') +
+        '" aria-label="' + escAttr(label) + '"' + (enabled ? '' : ' disabled') + '>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19H20M7 15l4-4 3 2 5-6"></path></svg>' +
+        '</button>';
     }
 
     function valuesEqual(a, b) {
@@ -1210,7 +1564,8 @@
       if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed') {
         return '$' + fmtMoney(value);
       }
-      if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount' || fieldKey === 'totalGameUsers') return fmtInt(value);
+      if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount') return fmtInt(value);
+      if (fieldKey === 'totalGameUsers') return fmtInt(gameUsersCount(value));
       if (fieldKey === 'avgRating') return Number(value).toFixed(1);
       if (fieldKey === 'feedbackDate' || fieldKey === 'createdAt' || fieldKey === 'lastFeedbackDate' || fieldKey === 'date') {
         return fmtFeedbackDate(value);
@@ -1221,9 +1576,36 @@
       }
       if (fieldKey === 'feedbacks') {
         if (!Array.isArray(value) || value.length === 0) return '—';
-        return value.map((f) => Number(f.ratingStar || 0) + '/5: ' + (f.message || '')).join(' · ');
+        return value.map((f) => Number(f.ratingStar || 0) + '/5: ' + feedbackText(f)).join(' · ');
       }
       return String(value);
+    }
+
+    /** API may send totalGameUsers as a number or { count, users }. */
+    function gameUsersCount(value) {
+      if (value == null) return 0;
+      if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      if (typeof value === 'string') {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      if (typeof value === 'object') {
+        const raw = value.count ?? value.Count;
+        if (raw != null) {
+          const n = Number(raw);
+          if (Number.isFinite(n)) return n;
+        }
+        if (Array.isArray(value.users)) return value.users.length;
+        if (Array.isArray(value.Users)) return value.Users.length;
+      }
+      return 0;
+    }
+
+    /** API field renamed: feedback (new) / message (demo & older payloads). */
+    function feedbackText(entry) {
+      if (!entry || typeof entry !== 'object') return '';
+      const text = entry.feedback ?? entry.message;
+      return text == null ? '' : String(text).trim();
     }
 
     function getUserFeedbacksList(userRow) {
@@ -1234,10 +1616,22 @@
         return userRow.feedbackMessages.map((message) => ({
           ratingStar: null,
           message,
+          feedback: message,
           createdAt: userRow.feedbackDate ?? userRow.createdAt ?? userRow.lastFeedbackDate ?? userRow.date,
         }));
       }
       return [];
+    }
+
+    function sortFeedbacksByDate(items) {
+      return [...items].sort((a, b) => {
+        const da = parseFeedbackDate(a.createdAt);
+        const db = parseFeedbackDate(b.createdAt);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return db - da;
+      });
     }
 
     function filterFeedbacksByDate(feedbacks) {
@@ -1259,15 +1653,112 @@
     }
 
     function getVisibleFeedbacksForUser(userRow) {
-      return filterFeedbacksByDate(getUserFeedbacksList(userRow));
+      return sortFeedbacksByDate(filterFeedbacksByDate(getUserFeedbacksList(userRow)));
+    }
+
+    function localDateInputValue(d = new Date()) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function setDefaultFeedbackDateFilter() {
+      const today = localDateInputValue();
+      feedbackDateFromActive = today;
+      feedbackDateToActive = today;
+      if ($('feedbackDateFrom')) $('feedbackDateFrom').value = today;
+      if ($('feedbackDateTo')) $('feedbackDateTo').value = today;
+    }
+
+    function formatFilterDateLabel(isoDate) {
+      if (!isoDate) return '…';
+      const d = parseFeedbackDate(isoDate + 'T12:00:00');
+      if (!d) return isoDate;
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    function updateFeedbackFilterHint() {
+      const hint = $('feedbackFilterHint');
+      if (!hint) return;
+      if (!feedbackDateFromActive && !feedbackDateToActive) {
+        hint.textContent = '· all dates';
+        return;
+      }
+      const from = formatFilterDateLabel(feedbackDateFromActive);
+      const to = formatFilterDateLabel(feedbackDateToActive);
+      if (feedbackDateFromActive && feedbackDateToActive && feedbackDateFromActive === feedbackDateToActive) {
+        hint.textContent = '· ' + from + ' only';
+      } else {
+        hint.textContent = '· ' + from + ' – ' + to;
+      }
+    }
+
+    function isTodayDate(d) {
+      if (!d) return false;
+      const now = new Date();
+      return d.getFullYear() === now.getFullYear()
+        && d.getMonth() === now.getMonth()
+        && d.getDate() === now.getDate();
+    }
+
+    function relativeDateHint(d) {
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dateStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diffDays = Math.round((todayStart - dateStart) / 86400000);
+      if (diffDays <= 0) return '';
+      if (diffDays === 1) return 'yesterday';
+      if (diffDays < 30) return diffDays + ' days ago';
+      if (diffDays < 365) {
+        const months = Math.round(diffDays / 30);
+        return months === 1 ? '1 month ago' : months + ' months ago';
+      }
+      const years = Math.round(diffDays / 365);
+      return years === 1 ? '1 year ago' : years + ' years ago';
+    }
+
+    function fmtFeedbackDateTime(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+    }
+
+    function renderFeedbackDateHtml(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '<span class="empty">—</span>';
+      const text = fmtFeedbackDateTime(value);
+      if (isTodayDate(d)) {
+        return '<span class="feedback-date-today">' +
+          '<span class="feedback-today-badge">Today</span>' +
+          escHtml(text) +
+          '</span>';
+      }
+      const age = relativeDateHint(d);
+      return '<span class="feedback-date-other">' + escHtml(text) +
+        (age ? ' <span class="feedback-date-age">(' + escHtml(age) + ')</span>' : '') +
+        '</span>';
     }
 
     function feedbackDatesCell(userRow) {
       const items = getVisibleFeedbacksForUser(userRow);
       if (!items.length) return '<span class="empty">—</span>';
-      const dates = items.map((f) => fmtFeedbackDateTime(f.createdAt)).filter((d) => d !== '—');
-      if (!dates.length) return '<span class="empty">—</span>';
-      return escHtml(dates.join(' · '));
+      if (items.length === 1) return renderFeedbackDateHtml(items[0].createdAt);
+      return '<ul class="feedback-dates">' + items.map((f) =>
+        '<li>' + renderFeedbackDateHtml(f.createdAt) + '</li>'
+      ).join('') + '</ul>';
     }
 
     function feedbackStarsCell(userRow) {
@@ -1277,12 +1768,27 @@
         .filter((f) => f.ratingStar != null)
         .map((f) => Number(f.ratingStar).toFixed(1) + ' / 5');
       if (!stars.length) return '<span class="empty">—</span>';
-      return stars.map((s) => '<span class="badge rating-mid">' + escHtml(s) + '</span>').join(' <span class="empty">·</span> ');
+      if (stars.length === 1) {
+        return '<span class="badge rating-mid">' + escHtml(stars[0]) + '</span>';
+      }
+      return '<ul class="feedback-dates">' + stars.map((s) =>
+        '<li><span class="badge rating-mid">' + escHtml(s) + '</span></li>'
+      ).join('') + '</ul>';
+    }
+
+    function feedbackAvgRatingCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      const stars = items
+        .map((f) => Number(f.ratingStar))
+        .filter((n) => !Number.isNaN(n));
+      if (!stars.length) return ratingBadge(userRow.avgRating);
+      const avg = stars.reduce((s, n) => s + n, 0) / stars.length;
+      return ratingBadge(avg);
     }
 
     function feedbackMessagesCell(userRow) {
       const items = getVisibleFeedbacksForUser(userRow);
-      const messages = items.map((f) => f.message).filter(Boolean);
+      const messages = items.map((f) => feedbackText(f)).filter(Boolean);
       if (!messages.length) return '<span class="empty">—</span>';
       return '<ul class="feedback-messages">' + messages.map((m) =>
         '<li>' + escHtml(m) + '</li>'
@@ -1325,20 +1831,6 @@
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
-    }
-
-    function fmtFeedbackDateTime(value) {
-      const d = parseFeedbackDate(value);
-      if (!d) return '—';
-      return d.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     }
@@ -1388,6 +1880,7 @@
     function applyFeedbackDateFilter() {
       feedbackDateFromActive = $('feedbackDateFrom')?.value || '';
       feedbackDateToActive = $('feedbackDateTo')?.value || '';
+      updateFeedbackFilterHint();
       renderUserFeedbacksTable(true);
     }
 
@@ -1396,6 +1889,7 @@
       feedbackDateToActive = '';
       if ($('feedbackDateFrom')) $('feedbackDateFrom').value = '';
       if ($('feedbackDateTo')) $('feedbackDateTo').value = '';
+      updateFeedbackFilterHint();
       renderUserFeedbacksTable(true);
     }
 
@@ -1405,8 +1899,8 @@
         { label: 'Date', render: (r) => feedbackDatesCell(r) },
         { label: 'Username', key: 'username' },
         { label: 'User ID', render: (r) => '<span title="' + escHtml(r.userId || '') + '">' + escHtml(r.userId || '') + '</span>' },
-        { label: 'Feedback Count', render: (r) => fmtInt(r.feedBackCount) },
-        { label: 'Avg Rating', render: (r) => ratingBadge(r.avgRating) },
+        { label: 'Feedback Count', render: (r) => fmtInt(getVisibleFeedbacksForUser(r).length || r.feedBackCount) },
+        { label: 'Avg Rating', render: (r) => feedbackAvgRatingCell(r) },
         { label: 'Ratings', render: (r) => feedbackStarsCell(r) },
         { label: 'Messages', render: (r) => feedbackMessagesCell(r) },
       ];
@@ -1417,6 +1911,7 @@
         renderTable('userFeedbacksWrap', filtered, columns);
         setRowCount('countFeedbacks', filtered);
         updateFeedbackHeaderStats(filtered);
+        updateFeedbackFilterHint();
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-feedbacks"]');
         if (navLink) updateSectionNavCount('sec-feedbacks', filtered.length);
       };
@@ -1564,7 +2059,13 @@
         { key: 'totalGameUsers', label: 'Game Users' },
       ];
       for (const s of scalars) {
-        if (!valuesEqual(oldD[s.key], newD[s.key])) {
+        const oldVal = s.key === 'totalGameUsers'
+          ? gameUsersCount(oldD[s.key])
+          : oldD[s.key];
+        const newVal = s.key === 'totalGameUsers'
+          ? gameUsersCount(newD[s.key])
+          : newD[s.key];
+        if (!valuesEqual(oldVal, newVal)) {
           summaryRows.push({
             item: 'Summary',
             field: s.label,
@@ -1623,10 +2124,12 @@
     }
 
     function setDashboardViewMode() {
-      const inDiffMode = isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
-      show($('mainDashboard'), !inDiffMode);
+      const inDrillMode = drillStack.length > 0;
+      const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
+      show($('mainDashboard'), !inDiffMode && !inDrillMode);
       show($('diffCard'), inDiffMode);
-      if (inDiffMode) {
+      show($('drillDownCard'), inDrillMode);
+      if (inDiffMode || inDrillMode) {
         show($('jsonCard'), false);
         const jsonBtn = $('toggleJsonBtn');
         if (jsonBtn) jsonBtn.textContent = 'Show JSON';
@@ -1771,14 +2274,622 @@
 
       const head = '<tr>' + columns.map((c) => '<th>' + c.label + '</th>').join('') + '</tr>';
       const body = rows.map((row) =>
-        '<tr>' + columns.map((c) => '<td>' + (c.render ? c.render(row) : (row[c.key] ?? '')) + '</td>').join('') + '</tr>'
+        '<tr>' + columns.map((c) => '<td>' + (c.render ? c.render(row) : escHtml(row[c.key] ?? '')) + '</td>').join('') + '</tr>'
       ).join('');
 
       el.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
     }
 
+    function pushDrill(frame) {
+      drillStack.push(frame);
+      isDiffVisible = false;
+      renderDrillView();
+    }
+
+    function findSummaryRow(kind, id) {
+      const rows = kind === 'game'
+        ? currentDashboardData?.rtpByGame
+        : currentDashboardData?.rtpByUser;
+      const key = kind === 'game' ? 'gameId' : 'userId';
+      return (rows || []).find((row) => String(row[key]) === String(id));
+    }
+
+    function renderDrillView() {
+      const frame = drillStack[drillStack.length - 1];
+      setDashboardViewMode();
+      if (!frame) return;
+
+      show($('drillTableWrap'), frame.type !== 'spins');
+      show($('drillChartWrap'), frame.type === 'spins');
+
+      if (frame.type === 'game-users') {
+        const users = frame.game.users || [];
+        $('drillTitle').textContent = frame.game.gameName + ' · Users';
+        $('drillMeta').textContent = users.length + ' user' + (users.length === 1 ? '' : 's');
+        renderTable('drillTableWrap', users, [
+          { label: 'Username', render: (r) => escHtml(r.username) },
+          { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+          { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+          { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+          { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
+          {
+            label: 'Graph',
+            render: (r) => graphIconButton('game-user', r.userId, (r.sessions || []).length > 0, 'View user sessions'),
+          },
+        ]);
+        return;
+      }
+
+      if (frame.type === 'sessions') {
+        const sessions = frame.sessions || [];
+        $('drillTitle').textContent = frame.title + ' · Sessions';
+        $('drillMeta').textContent = sessions.length + ' session' + (sessions.length === 1 ? '' : 's');
+        renderTable('drillTableWrap', sessions, [
+          { label: 'Started', render: (r) => escHtml(fmtFeedbackDateTime(r.startedAt)) },
+          { label: 'Game', render: (r) => escHtml(r.gameName) },
+          { label: 'Username', render: (r) => escHtml(r.username) },
+          { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+          { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+          { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+          { label: 'RTP', render: (r) => fmtRtp(r.rtp) },
+          {
+            label: 'Graph',
+            render: (r) => graphIconButton('session', r.sessionId, Number(r.totalSpin) > 0, 'View session spin graph'),
+          },
+        ]);
+        return;
+      }
+
+      const session = frame.session;
+      const spins = session.spinLogs || [];
+      const totalBet = spins.reduce((sum, spin) => sum + Number(spin.betAmount || 0), 0);
+      const totalWin = spins.reduce((sum, spin) => sum + Number(spin.winAmount || 0), 0);
+      $('drillTitle').textContent = session.username + ' · ' + session.gameName + ' · Spin Graph';
+      $('drillMeta').textContent = spins.length + ' spin' + (spins.length === 1 ? '' : 's');
+      $('chartSummary').innerHTML = [
+        ['Session Total Bet', '$' + fmtMoney(totalBet || session.totalBet)],
+        ['Session Total Win', '$' + fmtMoney(totalWin || session.totalWin)],
+        ['Session RTP', fmtRtp(totalBet ? totalWin / totalBet : session.rtp)],
+        ['Spins', fmtInt(spins.length)],
+        ['Started', fmtFeedbackDateTime(session.startedAt)],
+      ].map((item) =>
+        '<div class="chart-stat"><span>' + escHtml(item[0]) + '</span><strong>' + escHtml(item[1]) + '</strong></div>'
+      ).join('');
+      activeChartSpins = spins;
+      resetSpinChartZoom(spins.length, false);
+      window.requestAnimationFrame(() => renderSpinChart(spins));
+    }
+
+    function resetSpinChartZoom(spinCount = activeChartSpins.length, redraw = true) {
+      const n = Math.max(0, Number(spinCount) || 0);
+      chartViewStart = 0;
+      chartViewEnd = Math.max(0, n - 1);
+      chartPanState = null;
+      hoveredSpinIndex = -1;
+      updateSpinZoomControls();
+      if (redraw && activeChartSpins.length) renderSpinChart(activeChartSpins);
+    }
+
+    function clampChartView(start, end, spinCount) {
+      const n = Math.max(1, spinCount);
+      const minWindow = Math.min(n, Math.max(6, Math.ceil(n * 0.08)));
+      let s = Math.max(0, Math.min(n - 1, Math.floor(start)));
+      let e = Math.max(0, Math.min(n - 1, Math.ceil(end)));
+      if (e < s) e = s;
+      let windowSize = e - s + 1;
+      if (windowSize < minWindow) {
+        const mid = (s + e) / 2;
+        s = Math.floor(mid - (minWindow - 1) / 2);
+        e = s + minWindow - 1;
+        if (s < 0) {
+          s = 0;
+          e = minWindow - 1;
+        }
+        if (e > n - 1) {
+          e = n - 1;
+          s = Math.max(0, e - minWindow + 1);
+        }
+        windowSize = e - s + 1;
+      }
+      if (windowSize > n) {
+        s = 0;
+        e = n - 1;
+      }
+      return { start: s, end: e };
+    }
+
+    function updateSpinZoomControls() {
+      const n = activeChartSpins.length;
+      const hint = $('spinZoomHint');
+      const zoomInBtn = $('spinZoomInBtn');
+      const zoomOutBtn = $('spinZoomOutBtn');
+      const resetBtn = $('spinZoomResetBtn');
+      if (!n) {
+        if (hint) hint.textContent = 'Scroll to zoom · drag to pan';
+        if (zoomInBtn) zoomInBtn.disabled = true;
+        if (zoomOutBtn) zoomOutBtn.disabled = true;
+        if (resetBtn) resetBtn.disabled = true;
+        return;
+      }
+      const visible = chartViewEnd - chartViewStart + 1;
+      const fullyZoomedOut = chartViewStart <= 0 && chartViewEnd >= n - 1;
+      const minWindow = Math.min(n, Math.max(6, Math.ceil(n * 0.08)));
+      if (hint) {
+        hint.textContent = fullyZoomedOut
+          ? 'Scroll to zoom · drag to pan'
+          : 'Spins ' + fmtInt(chartViewStart + 1) + '–' + fmtInt(chartViewEnd + 1) + ' of ' + fmtInt(n);
+      }
+      if (zoomInBtn) zoomInBtn.disabled = visible <= minWindow;
+      if (zoomOutBtn) zoomOutBtn.disabled = fullyZoomedOut;
+      if (resetBtn) resetBtn.disabled = fullyZoomedOut;
+    }
+
+    function zoomSpinChart(factor, anchorRatio = 0.5) {
+      const n = activeChartSpins.length;
+      if (!n) return;
+      const visible = chartViewEnd - chartViewStart + 1;
+      const nextVisible = Math.round(visible * factor);
+      const anchor = chartViewStart + anchorRatio * (visible - 1);
+      const half = (nextVisible - 1) / 2;
+      const clamped = clampChartView(anchor - half, anchor + half, n);
+      chartViewStart = clamped.start;
+      chartViewEnd = clamped.end;
+      updateSpinZoomControls();
+      hideSpinChartTooltip();
+      renderSpinChart(activeChartSpins, hoveredSpinIndex);
+    }
+
+    function renderSpinChart(spins, hoverIndex = -1) {
+      const canvas = $('spinChart');
+      if (!canvas || !Array.isArray(spins) || !spins.length || canvas.offsetParent === null) return;
+
+      if (chartViewEnd < chartViewStart || chartViewEnd >= spins.length) {
+        chartViewStart = 0;
+        chartViewEnd = spins.length - 1;
+      }
+
+      const width = Math.max(canvas.parentElement.clientWidth - 32, 320);
+      const height = 360;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      const pad = { left: 58, right: 18, top: 18, bottom: 42 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+      const viewStart = chartViewStart;
+      const viewEnd = chartViewEnd;
+      const visibleSpins = spins.slice(viewStart, viewEnd + 1);
+      const visibleCount = visibleSpins.length;
+      const bets = visibleSpins.map((s) => Number(s.betAmount || 0));
+      const wins = visibleSpins.map((s) => Number(s.winAmount || 0));
+      const maxValue = Math.max(1, ...bets, ...wins) * 1.08;
+      const slotW = plotW / visibleCount;
+      const barW = Math.max(2, Math.min(18, slotW * 0.42));
+      const xCenter = (i) => pad.left + (i + 0.5) * slotW;
+      const yAt = (value) => pad.top + plotH - (Number(value || 0) / maxValue) * plotH;
+
+      // Soft plot background
+      ctx.fillStyle = 'rgba(255,255,255,0.015)';
+      ctx.fillRect(pad.left, pad.top, plotW, plotH);
+
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillStyle = '#8b9bb0';
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i += 1) {
+        const y = pad.top + (plotH * i / 4);
+        const value = maxValue * (1 - i / 4);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(width - pad.right, y);
+        ctx.stroke();
+        ctx.textAlign = 'right';
+        ctx.fillText('$' + fmtNum(value), pad.left - 8, y + 3);
+      }
+
+      // Bet bars
+      visibleSpins.forEach((spin, i) => {
+        const cx = xCenter(i);
+        const bet = Number(spin.betAmount || 0);
+        const betY = yAt(bet);
+        const active = (viewStart + i) === hoverIndex;
+        ctx.fillStyle = active ? 'rgba(66, 165, 245, 0.95)' : 'rgba(66, 165, 245, 0.55)';
+        ctx.fillRect(cx - barW / 2, betY, barW, pad.top + plotH - betY);
+      });
+
+      // Win area + line
+      if (visibleCount > 0) {
+        ctx.beginPath();
+        visibleSpins.forEach((spin, i) => {
+          const x = xCenter(i);
+          const y = yAt(spin.winAmount);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.lineTo(xCenter(visibleCount - 1), pad.top + plotH);
+        ctx.lineTo(xCenter(0), pad.top + plotH);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        grad.addColorStop(0, 'rgba(102, 187, 106, 0.28)');
+        grad.addColorStop(1, 'rgba(102, 187, 106, 0.02)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        visibleSpins.forEach((spin, i) => {
+          const x = xCenter(i);
+          const y = yAt(spin.winAmount);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = 'rgba(102, 187, 106, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      }
+
+      if (hoverIndex >= viewStart && hoverIndex <= viewEnd) {
+        const localIndex = hoverIndex - viewStart;
+        const spin = spins[hoverIndex];
+        const cx = xCenter(localIndex);
+        const winY = yAt(spin.winAmount);
+        const betY = yAt(spin.betAmount);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cx, pad.top);
+        ctx.lineTo(cx, pad.top + plotH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.beginPath();
+        ctx.arc(cx, betY, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#42a5f5';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, winY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#66bb6a';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+      }
+
+      // X labels — first, mid (when zoomed), last
+      ctx.fillStyle = '#8b9bb0';
+      ctx.textAlign = 'left';
+      const firstSpin = visibleSpins[0];
+      const lastSpin = visibleSpins[visibleCount - 1];
+      const firstLabel = 'Spin ' + fmtInt(firstSpin.spinIndex ?? viewStart + 1);
+      const lastLabel = 'Spin ' + fmtInt(lastSpin.spinIndex ?? viewEnd + 1);
+      ctx.fillText(firstLabel, pad.left, height - 14);
+      ctx.fillText(lastLabel, width - pad.right - ctx.measureText(lastLabel).width, height - 14);
+      if (visibleCount > 12) {
+        const mid = Math.floor(visibleCount / 2);
+        const midSpin = visibleSpins[mid];
+        const midLabel = 'Spin ' + fmtInt(midSpin.spinIndex ?? viewStart + mid + 1);
+        ctx.textAlign = 'center';
+        ctx.fillText(midLabel, xCenter(mid), height - 14);
+      }
+
+      canvas._chartMeta = {
+        spins,
+        pad,
+        plotW,
+        plotH,
+        slotW,
+        width,
+        height,
+        viewStart,
+        viewEnd,
+        xAt: (globalIndex) => xCenter(globalIndex - viewStart),
+        yAt,
+        localXAt: xCenter,
+      };
+      updateSpinZoomControls();
+    }
+
+    function spinIndexFromPointer(meta, x) {
+      if (!meta?.spins?.length) return -1;
+      const local = Math.floor((x - meta.pad.left) / meta.slotW);
+      if (local < 0 || local > meta.viewEnd - meta.viewStart) return -1;
+      return meta.viewStart + local;
+    }
+
+    function updateSpinChartTooltip(e) {
+      const canvas = $('spinChart');
+      const tooltip = $('spinChartTooltip');
+      const panel = canvas?.parentElement;
+      const meta = canvas?._chartMeta;
+      if (!canvas || !tooltip || !panel || !meta?.spins?.length) return;
+      if (chartPanState) {
+        show(tooltip, false);
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      if (x < meta.pad.left || x > meta.width - meta.pad.right || y < meta.pad.top || y > meta.height - meta.pad.bottom) {
+        if (hoveredSpinIndex !== -1) {
+          hoveredSpinIndex = -1;
+          renderSpinChart(meta.spins, -1);
+        }
+        show(tooltip, false);
+        return;
+      }
+
+      const index = spinIndexFromPointer(meta, x);
+      if (index < 0) {
+        show(tooltip, false);
+        return;
+      }
+      const spin = meta.spins[index];
+      const pointX = meta.xAt(index);
+      const pointY = Math.min(meta.yAt(spin.betAmount), meta.yAt(spin.winAmount));
+
+      if (hoveredSpinIndex !== index) {
+        hoveredSpinIndex = index;
+        renderSpinChart(meta.spins, index);
+      }
+
+      tooltip.innerHTML =
+        '<strong>Spin ' + escHtml(spin.spinIndex) + '</strong>' +
+        '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Time</span><b>' + escHtml(fmtFeedbackDateTime(spin.createdAt)) + '</b></div>';
+
+      const tipW = tooltip.offsetWidth || 190;
+      const tipH = tooltip.offsetHeight || 110;
+      const panelW = panel.clientWidth;
+      let left = pointX;
+      let top = Math.min(pointY, y) - 8;
+      left = Math.max(tipW / 2 + 8, Math.min(panelW - tipW / 2 - 8, left));
+      top = Math.max(tipH + 8, top);
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+      tooltip.style.right = 'auto';
+      show(tooltip, true);
+    }
+
+    function hideSpinChartTooltip() {
+      const tooltip = $('spinChartTooltip');
+      if (tooltip) show(tooltip, false);
+      if (hoveredSpinIndex !== -1) {
+        hoveredSpinIndex = -1;
+        if (activeChartSpins.length) renderSpinChart(activeChartSpins, -1);
+      }
+    }
+
+    function onSpinChartWheel(e) {
+      const canvas = $('spinChart');
+      const meta = canvas?._chartMeta;
+      if (!meta?.spins?.length) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const plotLeft = meta.pad.left;
+      const plotRight = meta.width - meta.pad.right;
+      const ratio = x <= plotLeft
+        ? 0
+        : x >= plotRight
+          ? 1
+          : (x - plotLeft) / (plotRight - plotLeft);
+      const factor = e.deltaY < 0 ? 0.72 : 1.38;
+      zoomSpinChart(factor, ratio);
+    }
+
+    function onSpinChartPointerDown(e) {
+      const canvas = $('spinChart');
+      const meta = canvas?._chartMeta;
+      if (!meta?.spins?.length || e.button !== 0) return;
+      const visible = meta.viewEnd - meta.viewStart + 1;
+      if (visible >= meta.spins.length) return;
+      chartPanState = {
+        startX: e.clientX,
+        originStart: chartViewStart,
+        originEnd: chartViewEnd,
+        slotW: meta.slotW,
+      };
+      canvas.classList.add('is-panning');
+      hideSpinChartTooltip();
+      e.preventDefault();
+    }
+
+    function onSpinChartPointerMove(e) {
+      if (!chartPanState) {
+        updateSpinChartTooltip(e);
+        return;
+      }
+      const deltaPx = e.clientX - chartPanState.startX;
+      const deltaSpins = Math.round(-deltaPx / chartPanState.slotW);
+      const n = activeChartSpins.length;
+      const windowSize = chartPanState.originEnd - chartPanState.originStart + 1;
+      let s = chartPanState.originStart + deltaSpins;
+      let eIdx = s + windowSize - 1;
+      if (s < 0) {
+        s = 0;
+        eIdx = windowSize - 1;
+      }
+      if (eIdx > n - 1) {
+        eIdx = n - 1;
+        s = Math.max(0, eIdx - windowSize + 1);
+      }
+      if (s !== chartViewStart || eIdx !== chartViewEnd) {
+        chartViewStart = s;
+        chartViewEnd = eIdx;
+        updateSpinZoomControls();
+        renderSpinChart(activeChartSpins, -1);
+      }
+    }
+
+    function onSpinChartPointerUp() {
+      const canvas = $('spinChart');
+      if (canvas) canvas.classList.remove('is-panning');
+      chartPanState = null;
+    }
+
+    async function fetchUserSessions(userId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/users/' + encodeURIComponent(userId) + '/sessions';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.sessions || [];
+    }
+
+    async function fetchGameUsers(gameId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/games/' + encodeURIComponent(gameId) + '/users';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.users || [];
+    }
+
+    async function fetchSessionSpins(sessionId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/sessions/' + encodeURIComponent(sessionId) + '/spins';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.spinLogs || [];
+    }
+
+    async function openUserSessions(userRow) {
+      if (isDrillLoading || !userRow) return;
+      isDrillLoading = true;
+      setError('');
+      $('drillTitle').textContent = 'Loading sessions for ' + (userRow.username || 'user') + '…';
+      show($('mainDashboard'), false);
+      show($('diffCard'), false);
+      show($('drillDownCard'), true);
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      $('drillMeta').textContent = '';
+
+      try {
+        let sessions = userRow.sessions;
+        if (!isDemoMode()) {
+          sessions = await fetchUserSessions(userRow.userId);
+        } else if (!Array.isArray(sessions)) {
+          sessions = [];
+        }
+        pushDrill({
+          type: 'sessions',
+          title: userRow.username,
+          sessions,
+        });
+      } catch (err) {
+        setDashboardViewMode();
+        setError(err.message || 'Failed to load user sessions');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    async function openGameUsers(gameRow) {
+      if (isDrillLoading || !gameRow) return;
+      isDrillLoading = true;
+      setError('');
+      $('drillTitle').textContent = 'Loading users for ' + (gameRow.gameName || 'game') + '…';
+      show($('mainDashboard'), false);
+      show($('diffCard'), false);
+      show($('drillDownCard'), true);
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      $('drillMeta').textContent = '';
+
+      try {
+        let users = gameRow.users;
+        if (!isDemoMode()) {
+          users = await fetchGameUsers(gameRow.gameId);
+        } else if (!Array.isArray(users)) {
+          users = [];
+        }
+        pushDrill({
+          type: 'game-users',
+          game: { ...gameRow, users },
+        });
+      } catch (err) {
+        setDashboardViewMode();
+        setError(err.message || 'Failed to load game users');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    async function openSessionGraph(session) {
+      if (isDrillLoading || !session) return;
+      isDrillLoading = true;
+      const savedTitle = $('drillTitle').textContent;
+      $('drillTitle').textContent = 'Loading session spins…';
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      setDashboardViewMode();
+
+      try {
+        let spinLogs = session.spinLogs;
+        if (!isDemoMode()) {
+          spinLogs = await fetchSessionSpins(session.sessionId);
+        } else if (!Array.isArray(spinLogs)) {
+          spinLogs = [];
+        }
+        pushDrill({ type: 'spins', session: { ...session, spinLogs } });
+      } catch (err) {
+        $('drillTitle').textContent = savedTitle;
+        show($('drillTableWrap'), true);
+        setError(err.message || 'Failed to load session spins');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    function handleDrillClick(button) {
+      const kind = button.dataset.drill;
+      const id = button.dataset.id;
+
+      if (kind === 'game' || kind === 'user') {
+        const row = findSummaryRow(kind, id);
+        if (!row) return;
+        if (kind === 'game') openGameUsers(row);
+        else openUserSessions(row);
+        return;
+      }
+
+      const frame = drillStack[drillStack.length - 1];
+      if (kind === 'game-user' && frame?.type === 'game-users') {
+        const user = (frame.game.users || []).find((row) => String(row.userId) === String(id));
+        if (user) {
+          pushDrill({
+            type: 'sessions',
+            title: user.username + ' · ' + frame.game.gameName,
+            sessions: user.sessions || [],
+          });
+        }
+        return;
+      }
+
+      if (kind === 'session' && frame?.type === 'sessions') {
+        const session = (frame.sessions || []).find((row) => String(row.sessionId) === String(id));
+        if (session) openSessionGraph(session);
+      }
+    }
+
     function renderDashboard(data) {
       const d = data?.data || {};
+      currentDashboardData = d;
       const feedbacks = d.userFeedbacks || [];
       const totalFeedbackCount = feedbacks.reduce((s, r) => s + Number(r.feedBackCount || 0), 0);
       const avgFeedbackRating = feedbacks.length
@@ -1788,7 +2899,7 @@
       $('kpiGrid').innerHTML = [
         { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged), icon: '💰', tone: 'kpi-money' },
         { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed), icon: '💸', tone: 'kpi-redeem' },
-        { label: 'Game Users', value: fmtInt(d.totalGameUsers), icon: '👥', tone: 'kpi-users' },
+        { label: 'Game Users', value: fmtInt(gameUsersCount(d.totalGameUsers)), icon: '👥', tone: 'kpi-users' },
         {
           label: 'Whole Game RTP',
           value: fmtRtp(d.wholeGameRtp?.rtp),
@@ -1811,7 +2922,7 @@
       ).join('');
 
       const gameRtpCols = [
-        { label: 'Game', key: 'gameName' },
+        { label: 'Game', render: (r) => escHtml(r.gameName) },
         { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
         { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
         { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
@@ -1823,14 +2934,22 @@
             ? '<span class="badge warn">Above target</span>'
             : '<span class="badge ok">Below target</span>',
         },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('game', r.gameId, Number(r.totalSpin) > 0, 'View game users and sessions'),
+        },
       ];
 
       const userRtpCols = [
-        { label: 'Username', key: 'username' },
+        { label: 'Username', render: (r) => escHtml(r.username) },
         { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
         { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
         { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
         { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('user', r.userId, Number(r.totalSpin) > 0, 'View user sessions'),
+        },
       ];
 
       renderTable('rtpByGameWrap', d.rtpByGame, gameRtpCols);
@@ -1917,7 +3036,8 @@
       }
 
       pushResponseHistory(json);
-      renderDashboard(json);
+      if (!drillStack.length) renderDashboard(json);
+      else currentDashboardData = json?.data || {};
       const time = new Date().toLocaleTimeString();
       setConn('ok', 'API · last updated ' + time);
       setError('');
@@ -2083,11 +3203,17 @@
       toggleRefreshPaused();
     });
     $('dataSource').addEventListener('change', () => {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
       resetRefreshTimer();
       if (isDemoMode()) clearResponseHistory();
       loadData(false);
     });
     $('responseHistory').addEventListener('change', () => {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
       showHistoryAt(Number($('responseHistory').value));
     });
     $('targetRtpFilter').addEventListener('change', () => {
@@ -2118,11 +3244,43 @@
         $('diffCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
+    $('dashboard').addEventListener('click', (e) => {
+      const button = e.target.closest('[data-drill]');
+      if (button && !button.disabled && !isDrillLoading) handleDrillClick(button);
+    });
+    $('drillBackBtn').addEventListener('click', () => {
+      drillStack.pop();
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      if (drillStack.length) renderDrillView();
+      else setDashboardViewMode();
+    });
+    $('spinZoomInBtn').addEventListener('click', () => zoomSpinChart(0.65, 0.5));
+    $('spinZoomOutBtn').addEventListener('click', () => zoomSpinChart(1.45, 0.5));
+    $('spinZoomResetBtn').addEventListener('click', () => resetSpinChartZoom());
+    $('spinChart').addEventListener('mousemove', onSpinChartPointerMove);
+    $('spinChart').addEventListener('mousedown', onSpinChartPointerDown);
+    $('spinChart').addEventListener('mouseleave', () => {
+      onSpinChartPointerUp();
+      hideSpinChartTooltip();
+    });
+    window.addEventListener('mouseup', onSpinChartPointerUp);
+    $('spinChart').addEventListener('wheel', onSpinChartWheel, { passive: false });
+    window.addEventListener('resize', () => {
+      if (drillStack[drillStack.length - 1]?.type === 'spins') {
+        hideSpinChartTooltip();
+        renderSpinChart(activeChartSpins);
+      }
+    });
 
     function initPage() {
       isDiffVisible = false;
+      drillStack = [];
       isTabHidden = document.hidden;
       clearResponseHistory();
+      setDefaultFeedbackDateFilter();
+      updateFeedbackFilterHint();
       updateDataSourceUi();
       startRefreshClock();
       loadData(false);
