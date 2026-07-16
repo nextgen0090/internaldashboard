@@ -7,12 +7,13 @@ set "BACKEND_URL=http://localhost:5036"
 
 echo.
 echo ========================================
-echo   Game Vault - DB Visual Report
+echo   Game Vault - Internal Dashboard
 echo ========================================
 echo.
-echo URL:   http://localhost:%PORT%
-echo API:   %BACKEND_URL%
+echo Local:  http://localhost:%PORT%
+echo API:    %BACKEND_URL%/api/*  (local .NET)
 echo.
+echo Vercel: /api/* proxies to https://gamevault222.com/api/*
 echo Do NOT use: python -m http.server
 echo.
 

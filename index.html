@@ -3154,18 +3154,28 @@
       } catch (err) {
         setConn('err', isAutoRefresh ? 'Refresh failed' : 'Failed');
         let msg = err.message || String(err);
+        const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
         if (msg === 'STATIC_404') {
           msg = 'You started python -m http.server — that cannot proxy /api.\n\n'
             + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.';
         } else if (msg === 'Failed to fetch') {
-          msg = 'Cannot reach API.\n\n'
-            + '1. .NET backend must run on http://localhost:5036\n'
-            + '2. Double-click start.bat (not python -m http.server)\n'
-            + '3. Or switch Data source to Demo to preview without the backend';
+          msg = isLocal
+            ? ('Cannot reach API.\n\n'
+              + '1. .NET backend must run on http://localhost:5036\n'
+              + '2. Double-click start.bat (not python -m http.server)\n'
+              + '3. Or switch Data source to Demo to preview without the backend')
+            : ('Cannot reach API.\n\n'
+              + 'The dashboard proxies /api to https://gamevault222.com/api/\n'
+              + 'Check that the live API is up, then retry Load.\n'
+              + 'Or switch Data source to Demo to preview without the backend');
         } else if (/Proxy error/i.test(msg) || /WinError 10061/i.test(msg)) {
-          msg = 'Backend not reachable at http://localhost:5036\n\n'
-            + 'Start the .NET API, then click Load or wait for auto-refresh.\n'
-            + 'Showing last successful data if available.';
+          msg = isLocal
+            ? ('Backend not reachable at http://localhost:5036\n\n'
+              + 'Start the .NET API, then click Load or wait for auto-refresh.\n'
+              + 'Showing last successful data if available.')
+            : ('Backend not reachable at https://gamevault222.com\n\n'
+              + 'Check the live API, then click Load or wait for auto-refresh.\n'
+              + 'Showing last successful data if available.');
         }
         if (!isAutoRefresh) {
           setError(msg);
