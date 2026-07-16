@@ -1,0 +1,3315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Game Vault 2.0 — Internal Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-elevated: #121820;
+      --card: rgba(22, 30, 42, 0.88);
+      --card-hover: rgba(28, 38, 54, 0.95);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(66, 165, 245, 0.28);
+      --text: #eef3f9;
+      --muted: #8b9bb0;
+      --accent: #42a5f5;
+      --accent-glow: rgba(66, 165, 245, 0.22);
+      --ok: #4caf50;
+      --warn: #ff9800;
+      --err: #f44336;
+      --money: #66bb6a;
+      --redeem: #ffa726;
+      --users: #42a5f5;
+      --rtp: #ab47bc;
+      --feedback: #ffd54f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 90% 70% at 15% -10%, rgba(66, 165, 245, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 50% at 95% 10%, rgba(171, 71, 188, 0.12), transparent 45%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(76, 175, 80, 0.08), transparent 50%),
+        var(--bg);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1920px, 98vw);
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    header {
+      margin-bottom: 1.75rem;
+    }
+
+    .header-panel {
+      padding: 1.35rem 1.5rem;
+      border-radius: 18px;
+      border: 1px solid var(--border-strong);
+      background:
+        linear-gradient(135deg, rgba(66, 165, 245, 0.1), rgba(22, 30, 42, 0.92) 45%),
+        var(--card);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: linear-gradient(135deg, #1565c0, #42a5f5);
+      box-shadow: 0 8px 20px rgba(66, 165, 245, 0.35);
+    }
+
+    .title-badge {
+      display: inline-block;
+      margin-left: 0.5rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #b3d9ff;
+      border: 1px solid rgba(66, 165, 245, 0.35);
+      background: rgba(66, 165, 245, 0.12);
+      vertical-align: middle;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: end;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(10, 14, 20, 0.55);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      margin-top: 1rem;
+    }
+
+    .controls-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      margin-bottom: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .card h2 {
+      margin: 0 0 1rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .card h2::before {
+      content: "";
+      width: 4px;
+      height: 1.1rem;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #42a5f5, #ab47bc);
+      flex-shrink: 0;
+    }
+
+    .row-count {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      transition: opacity 0.28s ease;
+    }
+
+    .row-count.is-updating {
+      opacity: 0.45;
+    }
+
+    .section-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+      padding: 0.55rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(10, 14, 20, 0.55);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .section-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.55rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .section-nav a:hover {
+      background: rgba(66, 165, 245, 0.12);
+      border-color: rgba(66, 165, 245, 0.28);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-nav-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .section-nav-label {
+      color: #c5d4e6;
+      white-space: nowrap;
+    }
+
+    .section-nav-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.6rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #b3d9ff;
+      background: rgba(66, 165, 245, 0.16);
+      border: 1px solid rgba(66, 165, 245, 0.28);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .section-nav a[data-tone="warn"] .section-nav-count {
+      color: #ffcc80;
+      background: rgba(255, 152, 0, 0.16);
+      border-color: rgba(255, 152, 0, 0.3);
+    }
+
+    .section-nav a[data-tone="ok"] .section-nav-count {
+      color: #a5d6a7;
+      background: rgba(76, 175, 80, 0.16);
+      border-color: rgba(76, 175, 80, 0.3);
+    }
+
+    .section-nav a[data-tone="feedback"] .section-nav-count {
+      color: #ffe082;
+      background: rgba(255, 213, 79, 0.14);
+      border-color: rgba(255, 213, 79, 0.28);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .field { flex: 1; min-width: 240px; }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input, select, button {
+      font: inherit;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 20, 25, 0.65);
+      color: var(--text);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .field-narrow {
+      flex: 0 0 160px;
+      min-width: 160px;
+    }
+
+    .field-history {
+      flex: 0 0 240px;
+      min-width: 240px;
+    }
+
+    .section-toolbar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .section-toolbar .field-narrow {
+      flex: 0 0 180px;
+      min-width: 180px;
+    }
+
+    .section-toolbar-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .section-header-row h2 {
+      margin: 0;
+    }
+
+    .section-header-row h2::before {
+      display: none;
+    }
+
+    .section-toolbar-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: nowrap;
+      margin-bottom: 0;
+    }
+
+    .inline-field {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .inline-field label {
+      margin: 0;
+      white-space: nowrap;
+      font-size: 0.8rem;
+    }
+
+    .inline-field select {
+      width: auto;
+      min-width: 150px;
+      padding: 0.55rem 0.65rem;
+    }
+
+    .inline-field input[type="date"] {
+      width: auto;
+      min-width: 150px;
+      padding: 0.55rem 0.65rem;
+    }
+
+    .section-toolbar-inline .section-toolbar-actions {
+      align-items: center;
+    }
+
+    .section-toolbar-inline button {
+      padding: 0.55rem 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .section-toolbar-inline {
+        flex-wrap: wrap;
+        width: 100%;
+      }
+    }
+
+    input[type="date"] {
+      color-scheme: dark;
+    }
+
+    #dataSource {
+      font-weight: 600;
+      border-color: rgba(66, 165, 245, 0.5);
+      background: #fff;
+      color: #000;
+    }
+
+    #dataSource option {
+      color: #000;
+      background: #fff;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 0.7rem 1.1rem;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #1565c0, #42a5f5);
+      color: #fff;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(66, 165, 245, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(66, 165, 245, 0.32);
+    }
+
+    button.secondary,
+    a.btn-link {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    button.secondary:hover:not(:disabled),
+    a.btn-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    a.btn-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      padding: 0.7rem 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    a.btn-link:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .refresh-timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.82rem;
+      color: #b3d9ff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .refresh-timer strong {
+      color: var(--text);
+      min-width: 1.5rem;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      z-index: 9999;
+      padding: 0.85rem 1.1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(76, 175, 80, 0.35);
+      background: rgba(20, 45, 30, 0.95);
+      color: #b9f6ca;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .dot.ok { background: var(--ok); box-shadow: 0 0 6px 1px rgba(76, 175, 80, 0.5); }
+    .dot.err { background: var(--err); box-shadow: 0 0 6px 1px rgba(244, 67, 54, 0.4); }
+    .dot.busy { background: var(--warn); }
+
+    .error {
+      color: #ffb4ab;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      white-space: pre-wrap;
+    }
+
+    .hidden { display: none !important; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .kpi {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(15, 20, 28, 0.5));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem 1.15rem 1.15rem 1.15rem;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .kpi::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--kpi-accent, var(--accent));
+      opacity: 0.9;
+    }
+
+    .kpi::after {
+      content: "";
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--kpi-accent, var(--accent));
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .kpi:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+    }
+
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .kpi-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .kpi.kpi-money { --kpi-accent: var(--money); }
+    .kpi.kpi-redeem { --kpi-accent: var(--redeem); }
+    .kpi.kpi-users { --kpi-accent: var(--users); }
+    .kpi.kpi-rtp { --kpi-accent: var(--rtp); }
+    .kpi.kpi-feedback { --kpi-accent: var(--feedback); }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi-sub {
+      margin-top: 0.45rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .section-grid .card {
+      min-width: 0;
+    }
+
+    @media (max-width: 1200px) {
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.62rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    tbody tr:hover {
+      background: rgba(66, 165, 245, 0.08);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      position: sticky;
+      top: 0;
+      background: rgba(35, 47, 62, 0.98);
+    }
+
+    .table-wrap {
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .table-wrap.tall {
+      max-height: min(70vh, 720px);
+      min-height: 320px;
+    }
+
+    .table-wrap.smooth-update {
+      scroll-behavior: smooth;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    .table-wrap.smooth-update.is-updating {
+      opacity: 0.25;
+      transform: translateY(6px);
+    }
+
+    #targetRtpFilter {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #targetRtpFilter:focus {
+      border-color: rgba(66, 165, 245, 0.65);
+      box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.15);
+      outline: none;
+    }
+
+    .rtp-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+
+    .rtp-bar-wrap > span {
+      font-size: 0.78rem;
+    }
+
+    .rtp-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .rtp-bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #1976d2, #42a5f5);
+    }
+
+    .rtp-bar.over > span { background: linear-gradient(90deg, #e65100, #ff9800); }
+
+    .graph-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.1rem;
+      height: 2.1rem;
+      padding: 0;
+      border-radius: 9px;
+      background: rgba(66, 165, 245, 0.12);
+      border: 1px solid rgba(66, 165, 245, 0.3);
+      box-shadow: none;
+      color: #90caf9;
+    }
+
+    .graph-btn:hover:not(:disabled) {
+      background: rgba(66, 165, 245, 0.22);
+      box-shadow: 0 6px 16px rgba(66, 165, 245, 0.18);
+    }
+
+    .graph-btn svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .drill-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .drill-toolbar h2 {
+      margin: 0;
+      flex: 1;
+    }
+
+    .chart-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .chart-stat {
+      padding: 0.75rem 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .chart-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .chart-stat strong {
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .spin-chart-panel {
+      position: relative;
+      min-height: 410px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 78% 12%, rgba(76, 175, 80, 0.09), transparent 24%),
+        linear-gradient(180deg, rgba(15, 22, 32, 0.82), rgba(8, 12, 18, 0.86));
+      overflow: hidden;
+    }
+
+    .spin-chart-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.65rem;
+    }
+
+    .spin-chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: #c5d4e6;
+      font-size: 0.78rem;
+    }
+
+    .spin-chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .spin-chart-legend i {
+      display: inline-block;
+      width: 12px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .spin-chart-legend .leg-bet { background: #42a5f5; }
+    .spin-chart-legend .leg-win {
+      background: linear-gradient(180deg, rgba(102, 187, 106, 0.95), rgba(102, 187, 106, 0.35));
+      border-top: 2px solid #66bb6a;
+      height: 8px;
+    }
+
+    .spin-chart-zoom {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .spin-chart-zoom button {
+      min-width: 34px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.78rem;
+      line-height: 1;
+    }
+
+    .spin-chart-zoom .zoom-hint {
+      color: var(--muted);
+      font-size: 0.72rem;
+      margin-left: 0.25rem;
+    }
+
+    #spinChart {
+      display: block;
+      width: 100%;
+      height: 380px;
+      cursor: crosshair;
+    }
+
+    #spinChart.is-panning {
+      cursor: grabbing;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      z-index: 4;
+      min-width: 180px;
+      max-width: 240px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 18, 27, 0.97);
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 14px));
+      white-space: nowrap;
+    }
+
+    .chart-tooltip strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #b3d9ff;
+      font-size: 0.82rem;
+    }
+
+    .chart-tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chart-tooltip-row span:first-child {
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge.ok { background: rgba(76, 175, 80, 0.15); color: #81c784; }
+    .badge.warn { background: rgba(255, 152, 0, 0.15); color: #ffb74d; }
+    .badge.muted { background: rgba(255, 255, 255, 0.06); color: var(--muted); }
+    .badge.rating-low { background: rgba(244, 67, 54, 0.15); color: #ef9a9a; }
+    .badge.rating-mid { background: rgba(255, 152, 0, 0.15); color: #ffb74d; }
+    .badge.rating-high { background: rgba(76, 175, 80, 0.15); color: #81c784; }
+
+    .feedback-messages {
+      margin: 0;
+      padding-left: 1.1rem;
+      list-style: disc;
+    }
+
+    .feedback-messages li {
+      margin: 0.15rem 0;
+      line-height: 1.35;
+    }
+
+    .feedback-messages li + li {
+      margin-top: 0.35rem;
+    }
+
+    .feedback-dates {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .feedback-dates li {
+      margin: 0.15rem 0;
+      line-height: 1.35;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .feedback-dates li + li {
+      margin-top: 0.35rem;
+    }
+
+    .feedback-date-today {
+      color: #a5d6a7;
+      font-weight: 600;
+    }
+
+    .feedback-today-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.12rem 0.4rem;
+      margin-right: 0.35rem;
+      border-radius: 4px;
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      vertical-align: middle;
+    }
+
+    .feedback-date-other {
+      color: var(--muted);
+    }
+
+    .feedback-date-age {
+      font-size: 0.78em;
+      color: var(--muted);
+      opacity: 0.85;
+    }
+
+    .feedback-filter-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+      font-weight: 400;
+    }
+
+    .feedback-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .feedback-entry-date {
+      font-size: 0.74rem;
+      color: var(--muted);
+    }
+
+    pre.json-view {
+      margin: 0;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15, 20, 25, 0.65);
+      overflow: auto;
+      max-height: 480px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #b3d9ff;
+    }
+
+    .diff-meta {
+      margin: 0 0 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .diff-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .diff-section h3 {
+      margin: 0 0 0.6rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #b3d9ff;
+    }
+
+    .diff-old {
+      color: #ef9a9a;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .diff-new {
+      color: #81c784;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tr.diff-added td:first-child { border-left: 3px solid var(--ok); }
+    tr.diff-removed td:first-child { border-left: 3px solid var(--err); }
+    tr.diff-changed td:first-child { border-left: 3px solid var(--warn); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-panel">
+      <div class="header-top">
+        <div>
+          <div class="brand-row">
+            <span class="brand-mark">GV</span>
+            <h1>Game Vault 2.0<span class="title-badge">Internal</span></h1>
+          </div>
+          <p class="subtitle" id="subtitle">Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code></p>
+          <div class="status-row">
+            <div class="status">
+              <span class="dot" id="connDot"></span>
+              <span id="connText">Not loaded</span>
+            </div>
+            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">40</strong>s</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="field field-narrow">
+          <label for="dataSource">Data source</label>
+          <select id="dataSource">
+            <option value="api">API </option>
+            <option value="demo">Demo </option>
+          </select>
+        </div>
+        <div class="field field-history" id="historyField">
+          <label for="responseHistory">Response history</label>
+          <select id="responseHistory" disabled>
+            <option value="0">No history yet</option>
+          </select>
+        </div>
+        <div class="controls-actions">
+          <button id="loadBtn" type="button">Load</button>
+          <button class="secondary" id="pauseRefreshBtn" type="button">Pause</button>
+          <button class="secondary" id="toggleDiffBtn" type="button">Show Diff</button>
+          <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
+          <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
+        </div>
+      </div>
+      </div>
+    </header>
+
+    <div class="toast hidden" id="loadToast"></div>
+
+    <div class="error hidden" id="fetchError"></div>
+
+    <section id="dashboard" class="hidden">
+      <section class="card hidden" id="diffCard">
+        <h2>Changes vs previous response <span class="row-count" id="diffChangeCount"></span></h2>
+        <p class="diff-meta" id="diffMeta"></p>
+        <div id="diffContent"></div>
+      </section>
+
+      <div id="mainDashboard">
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <nav class="section-nav" id="sectionNav"></nav>
+
+      <div class="section-grid">
+        <section class="card" id="sec-rtp-game">
+          <h2>RTP by Game <span class="row-count" id="countRtpGame"></span></h2>
+          <div class="table-wrap" id="rtpByGameWrap"></div>
+        </section>
+        <section class="card" id="sec-rtp-user">
+          <h2>RTP by User <span class="row-count" id="countRtpUser"></span></h2>
+          <div class="table-wrap" id="rtpByUserWrap"></div>
+        </section>
+        <section class="card" id="sec-above-target">
+          <h2>Games Above Target RTP <span class="row-count" id="countAboveTarget"></span></h2>
+          <div class="table-wrap" id="gamesAboveTargetWrap"></div>
+        </section>
+        <section class="card" id="sec-users-high">
+          <h2>Users RTP &ge; 100% <span class="row-count" id="countUsersHigh"></span></h2>
+          <div class="table-wrap" id="usersRtpHighWrap"></div>
+        </section>
+        <section class="card" style="grid-column: 1 / -1;" id="sec-feedbacks">
+          <div class="section-header-row">
+            <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span> <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span> <span class="feedback-filter-hint" id="feedbackFilterHint"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="feedbackDateFrom">From</label>
+                <input type="date" id="feedbackDateFrom" />
+              </div>
+              <div class="inline-field">
+                <label for="feedbackDateTo">To</label>
+                <input type="date" id="feedbackDateTo" />
+              </div>
+              <div class="section-toolbar-actions">
+                <button type="button" id="feedbackFilterBtn">Filter</button>
+                <button type="button" class="secondary" id="feedbackClearFilterBtn">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap tall smooth-update" id="userFeedbacksWrap"></div>
+        </section>
+        <section class="card" style="grid-column: 1 / -1;" id="sec-target-rtp">
+          <div class="section-header-row">
+            <h2>Game Target RTP <span class="row-count" id="countTargetRtp"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="targetRtpFilter">Filter by Target RTP</label>
+                <select id="targetRtpFilter">
+                  <option value="all">All</option>
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="80">80%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap tall smooth-update" id="gamesTargetRtpWrap"></div>
+        </section>
+      </div>
+      </div>
+
+      <section class="card hidden" id="drillDownCard">
+        <div class="drill-toolbar">
+          <button type="button" class="secondary" id="drillBackBtn">← Back</button>
+          <h2 id="drillTitle">Session details</h2>
+          <span class="row-count" id="drillMeta"></span>
+        </div>
+        <div class="table-wrap tall" id="drillTableWrap"></div>
+        <div class="hidden" id="drillChartWrap">
+          <div class="chart-summary" id="chartSummary"></div>
+          <div class="spin-chart-panel">
+            <div class="spin-chart-toolbar">
+              <div class="spin-chart-legend">
+                <span><i class="leg-bet" aria-hidden="true"></i> Bet</span>
+                <span><i class="leg-win" aria-hidden="true"></i> Win</span>
+              </div>
+              <div class="spin-chart-zoom">
+                <button type="button" class="secondary" id="spinZoomOutBtn" title="Zoom out">−</button>
+                <button type="button" class="secondary" id="spinZoomInBtn" title="Zoom in">+</button>
+                <button type="button" class="secondary" id="spinZoomResetBtn" title="Reset zoom">Reset</button>
+                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag to pan</span>
+              </div>
+            </div>
+            <canvas id="spinChart" aria-label="Session spin bet and win chart"></canvas>
+            <div class="chart-tooltip hidden" id="spinChartTooltip"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card hidden" id="jsonCard">
+        <h2>Raw JSON</h2>
+        <pre class="json-view" id="jsonView"></pre>
+      </section>
+    </section>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const HISTORY_MAX = 3;
+    let responseHistory = [];
+    let historyViewIndex = 0;
+    let isDiffVisible = false;
+    let gamesTargetRtpData = [];
+    let userFeedbacksData = [];
+    let feedbackDateFromActive = '';
+    let feedbackDateToActive = '';
+    let lastSummaryEtag = '';
+    let lastSummaryJson = null;
+    let isTabHidden = document.hidden;
+    let currentDashboardData = null;
+    let drillStack = [];
+    let activeChartSpins = [];
+    let isDrillLoading = false;
+    let hoveredSpinIndex = -1;
+    let chartViewStart = 0;
+    let chartViewEnd = 0;
+    let chartPanState = null;
+
+    function isDemoMode() {
+      return $('dataSource').value === 'demo';
+    }
+
+    function historyOptionLabel(index, loadedAt) {
+      const time = loadedAt.toLocaleTimeString();
+      if (index === 0) return 'Latest · ' + time;
+      const n = index + 1;
+      const suffix = n === 2 ? '2nd last' : n === 3 ? '3rd last' : n + 'th last';
+      return suffix + ' · ' + time;
+    }
+
+    function clearResponseHistory() {
+      responseHistory = [];
+      historyViewIndex = 0;
+      lastSummaryEtag = '';
+      lastSummaryJson = null;
+      updateHistoryDropdown();
+      updateDiffPanel();
+    }
+
+    function summaryFingerprint(response) {
+      return JSON.stringify(response?.data ?? response);
+    }
+
+    function responsesEqual(a, b) {
+      if (!a || !b) return false;
+      return summaryFingerprint(a) === summaryFingerprint(b);
+    }
+
+    function pushResponseHistory(response) {
+      if (responseHistory.length && responsesEqual(responseHistory[0].response, response)) {
+        responseHistory[0].loadedAt = new Date();
+        updateHistoryDropdown();
+        return false;
+      }
+      const entry = {
+        response: JSON.parse(JSON.stringify(response)),
+        loadedAt: new Date(),
+      };
+      responseHistory.unshift(entry);
+      while (responseHistory.length > HISTORY_MAX) {
+        responseHistory.pop();
+      }
+      historyViewIndex = 0;
+      updateHistoryDropdown();
+      updateDiffPanel();
+      return true;
+    }
+
+    function updateHistoryDropdown() {
+      const sel = $('responseHistory');
+      const hasHistory = responseHistory.length > 0;
+      sel.disabled = !hasHistory || isDemoMode();
+      show($('historyField'), !isDemoMode());
+
+      if (!hasHistory) {
+        sel.innerHTML = '<option value="0">No history yet</option>';
+        sel.value = '0';
+        return;
+      }
+
+      sel.innerHTML = responseHistory.map((entry, i) =>
+        '<option value="' + i + '">' + historyOptionLabel(i, entry.loadedAt) + '</option>'
+      ).join('');
+      sel.value = String(Math.min(historyViewIndex, responseHistory.length - 1));
+    }
+
+    function showHistoryAt(index) {
+      if (!responseHistory.length) return;
+      historyViewIndex = Math.max(0, Math.min(index, responseHistory.length - 1));
+      const entry = responseHistory[historyViewIndex];
+      renderDashboard(entry.response);
+      const label = historyOptionLabel(historyViewIndex, entry.loadedAt);
+      setConn('ok', 'Viewing ' + label);
+      $('responseHistory').value = String(historyViewIndex);
+    }
+
+    function updateDataSourceUi() {
+      const demo = isDemoMode();
+      $('subtitle').innerHTML = demo
+        ? 'Demo mode — sample data (no API call)'
+        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · skips refresh when unchanged';
+      updateHistoryDropdown();
+      updatePauseButtonUi();
+      updateDiffPanel();
+    }
+
+    const DEMO_SPIN_LOGS = [
+      { spinIndex: 1, betAmount: 1, winAmount: 0 },
+      { spinIndex: 2, betAmount: 1, winAmount: 2.5 },
+      { spinIndex: 3, betAmount: 2, winAmount: 0.5 },
+      { spinIndex: 4, betAmount: 1, winAmount: 1 },
+      { spinIndex: 5, betAmount: 2, winAmount: 3 },
+    ];
+
+    const DEMO_SUMMARY = {
+      success: true,
+      message: 'Demo data — not from API',
+      data: {
+        totalRecharged: 125430.50,
+        totalRedeemed: 98210.25,
+        totalGameUsers: { count: 1842, users: [] },
+        wholeGameRtp: { totalBet: 890120.00, totalWin: 801108.00, rtp: 0.90 },
+        rtpByGame: [
+          {
+            gameId: 'g1111111-1111-1111-1111-111111111101',
+            gameName: 'Lucky Slots',
+            totalBet: 320000,
+            totalWin: 288000,
+            totalSpin: 15420,
+            rtp: 0.90,
+            targetRtp: 0.92,
+            users: [
+              {
+                userId: 'u1111111-1111-1111-1111-111111111101',
+                username: 'player_alpha',
+                totalBet: 7,
+                totalWin: 6.5,
+                totalSpin: 5,
+                rtp: 0.9286,
+                sessions: [
+                  {
+                    sessionId: 'a1111111-1111-1111-1111-111111111101',
+                    userId: 'u1111111-1111-1111-1111-111111111101',
+                    username: 'player_alpha',
+                    gameId: 'g1111111-1111-1111-1111-111111111101',
+                    gameName: 'Lucky Slots',
+                    totalBet: 7,
+                    totalWin: 6.5,
+                    totalSpin: 5,
+                    rtp: 0.9286,
+                    startedAt: '2026-07-14T10:00:00Z',
+                    endedAt: '2026-07-14T10:05:00Z',
+                    spinLogs: DEMO_SPIN_LOGS,
+                  },
+                ],
+              },
+            ],
+          },
+          { gameId: 'g1111111-1111-1111-1111-111111111102', gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93, users: [] },
+          { gameId: 'g1111111-1111-1111-1111-111111111103', gameName: 'Vault Poker', totalBet: 180000, totalWin: 153000, totalSpin: 4200, rtp: 0.85, targetRtp: 0.90, users: [] },
+          { gameId: 'g1111111-1111-1111-1111-111111111104', gameName: 'Mega Wheel', totalBet: 179620, totalWin: 160133, totalSpin: 11200, rtp: 0.8915, targetRtp: 0.88, users: [] },
+        ],
+        rtpByUser: [
+          {
+            userId: 'u1111111-1111-1111-1111-111111111101',
+            username: 'player_alpha',
+            totalBet: 45000,
+            totalWin: 40500,
+            totalSpin: 2100,
+            rtp: 0.90,
+            sessions: [
+              {
+                sessionId: 'a1111111-1111-1111-1111-111111111101',
+                userId: 'u1111111-1111-1111-1111-111111111101',
+                username: 'player_alpha',
+                gameId: 'g1111111-1111-1111-1111-111111111101',
+                gameName: 'Lucky Slots',
+                totalBet: 7,
+                totalWin: 6.5,
+                totalSpin: 5,
+                rtp: 0.9286,
+                startedAt: '2026-07-14T10:00:00Z',
+                endedAt: '2026-07-14T10:05:00Z',
+                spinLogs: DEMO_SPIN_LOGS,
+              },
+            ],
+          },
+          { userId: 'u1111111-1111-1111-1111-111111111102', username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045, sessions: [] },
+          { userId: 'u1111111-1111-1111-1111-111111111103', username: 'casual_joe', totalBet: 8500, totalWin: 6800, totalSpin: 420, rtp: 0.80, sessions: [] },
+        ],
+        gamesAboveTargetRtp: [
+          { gameName: 'Dragon Spin', totalBet: 210500, totalWin: 199975, totalSpin: 9820, rtp: 0.95, targetRtp: 0.93 },
+        ],
+        usersRtpAboveOrEqualOne: [
+          { username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045 },
+        ],
+        gamesTargetRtp: [
+          { gameName: 'Lucky Slots', targetRtp: 0.92 },
+          { gameName: 'Dragon Spin', targetRtp: 0.93 },
+          { gameName: 'Vault Poker', targetRtp: 0.90 },
+          { gameName: 'Mega Wheel', targetRtp: 0.88 },
+        ],
+        userFeedbacks: [
+          {
+            userId: '53935c4c-8511-4acf-a030-7bd263b7355d',
+            username: 'g291sheshe',
+            feedBackCount: 2,
+            avgRating: 3.5,
+            feedbacks: [
+              { ratingStar: 4, message: 'Love it', createdAt: '2026-07-10T14:32:15.1234567Z' },
+              { ratingStar: 3, message: 'Good', createdAt: '2026-07-08T09:15:42.9876543Z' },
+            ],
+          },
+          {
+            userId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+            username: 'player_beta',
+            feedBackCount: 1,
+            avgRating: 2.0,
+            feedbacks: [
+              { ratingStar: 2, message: 'Too slow on mobile', createdAt: '2026-07-05T11:20:00Z' },
+            ],
+          },
+          {
+            userId: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+            username: 'casual_joe',
+            feedBackCount: 3,
+            avgRating: 4.0,
+            feedbacks: [
+              { ratingStar: 5, message: 'Fun slots', createdAt: '2026-07-11T18:45:00Z' },
+              { ratingStar: 4, message: 'Nice UI', createdAt: '2026-07-11T19:10:00Z' },
+              { ratingStar: 3, message: 'More bonuses please', createdAt: '2026-07-11T19:30:00Z' },
+            ],
+          },
+        ],
+      },
+    };
+
+    function apiOrigin() {
+      return window.location.origin;
+    }
+
+    function show(el, visible) {
+      el.classList.toggle('hidden', !visible);
+    }
+
+    function setConn(state, text) {
+      $('connDot').className = 'dot ' + (state || '');
+      $('connText').textContent = text;
+    }
+
+    function fmtMoney(n) {
+      return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtRtp(n) {
+      return (Number(n || 0) * 100).toFixed(2) + '%';
+    }
+
+    function fmtNum(n) {
+      return Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 6 });
+    }
+
+    function fmtInt(n) {
+      const num = Number(n);
+      const safe = Number.isFinite(num) ? num : 0;
+      return safe.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function escAttr(s) {
+      return escHtml(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function graphIconButton(kind, id, enabled = true, label = 'View graph') {
+      return '<button type="button" class="graph-btn" data-drill="' + escAttr(kind) +
+        '" data-id="' + escAttr(id) + '" title="' + escAttr(enabled ? label : 'No session spin data') +
+        '" aria-label="' + escAttr(label) + '"' + (enabled ? '' : ' disabled') + '>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19H20M7 15l4-4 3 2 5-6"></path></svg>' +
+        '</button>';
+    }
+
+    function valuesEqual(a, b) {
+      if (a === b) return true;
+      if (a == null && b == null) return true;
+      if (typeof a === 'number' && typeof b === 'number') {
+        return Math.abs(a - b) < 1e-9;
+      }
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    function formatDiffValue(fieldKey, value) {
+      if (value == null || value === '') return '—';
+      if (fieldKey === 'rtp' || fieldKey === 'targetRtp') return fmtRtp(value);
+      if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed') {
+        return '$' + fmtMoney(value);
+      }
+      if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount') return fmtInt(value);
+      if (fieldKey === 'totalGameUsers') return fmtInt(gameUsersCount(value));
+      if (fieldKey === 'avgRating') return Number(value).toFixed(1);
+      if (fieldKey === 'feedbackDate' || fieldKey === 'createdAt' || fieldKey === 'lastFeedbackDate' || fieldKey === 'date') {
+        return fmtFeedbackDate(value);
+      }
+      if (fieldKey === 'feedbackMessages') {
+        if (!Array.isArray(value) || value.length === 0) return '—';
+        return value.join(' · ');
+      }
+      if (fieldKey === 'feedbacks') {
+        if (!Array.isArray(value) || value.length === 0) return '—';
+        return value.map((f) => Number(f.ratingStar || 0) + '/5: ' + feedbackText(f)).join(' · ');
+      }
+      return String(value);
+    }
+
+    /** API may send totalGameUsers as a number or { count, users }. */
+    function gameUsersCount(value) {
+      if (value == null) return 0;
+      if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      if (typeof value === 'string') {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      if (typeof value === 'object') {
+        const raw = value.count ?? value.Count;
+        if (raw != null) {
+          const n = Number(raw);
+          if (Number.isFinite(n)) return n;
+        }
+        if (Array.isArray(value.users)) return value.users.length;
+        if (Array.isArray(value.Users)) return value.Users.length;
+      }
+      return 0;
+    }
+
+    /** API field renamed: feedback (new) / message (demo & older payloads). */
+    function feedbackText(entry) {
+      if (!entry || typeof entry !== 'object') return '';
+      const text = entry.feedback ?? entry.message;
+      return text == null ? '' : String(text).trim();
+    }
+
+    function getUserFeedbacksList(userRow) {
+      if (Array.isArray(userRow.feedbacks) && userRow.feedbacks.length) {
+        return userRow.feedbacks;
+      }
+      if (Array.isArray(userRow.feedbackMessages) && userRow.feedbackMessages.length) {
+        return userRow.feedbackMessages.map((message) => ({
+          ratingStar: null,
+          message,
+          feedback: message,
+          createdAt: userRow.feedbackDate ?? userRow.createdAt ?? userRow.lastFeedbackDate ?? userRow.date,
+        }));
+      }
+      return [];
+    }
+
+    function sortFeedbacksByDate(items) {
+      return [...items].sort((a, b) => {
+        const da = parseFeedbackDate(a.createdAt);
+        const db = parseFeedbackDate(b.createdAt);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return db - da;
+      });
+    }
+
+    function filterFeedbacksByDate(feedbacks) {
+      if (!Array.isArray(feedbacks)) return [];
+      if (!feedbackDateFromActive && !feedbackDateToActive) return feedbacks;
+      return feedbacks.filter((f) => {
+        const rowDate = parseFeedbackDate(f.createdAt);
+        if (!rowDate) return false;
+        const from = feedbackDateFromActive
+          ? new Date(feedbackDateFromActive + 'T00:00:00')
+          : null;
+        const to = feedbackDateToActive
+          ? new Date(feedbackDateToActive + 'T23:59:59.999')
+          : null;
+        if (from && rowDate < from) return false;
+        if (to && rowDate > to) return false;
+        return true;
+      });
+    }
+
+    function getVisibleFeedbacksForUser(userRow) {
+      return sortFeedbacksByDate(filterFeedbacksByDate(getUserFeedbacksList(userRow)));
+    }
+
+    function localDateInputValue(d = new Date()) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function setDefaultFeedbackDateFilter() {
+      const today = localDateInputValue();
+      feedbackDateFromActive = today;
+      feedbackDateToActive = today;
+      if ($('feedbackDateFrom')) $('feedbackDateFrom').value = today;
+      if ($('feedbackDateTo')) $('feedbackDateTo').value = today;
+    }
+
+    function formatFilterDateLabel(isoDate) {
+      if (!isoDate) return '…';
+      const d = parseFeedbackDate(isoDate + 'T12:00:00');
+      if (!d) return isoDate;
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    function updateFeedbackFilterHint() {
+      const hint = $('feedbackFilterHint');
+      if (!hint) return;
+      if (!feedbackDateFromActive && !feedbackDateToActive) {
+        hint.textContent = '· all dates';
+        return;
+      }
+      const from = formatFilterDateLabel(feedbackDateFromActive);
+      const to = formatFilterDateLabel(feedbackDateToActive);
+      if (feedbackDateFromActive && feedbackDateToActive && feedbackDateFromActive === feedbackDateToActive) {
+        hint.textContent = '· ' + from + ' only';
+      } else {
+        hint.textContent = '· ' + from + ' – ' + to;
+      }
+    }
+
+    function isTodayDate(d) {
+      if (!d) return false;
+      const now = new Date();
+      return d.getFullYear() === now.getFullYear()
+        && d.getMonth() === now.getMonth()
+        && d.getDate() === now.getDate();
+    }
+
+    function relativeDateHint(d) {
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dateStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diffDays = Math.round((todayStart - dateStart) / 86400000);
+      if (diffDays <= 0) return '';
+      if (diffDays === 1) return 'yesterday';
+      if (diffDays < 30) return diffDays + ' days ago';
+      if (diffDays < 365) {
+        const months = Math.round(diffDays / 30);
+        return months === 1 ? '1 month ago' : months + ' months ago';
+      }
+      const years = Math.round(diffDays / 365);
+      return years === 1 ? '1 year ago' : years + ' years ago';
+    }
+
+    function fmtFeedbackDateTime(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+    }
+
+    function renderFeedbackDateHtml(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '<span class="empty">—</span>';
+      const text = fmtFeedbackDateTime(value);
+      if (isTodayDate(d)) {
+        return '<span class="feedback-date-today">' +
+          '<span class="feedback-today-badge">Today</span>' +
+          escHtml(text) +
+          '</span>';
+      }
+      const age = relativeDateHint(d);
+      return '<span class="feedback-date-other">' + escHtml(text) +
+        (age ? ' <span class="feedback-date-age">(' + escHtml(age) + ')</span>' : '') +
+        '</span>';
+    }
+
+    function feedbackDatesCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      if (!items.length) return '<span class="empty">—</span>';
+      if (items.length === 1) return renderFeedbackDateHtml(items[0].createdAt);
+      return '<ul class="feedback-dates">' + items.map((f) =>
+        '<li>' + renderFeedbackDateHtml(f.createdAt) + '</li>'
+      ).join('') + '</ul>';
+    }
+
+    function feedbackStarsCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      if (!items.length) return '<span class="empty">—</span>';
+      const stars = items
+        .filter((f) => f.ratingStar != null)
+        .map((f) => Number(f.ratingStar).toFixed(1) + ' / 5');
+      if (!stars.length) return '<span class="empty">—</span>';
+      if (stars.length === 1) {
+        return '<span class="badge rating-mid">' + escHtml(stars[0]) + '</span>';
+      }
+      return '<ul class="feedback-dates">' + stars.map((s) =>
+        '<li><span class="badge rating-mid">' + escHtml(s) + '</span></li>'
+      ).join('') + '</ul>';
+    }
+
+    function feedbackAvgRatingCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      const stars = items
+        .map((f) => Number(f.ratingStar))
+        .filter((n) => !Number.isNaN(n));
+      if (!stars.length) return ratingBadge(userRow.avgRating);
+      const avg = stars.reduce((s, n) => s + n, 0) / stars.length;
+      return ratingBadge(avg);
+    }
+
+    function feedbackMessagesCell(userRow) {
+      const items = getVisibleFeedbacksForUser(userRow);
+      const messages = items.map((f) => feedbackText(f)).filter(Boolean);
+      if (!messages.length) return '<span class="empty">—</span>';
+      return '<ul class="feedback-messages">' + messages.map((m) =>
+        '<li>' + escHtml(m) + '</li>'
+      ).join('') + '</ul>';
+    }
+
+    function normalizeApiDateString(value) {
+      if (value == null || value === '') return null;
+      if (value instanceof Date) return value;
+
+      let text = String(value).trim();
+      if (!text) return null;
+
+      if (/[zZ]$/.test(text) || /[+-]\d{2}:\d{2}$/.test(text)) {
+        return text;
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+        return text + 'T00:00:00Z';
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(text)) {
+        return text.replace(' ', 'T') + 'Z';
+      }
+
+      return text;
+    }
+
+    function parseFeedbackDate(value) {
+      const normalized = normalizeApiDateString(value);
+      if (!normalized) return null;
+      const d = normalized instanceof Date ? normalized : new Date(normalized);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function fmtFeedbackDate(value) {
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+    }
+
+    function getFeedbackRowDate(row) {
+      const items = getUserFeedbacksList(row);
+      const dates = items.map((f) => parseFeedbackDate(f.createdAt)).filter(Boolean);
+      if (!dates.length) {
+        return parseFeedbackDate(row.feedbackDate ?? row.createdAt ?? row.lastFeedbackDate ?? row.date);
+      }
+      return dates.sort((a, b) => b - a)[0];
+    }
+
+    function matchesFeedbackDateFilter(row) {
+      if (!feedbackDateFromActive && !feedbackDateToActive) return true;
+      return getVisibleFeedbacksForUser(row).length > 0;
+    }
+
+    function filterUserFeedbacks(rows) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesFeedbackDateFilter(r));
+    }
+
+    function getFilteredFeedbackStars(users) {
+      const stars = [];
+      for (const user of users) {
+        for (const f of getVisibleFeedbacksForUser(user)) {
+          const star = Number(f.ratingStar);
+          if (!Number.isNaN(star)) stars.push(star);
+        }
+      }
+      return stars;
+    }
+
+    function updateFeedbackHeaderStats(filteredUsers) {
+      const avgEl = $('feedbackFilteredAvgRating');
+      if (!avgEl) return;
+      const stars = getFilteredFeedbackStars(filteredUsers);
+      if (!stars.length) {
+        avgEl.textContent = 'Avg —';
+        return;
+      }
+      const avg = stars.reduce((s, n) => s + n, 0) / stars.length;
+      avgEl.innerHTML = 'Avg ' + ratingBadge(avg);
+    }
+
+    function applyFeedbackDateFilter() {
+      feedbackDateFromActive = $('feedbackDateFrom')?.value || '';
+      feedbackDateToActive = $('feedbackDateTo')?.value || '';
+      updateFeedbackFilterHint();
+      renderUserFeedbacksTable(true);
+    }
+
+    function clearFeedbackDateFilter() {
+      feedbackDateFromActive = '';
+      feedbackDateToActive = '';
+      if ($('feedbackDateFrom')) $('feedbackDateFrom').value = '';
+      if ($('feedbackDateTo')) $('feedbackDateTo').value = '';
+      updateFeedbackFilterHint();
+      renderUserFeedbacksTable(true);
+    }
+
+    function renderUserFeedbacksTable(smooth = false) {
+      const filtered = filterUserFeedbacks(userFeedbacksData);
+      const columns = [
+        { label: 'Date', render: (r) => feedbackDatesCell(r) },
+        { label: 'Username', key: 'username' },
+        { label: 'User ID', render: (r) => '<span title="' + escHtml(r.userId || '') + '">' + escHtml(r.userId || '') + '</span>' },
+        { label: 'Feedback Count', render: (r) => fmtInt(getVisibleFeedbacksForUser(r).length || r.feedBackCount) },
+        { label: 'Avg Rating', render: (r) => feedbackAvgRatingCell(r) },
+        { label: 'Ratings', render: (r) => feedbackStarsCell(r) },
+        { label: 'Messages', render: (r) => feedbackMessagesCell(r) },
+      ];
+      const wrap = $('userFeedbacksWrap');
+      const countEl = $('countFeedbacks');
+
+      const apply = () => {
+        renderTable('userFeedbacksWrap', filtered, columns);
+        setRowCount('countFeedbacks', filtered);
+        updateFeedbackHeaderStats(filtered);
+        updateFeedbackFilterHint();
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-feedbacks"]');
+        if (navLink) updateSectionNavCount('sec-feedbacks', filtered.length);
+      };
+
+      if (!smooth || !wrap) {
+        apply();
+        return;
+      }
+
+      wrap.classList.add('is-updating');
+      if (countEl) countEl.classList.add('is-updating');
+
+      window.setTimeout(() => {
+        apply();
+        wrap.classList.remove('is-updating');
+        if (countEl) countEl.classList.remove('is-updating');
+      }, 160);
+    }
+
+    const ARRAY_DIFF_CONFIGS = [
+      {
+        title: 'RTP by Game',
+        arrayKey: 'rtpByGame',
+        idKey: 'gameName',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+          { key: 'targetRtp', label: 'Target RTP' },
+        ],
+      },
+      {
+        title: 'RTP by User',
+        arrayKey: 'rtpByUser',
+        idKey: 'username',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+        ],
+      },
+      {
+        title: 'Games Above Target RTP',
+        arrayKey: 'gamesAboveTargetRtp',
+        idKey: 'gameName',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+          { key: 'targetRtp', label: 'Target RTP' },
+        ],
+      },
+      {
+        title: 'Users RTP ≥ 100%',
+        arrayKey: 'usersRtpAboveOrEqualOne',
+        idKey: 'username',
+        fields: [
+          { key: 'totalBet', label: 'Total Bet' },
+          { key: 'totalWin', label: 'Total Win' },
+          { key: 'totalSpin', label: 'Spins' },
+          { key: 'rtp', label: 'RTP' },
+        ],
+      },
+      {
+        title: 'Game Target RTP',
+        arrayKey: 'gamesTargetRtp',
+        idKey: 'gameName',
+        fields: [{ key: 'targetRtp', label: 'Target RTP' }],
+      },
+      {
+        title: 'User Feedbacks',
+        arrayKey: 'userFeedbacks',
+        idKey: 'userId',
+        fields: [
+          { key: 'username', label: 'Username' },
+          { key: 'feedBackCount', label: 'Feedback Count' },
+          { key: 'avgRating', label: 'Avg Rating' },
+          { key: 'feedbacks', label: 'Feedbacks' },
+        ],
+      },
+    ];
+
+    function diffArraySection(oldArr, newArr, idKey, fields) {
+      const oldList = Array.isArray(oldArr) ? oldArr : [];
+      const newList = Array.isArray(newArr) ? newArr : [];
+      const oldMap = new Map(oldList.map((r) => [String(r[idKey]), r]));
+      const newMap = new Map(newList.map((r) => [String(r[idKey]), r]));
+      const rows = [];
+      const allIds = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+      for (const id of allIds) {
+        const oldRow = oldMap.get(id);
+        const newRow = newMap.get(id);
+        if (!oldRow && newRow) {
+          for (const f of fields) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: '—',
+              newVal: formatDiffValue(f.key, newRow[f.key]),
+              change: 'added',
+            });
+          }
+          continue;
+        }
+        if (oldRow && !newRow) {
+          for (const f of fields) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: formatDiffValue(f.key, oldRow[f.key]),
+              newVal: '—',
+              change: 'removed',
+            });
+          }
+          continue;
+        }
+        for (const f of fields) {
+          if (!valuesEqual(oldRow[f.key], newRow[f.key])) {
+            rows.push({
+              item: id,
+              field: f.label,
+              oldVal: formatDiffValue(f.key, oldRow[f.key]),
+              newVal: formatDiffValue(f.key, newRow[f.key]),
+              change: 'changed',
+            });
+          }
+        }
+      }
+      return rows;
+    }
+
+    function computeFullDiff(previousResponse, latestResponse) {
+      const sections = [];
+      const oldD = previousResponse?.data || {};
+      const newD = latestResponse?.data || {};
+      const summaryRows = [];
+
+      const scalars = [
+        { key: 'totalRecharged', label: 'Total Recharged' },
+        { key: 'totalRedeemed', label: 'Total Redeemed' },
+        { key: 'totalGameUsers', label: 'Game Users' },
+      ];
+      for (const s of scalars) {
+        const oldVal = s.key === 'totalGameUsers'
+          ? gameUsersCount(oldD[s.key])
+          : oldD[s.key];
+        const newVal = s.key === 'totalGameUsers'
+          ? gameUsersCount(newD[s.key])
+          : newD[s.key];
+        if (!valuesEqual(oldVal, newVal)) {
+          summaryRows.push({
+            item: 'Summary',
+            field: s.label,
+            oldVal: formatDiffValue(s.key, oldD[s.key]),
+            newVal: formatDiffValue(s.key, newD[s.key]),
+            change: 'changed',
+          });
+        }
+      }
+
+      const wholeFields = [
+        { key: 'totalBet', label: 'Total Bet' },
+        { key: 'totalWin', label: 'Total Win' },
+        { key: 'rtp', label: 'RTP' },
+      ];
+      for (const f of wholeFields) {
+        const oldVal = oldD.wholeGameRtp?.[f.key];
+        const newVal = newD.wholeGameRtp?.[f.key];
+        if (!valuesEqual(oldVal, newVal)) {
+          summaryRows.push({
+            item: 'Whole Game RTP',
+            field: f.label,
+            oldVal: formatDiffValue(f.key, oldVal),
+            newVal: formatDiffValue(f.key, newVal),
+            change: 'changed',
+          });
+        }
+      }
+
+      if (summaryRows.length) {
+        sections.push({ title: 'Summary', rows: summaryRows });
+      }
+
+      for (const cfg of ARRAY_DIFF_CONFIGS) {
+        const rows = diffArraySection(oldD[cfg.arrayKey], newD[cfg.arrayKey], cfg.idKey, cfg.fields);
+        if (rows.length) {
+          sections.push({ title: cfg.title, rows });
+        }
+      }
+
+      return sections;
+    }
+
+    function renderDiffSection(section) {
+      const head = '<tr><th>Item</th><th>Field</th><th>Previous</th><th>New</th></tr>';
+      const body = section.rows.map((r) =>
+        '<tr class="diff-' + r.change + '">' +
+        '<td>' + escHtml(r.item) + '</td>' +
+        '<td>' + escHtml(r.field) + '</td>' +
+        '<td class="diff-old">' + escHtml(r.oldVal) + '</td>' +
+        '<td class="diff-new">' + escHtml(r.newVal) + '</td>' +
+        '</tr>'
+      ).join('');
+      return '<div class="diff-section"><h3>' + escHtml(section.title) + '</h3>' +
+        '<div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></div>';
+    }
+
+    function setDashboardViewMode() {
+      const inDrillMode = drillStack.length > 0;
+      const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
+      show($('mainDashboard'), !inDiffMode && !inDrillMode);
+      show($('diffCard'), inDiffMode);
+      show($('drillDownCard'), inDrillMode);
+      if (inDiffMode || inDrillMode) {
+        show($('jsonCard'), false);
+        const jsonBtn = $('toggleJsonBtn');
+        if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      }
+    }
+
+    function updateDiffPanel() {
+      const btn = $('toggleDiffBtn');
+      const canDiff = !isDemoMode() && responseHistory.length >= 2;
+
+      if (btn) {
+        show(btn, !isDemoMode());
+        btn.disabled = !canDiff;
+      }
+
+      if (!canDiff) {
+        isDiffVisible = false;
+        if (btn) btn.textContent = 'Show Diff';
+        setDashboardViewMode();
+        return;
+      }
+
+      const previous = responseHistory[1];
+      const latest = responseHistory[0];
+      const sections = computeFullDiff(previous.response, latest.response);
+      const changeCount = sections.reduce((n, s) => n + s.rows.length, 0);
+
+      $('diffMeta').textContent =
+        'Previous (' + previous.loadedAt.toLocaleTimeString() + ') → Latest (' + latest.loadedAt.toLocaleTimeString() + ')';
+
+      if (btn) {
+        btn.textContent = (isDiffVisible ? 'Hide Diff' : 'Show Diff') +
+          (changeCount ? ' (' + changeCount + ')' : '');
+      }
+
+      if (isDiffVisible) {
+        $('diffChangeCount').textContent = changeCount + ' change' + (changeCount === 1 ? '' : 's');
+        if (!changeCount) {
+          $('diffContent').innerHTML = '<div class="empty">No changes since the previous response — all values are the same.</div>';
+        } else {
+          $('diffContent').innerHTML = sections.map(renderDiffSection).join('');
+        }
+      }
+
+      setDashboardViewMode();
+    }
+
+    function ratingBadge(rating) {
+      const r = Number(rating || 0);
+      let cls = 'rating-mid';
+      if (r <= 2) cls = 'rating-low';
+      else if (r >= 4) cls = 'rating-high';
+      return '<span class="badge ' + cls + '">' + r.toFixed(1) + ' / 5</span>';
+    }
+
+    function rtpBar(rtp, targetRtp) {
+      const val = Number(rtp || 0);
+      const pct = Math.min(val * 100, 100);
+      const over = targetRtp != null && val >= Number(targetRtp);
+      return '<div class="rtp-bar-wrap"><div class="rtp-bar' + (over ? ' over' : '') + '"><span style="width:' + pct + '%"></span></div><span>' + fmtRtp(val) + '</span></div>';
+    }
+
+    function setRowCount(id, rows) {
+      const el = $(id);
+      if (!el) return;
+      const n = Array.isArray(rows) ? rows.length : 0;
+      el.textContent = n + ' row' + (n === 1 ? '' : 's');
+    }
+
+    function updateSectionNavCount(sectionId, count) {
+      const countEl = $('sectionNav')?.querySelector('a[href="#' + sectionId + '"] .section-nav-count');
+      if (countEl) countEl.textContent = String(count);
+    }
+
+    function renderSectionNav(sections) {
+      $('sectionNav').innerHTML = sections.map((s) =>
+        '<a href="#' + s.id + '"' + (s.tone ? ' data-tone="' + s.tone + '"' : '') + '>' +
+        '<span class="section-nav-icon">' + (s.icon || '📊') + '</span>' +
+        '<span class="section-nav-label">' + s.label + '</span>' +
+        '<span class="section-nav-count">' + s.count + '</span>' +
+        '</a>'
+      ).join('');
+    }
+
+    function targetRtpToPercent(value) {
+      const n = Number(value);
+      if (Number.isNaN(n)) return null;
+      return n <= 1 ? n * 100 : n;
+    }
+
+    function matchesTargetRtpFilter(targetRtp, filter) {
+      if (filter === 'all') return true;
+      const pct = targetRtpToPercent(targetRtp);
+      const want = Number(filter);
+      if (pct == null || Number.isNaN(want)) return false;
+      return Math.abs(pct - want) < 0.01;
+    }
+
+    function filterGamesTargetRtp(rows) {
+      const filter = $('targetRtpFilter')?.value || 'all';
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesTargetRtpFilter(r.targetRtp, filter));
+    }
+
+    function renderGamesTargetRtpTable(smooth = false) {
+      const filtered = filterGamesTargetRtp(gamesTargetRtpData);
+      const columns = [
+        { label: 'Game', key: 'gameName' },
+        { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
+      ];
+      const wrap = $('gamesTargetRtpWrap');
+      const countEl = $('countTargetRtp');
+
+      const apply = () => {
+        renderTable('gamesTargetRtpWrap', filtered, columns);
+        setRowCount('countTargetRtp', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-target-rtp"]');
+        if (navLink) updateSectionNavCount('sec-target-rtp', filtered.length);
+      };
+
+      if (!smooth || !wrap) {
+        apply();
+        return;
+      }
+
+      wrap.classList.add('is-updating');
+      if (countEl) countEl.classList.add('is-updating');
+
+      window.setTimeout(() => {
+        apply();
+        wrap.classList.remove('is-updating');
+        if (countEl) countEl.classList.remove('is-updating');
+      }, 160);
+    }
+
+    function renderTable(containerId, rows, columns) {
+      const el = $(containerId);
+      if (!Array.isArray(rows) || rows.length === 0) {
+        el.innerHTML = '<div class="empty">No data.</div>';
+        return;
+      }
+
+      const head = '<tr>' + columns.map((c) => '<th>' + c.label + '</th>').join('') + '</tr>';
+      const body = rows.map((row) =>
+        '<tr>' + columns.map((c) => '<td>' + (c.render ? c.render(row) : escHtml(row[c.key] ?? '')) + '</td>').join('') + '</tr>'
+      ).join('');
+
+      el.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+    }
+
+    function pushDrill(frame) {
+      drillStack.push(frame);
+      isDiffVisible = false;
+      renderDrillView();
+    }
+
+    function findSummaryRow(kind, id) {
+      const rows = kind === 'game'
+        ? currentDashboardData?.rtpByGame
+        : currentDashboardData?.rtpByUser;
+      const key = kind === 'game' ? 'gameId' : 'userId';
+      return (rows || []).find((row) => String(row[key]) === String(id));
+    }
+
+    function renderDrillView() {
+      const frame = drillStack[drillStack.length - 1];
+      setDashboardViewMode();
+      if (!frame) return;
+
+      show($('drillTableWrap'), frame.type !== 'spins');
+      show($('drillChartWrap'), frame.type === 'spins');
+
+      if (frame.type === 'game-users') {
+        const users = frame.game.users || [];
+        $('drillTitle').textContent = frame.game.gameName + ' · Users';
+        $('drillMeta').textContent = users.length + ' user' + (users.length === 1 ? '' : 's');
+        renderTable('drillTableWrap', users, [
+          { label: 'Username', render: (r) => escHtml(r.username) },
+          { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+          { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+          { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+          { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
+          {
+            label: 'Graph',
+            render: (r) => graphIconButton('game-user', r.userId, (r.sessions || []).length > 0, 'View user sessions'),
+          },
+        ]);
+        return;
+      }
+
+      if (frame.type === 'sessions') {
+        const sessions = frame.sessions || [];
+        $('drillTitle').textContent = frame.title + ' · Sessions';
+        $('drillMeta').textContent = sessions.length + ' session' + (sessions.length === 1 ? '' : 's');
+        renderTable('drillTableWrap', sessions, [
+          { label: 'Started', render: (r) => escHtml(fmtFeedbackDateTime(r.startedAt)) },
+          { label: 'Game', render: (r) => escHtml(r.gameName) },
+          { label: 'Username', render: (r) => escHtml(r.username) },
+          { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+          { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+          { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+          { label: 'RTP', render: (r) => fmtRtp(r.rtp) },
+          {
+            label: 'Graph',
+            render: (r) => graphIconButton('session', r.sessionId, Number(r.totalSpin) > 0, 'View session spin graph'),
+          },
+        ]);
+        return;
+      }
+
+      const session = frame.session;
+      const spins = session.spinLogs || [];
+      const totalBet = spins.reduce((sum, spin) => sum + Number(spin.betAmount || 0), 0);
+      const totalWin = spins.reduce((sum, spin) => sum + Number(spin.winAmount || 0), 0);
+      $('drillTitle').textContent = session.username + ' · ' + session.gameName + ' · Spin Graph';
+      $('drillMeta').textContent = spins.length + ' spin' + (spins.length === 1 ? '' : 's');
+      $('chartSummary').innerHTML = [
+        ['Session Total Bet', '$' + fmtMoney(totalBet || session.totalBet)],
+        ['Session Total Win', '$' + fmtMoney(totalWin || session.totalWin)],
+        ['Session RTP', fmtRtp(totalBet ? totalWin / totalBet : session.rtp)],
+        ['Spins', fmtInt(spins.length)],
+        ['Started', fmtFeedbackDateTime(session.startedAt)],
+      ].map((item) =>
+        '<div class="chart-stat"><span>' + escHtml(item[0]) + '</span><strong>' + escHtml(item[1]) + '</strong></div>'
+      ).join('');
+      activeChartSpins = spins;
+      resetSpinChartZoom(spins.length, false);
+      window.requestAnimationFrame(() => renderSpinChart(spins));
+    }
+
+    function resetSpinChartZoom(spinCount = activeChartSpins.length, redraw = true) {
+      const n = Math.max(0, Number(spinCount) || 0);
+      chartViewStart = 0;
+      chartViewEnd = Math.max(0, n - 1);
+      chartPanState = null;
+      hoveredSpinIndex = -1;
+      updateSpinZoomControls();
+      if (redraw && activeChartSpins.length) renderSpinChart(activeChartSpins);
+    }
+
+    function clampChartView(start, end, spinCount) {
+      const n = Math.max(1, spinCount);
+      const minWindow = Math.min(n, Math.max(6, Math.ceil(n * 0.08)));
+      let s = Math.max(0, Math.min(n - 1, Math.floor(start)));
+      let e = Math.max(0, Math.min(n - 1, Math.ceil(end)));
+      if (e < s) e = s;
+      let windowSize = e - s + 1;
+      if (windowSize < minWindow) {
+        const mid = (s + e) / 2;
+        s = Math.floor(mid - (minWindow - 1) / 2);
+        e = s + minWindow - 1;
+        if (s < 0) {
+          s = 0;
+          e = minWindow - 1;
+        }
+        if (e > n - 1) {
+          e = n - 1;
+          s = Math.max(0, e - minWindow + 1);
+        }
+        windowSize = e - s + 1;
+      }
+      if (windowSize > n) {
+        s = 0;
+        e = n - 1;
+      }
+      return { start: s, end: e };
+    }
+
+    function updateSpinZoomControls() {
+      const n = activeChartSpins.length;
+      const hint = $('spinZoomHint');
+      const zoomInBtn = $('spinZoomInBtn');
+      const zoomOutBtn = $('spinZoomOutBtn');
+      const resetBtn = $('spinZoomResetBtn');
+      if (!n) {
+        if (hint) hint.textContent = 'Scroll to zoom · drag to pan';
+        if (zoomInBtn) zoomInBtn.disabled = true;
+        if (zoomOutBtn) zoomOutBtn.disabled = true;
+        if (resetBtn) resetBtn.disabled = true;
+        return;
+      }
+      const visible = chartViewEnd - chartViewStart + 1;
+      const fullyZoomedOut = chartViewStart <= 0 && chartViewEnd >= n - 1;
+      const minWindow = Math.min(n, Math.max(6, Math.ceil(n * 0.08)));
+      if (hint) {
+        hint.textContent = fullyZoomedOut
+          ? 'Scroll to zoom · drag to pan'
+          : 'Spins ' + fmtInt(chartViewStart + 1) + '–' + fmtInt(chartViewEnd + 1) + ' of ' + fmtInt(n);
+      }
+      if (zoomInBtn) zoomInBtn.disabled = visible <= minWindow;
+      if (zoomOutBtn) zoomOutBtn.disabled = fullyZoomedOut;
+      if (resetBtn) resetBtn.disabled = fullyZoomedOut;
+    }
+
+    function zoomSpinChart(factor, anchorRatio = 0.5) {
+      const n = activeChartSpins.length;
+      if (!n) return;
+      const visible = chartViewEnd - chartViewStart + 1;
+      const nextVisible = Math.round(visible * factor);
+      const anchor = chartViewStart + anchorRatio * (visible - 1);
+      const half = (nextVisible - 1) / 2;
+      const clamped = clampChartView(anchor - half, anchor + half, n);
+      chartViewStart = clamped.start;
+      chartViewEnd = clamped.end;
+      updateSpinZoomControls();
+      hideSpinChartTooltip();
+      renderSpinChart(activeChartSpins, hoveredSpinIndex);
+    }
+
+    function renderSpinChart(spins, hoverIndex = -1) {
+      const canvas = $('spinChart');
+      if (!canvas || !Array.isArray(spins) || !spins.length || canvas.offsetParent === null) return;
+
+      if (chartViewEnd < chartViewStart || chartViewEnd >= spins.length) {
+        chartViewStart = 0;
+        chartViewEnd = spins.length - 1;
+      }
+
+      const width = Math.max(canvas.parentElement.clientWidth - 32, 320);
+      const height = 360;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      const pad = { left: 58, right: 18, top: 18, bottom: 42 };
+      const plotW = width - pad.left - pad.right;
+      const plotH = height - pad.top - pad.bottom;
+      const viewStart = chartViewStart;
+      const viewEnd = chartViewEnd;
+      const visibleSpins = spins.slice(viewStart, viewEnd + 1);
+      const visibleCount = visibleSpins.length;
+      const bets = visibleSpins.map((s) => Number(s.betAmount || 0));
+      const wins = visibleSpins.map((s) => Number(s.winAmount || 0));
+      const maxValue = Math.max(1, ...bets, ...wins) * 1.08;
+      const slotW = plotW / visibleCount;
+      const barW = Math.max(2, Math.min(18, slotW * 0.42));
+      const xCenter = (i) => pad.left + (i + 0.5) * slotW;
+      const yAt = (value) => pad.top + plotH - (Number(value || 0) / maxValue) * plotH;
+
+      // Soft plot background
+      ctx.fillStyle = 'rgba(255,255,255,0.015)';
+      ctx.fillRect(pad.left, pad.top, plotW, plotH);
+
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillStyle = '#8b9bb0';
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i += 1) {
+        const y = pad.top + (plotH * i / 4);
+        const value = maxValue * (1 - i / 4);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(width - pad.right, y);
+        ctx.stroke();
+        ctx.textAlign = 'right';
+        ctx.fillText('$' + fmtNum(value), pad.left - 8, y + 3);
+      }
+
+      // Bet bars
+      visibleSpins.forEach((spin, i) => {
+        const cx = xCenter(i);
+        const bet = Number(spin.betAmount || 0);
+        const betY = yAt(bet);
+        const active = (viewStart + i) === hoverIndex;
+        ctx.fillStyle = active ? 'rgba(66, 165, 245, 0.95)' : 'rgba(66, 165, 245, 0.55)';
+        ctx.fillRect(cx - barW / 2, betY, barW, pad.top + plotH - betY);
+      });
+
+      // Win area + line
+      if (visibleCount > 0) {
+        ctx.beginPath();
+        visibleSpins.forEach((spin, i) => {
+          const x = xCenter(i);
+          const y = yAt(spin.winAmount);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.lineTo(xCenter(visibleCount - 1), pad.top + plotH);
+        ctx.lineTo(xCenter(0), pad.top + plotH);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        grad.addColorStop(0, 'rgba(102, 187, 106, 0.28)');
+        grad.addColorStop(1, 'rgba(102, 187, 106, 0.02)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.beginPath();
+        visibleSpins.forEach((spin, i) => {
+          const x = xCenter(i);
+          const y = yAt(spin.winAmount);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = 'rgba(102, 187, 106, 0.95)';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      }
+
+      if (hoverIndex >= viewStart && hoverIndex <= viewEnd) {
+        const localIndex = hoverIndex - viewStart;
+        const spin = spins[hoverIndex];
+        const cx = xCenter(localIndex);
+        const winY = yAt(spin.winAmount);
+        const betY = yAt(spin.betAmount);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cx, pad.top);
+        ctx.lineTo(cx, pad.top + plotH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.beginPath();
+        ctx.arc(cx, betY, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#42a5f5';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx, winY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#66bb6a';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+      }
+
+      // X labels — first, mid (when zoomed), last
+      ctx.fillStyle = '#8b9bb0';
+      ctx.textAlign = 'left';
+      const firstSpin = visibleSpins[0];
+      const lastSpin = visibleSpins[visibleCount - 1];
+      const firstLabel = 'Spin ' + fmtInt(firstSpin.spinIndex ?? viewStart + 1);
+      const lastLabel = 'Spin ' + fmtInt(lastSpin.spinIndex ?? viewEnd + 1);
+      ctx.fillText(firstLabel, pad.left, height - 14);
+      ctx.fillText(lastLabel, width - pad.right - ctx.measureText(lastLabel).width, height - 14);
+      if (visibleCount > 12) {
+        const mid = Math.floor(visibleCount / 2);
+        const midSpin = visibleSpins[mid];
+        const midLabel = 'Spin ' + fmtInt(midSpin.spinIndex ?? viewStart + mid + 1);
+        ctx.textAlign = 'center';
+        ctx.fillText(midLabel, xCenter(mid), height - 14);
+      }
+
+      canvas._chartMeta = {
+        spins,
+        pad,
+        plotW,
+        plotH,
+        slotW,
+        width,
+        height,
+        viewStart,
+        viewEnd,
+        xAt: (globalIndex) => xCenter(globalIndex - viewStart),
+        yAt,
+        localXAt: xCenter,
+      };
+      updateSpinZoomControls();
+    }
+
+    function spinIndexFromPointer(meta, x) {
+      if (!meta?.spins?.length) return -1;
+      const local = Math.floor((x - meta.pad.left) / meta.slotW);
+      if (local < 0 || local > meta.viewEnd - meta.viewStart) return -1;
+      return meta.viewStart + local;
+    }
+
+    function updateSpinChartTooltip(e) {
+      const canvas = $('spinChart');
+      const tooltip = $('spinChartTooltip');
+      const panel = canvas?.parentElement;
+      const meta = canvas?._chartMeta;
+      if (!canvas || !tooltip || !panel || !meta?.spins?.length) return;
+      if (chartPanState) {
+        show(tooltip, false);
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      if (x < meta.pad.left || x > meta.width - meta.pad.right || y < meta.pad.top || y > meta.height - meta.pad.bottom) {
+        if (hoveredSpinIndex !== -1) {
+          hoveredSpinIndex = -1;
+          renderSpinChart(meta.spins, -1);
+        }
+        show(tooltip, false);
+        return;
+      }
+
+      const index = spinIndexFromPointer(meta, x);
+      if (index < 0) {
+        show(tooltip, false);
+        return;
+      }
+      const spin = meta.spins[index];
+      const pointX = meta.xAt(index);
+      const pointY = Math.min(meta.yAt(spin.betAmount), meta.yAt(spin.winAmount));
+
+      if (hoveredSpinIndex !== index) {
+        hoveredSpinIndex = index;
+        renderSpinChart(meta.spins, index);
+      }
+
+      tooltip.innerHTML =
+        '<strong>Spin ' + escHtml(spin.spinIndex) + '</strong>' +
+        '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Time</span><b>' + escHtml(fmtFeedbackDateTime(spin.createdAt)) + '</b></div>';
+
+      const tipW = tooltip.offsetWidth || 190;
+      const tipH = tooltip.offsetHeight || 110;
+      const panelW = panel.clientWidth;
+      let left = pointX;
+      let top = Math.min(pointY, y) - 8;
+      left = Math.max(tipW / 2 + 8, Math.min(panelW - tipW / 2 - 8, left));
+      top = Math.max(tipH + 8, top);
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+      tooltip.style.right = 'auto';
+      show(tooltip, true);
+    }
+
+    function hideSpinChartTooltip() {
+      const tooltip = $('spinChartTooltip');
+      if (tooltip) show(tooltip, false);
+      if (hoveredSpinIndex !== -1) {
+        hoveredSpinIndex = -1;
+        if (activeChartSpins.length) renderSpinChart(activeChartSpins, -1);
+      }
+    }
+
+    function onSpinChartWheel(e) {
+      const canvas = $('spinChart');
+      const meta = canvas?._chartMeta;
+      if (!meta?.spins?.length) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const plotLeft = meta.pad.left;
+      const plotRight = meta.width - meta.pad.right;
+      const ratio = x <= plotLeft
+        ? 0
+        : x >= plotRight
+          ? 1
+          : (x - plotLeft) / (plotRight - plotLeft);
+      const factor = e.deltaY < 0 ? 0.72 : 1.38;
+      zoomSpinChart(factor, ratio);
+    }
+
+    function onSpinChartPointerDown(e) {
+      const canvas = $('spinChart');
+      const meta = canvas?._chartMeta;
+      if (!meta?.spins?.length || e.button !== 0) return;
+      const visible = meta.viewEnd - meta.viewStart + 1;
+      if (visible >= meta.spins.length) return;
+      chartPanState = {
+        startX: e.clientX,
+        originStart: chartViewStart,
+        originEnd: chartViewEnd,
+        slotW: meta.slotW,
+      };
+      canvas.classList.add('is-panning');
+      hideSpinChartTooltip();
+      e.preventDefault();
+    }
+
+    function onSpinChartPointerMove(e) {
+      if (!chartPanState) {
+        updateSpinChartTooltip(e);
+        return;
+      }
+      const deltaPx = e.clientX - chartPanState.startX;
+      const deltaSpins = Math.round(-deltaPx / chartPanState.slotW);
+      const n = activeChartSpins.length;
+      const windowSize = chartPanState.originEnd - chartPanState.originStart + 1;
+      let s = chartPanState.originStart + deltaSpins;
+      let eIdx = s + windowSize - 1;
+      if (s < 0) {
+        s = 0;
+        eIdx = windowSize - 1;
+      }
+      if (eIdx > n - 1) {
+        eIdx = n - 1;
+        s = Math.max(0, eIdx - windowSize + 1);
+      }
+      if (s !== chartViewStart || eIdx !== chartViewEnd) {
+        chartViewStart = s;
+        chartViewEnd = eIdx;
+        updateSpinZoomControls();
+        renderSpinChart(activeChartSpins, -1);
+      }
+    }
+
+    function onSpinChartPointerUp() {
+      const canvas = $('spinChart');
+      if (canvas) canvas.classList.remove('is-panning');
+      chartPanState = null;
+    }
+
+    async function fetchUserSessions(userId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/users/' + encodeURIComponent(userId) + '/sessions';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.sessions || [];
+    }
+
+    async function fetchGameUsers(gameId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/games/' + encodeURIComponent(gameId) + '/users';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.users || [];
+    }
+
+    async function fetchSessionSpins(sessionId) {
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/sessions/' + encodeURIComponent(sessionId) + '/spins';
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.spinLogs || [];
+    }
+
+    async function openUserSessions(userRow) {
+      if (isDrillLoading || !userRow) return;
+      isDrillLoading = true;
+      setError('');
+      $('drillTitle').textContent = 'Loading sessions for ' + (userRow.username || 'user') + '…';
+      show($('mainDashboard'), false);
+      show($('diffCard'), false);
+      show($('drillDownCard'), true);
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      $('drillMeta').textContent = '';
+
+      try {
+        let sessions = userRow.sessions;
+        if (!isDemoMode()) {
+          sessions = await fetchUserSessions(userRow.userId);
+        } else if (!Array.isArray(sessions)) {
+          sessions = [];
+        }
+        pushDrill({
+          type: 'sessions',
+          title: userRow.username,
+          sessions,
+        });
+      } catch (err) {
+        setDashboardViewMode();
+        setError(err.message || 'Failed to load user sessions');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    async function openGameUsers(gameRow) {
+      if (isDrillLoading || !gameRow) return;
+      isDrillLoading = true;
+      setError('');
+      $('drillTitle').textContent = 'Loading users for ' + (gameRow.gameName || 'game') + '…';
+      show($('mainDashboard'), false);
+      show($('diffCard'), false);
+      show($('drillDownCard'), true);
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      $('drillMeta').textContent = '';
+
+      try {
+        let users = gameRow.users;
+        if (!isDemoMode()) {
+          users = await fetchGameUsers(gameRow.gameId);
+        } else if (!Array.isArray(users)) {
+          users = [];
+        }
+        pushDrill({
+          type: 'game-users',
+          game: { ...gameRow, users },
+        });
+      } catch (err) {
+        setDashboardViewMode();
+        setError(err.message || 'Failed to load game users');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    async function openSessionGraph(session) {
+      if (isDrillLoading || !session) return;
+      isDrillLoading = true;
+      const savedTitle = $('drillTitle').textContent;
+      $('drillTitle').textContent = 'Loading session spins…';
+      show($('drillTableWrap'), false);
+      show($('drillChartWrap'), false);
+      setDashboardViewMode();
+
+      try {
+        let spinLogs = session.spinLogs;
+        if (!isDemoMode()) {
+          spinLogs = await fetchSessionSpins(session.sessionId);
+        } else if (!Array.isArray(spinLogs)) {
+          spinLogs = [];
+        }
+        pushDrill({ type: 'spins', session: { ...session, spinLogs } });
+      } catch (err) {
+        $('drillTitle').textContent = savedTitle;
+        show($('drillTableWrap'), true);
+        setError(err.message || 'Failed to load session spins');
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    function handleDrillClick(button) {
+      const kind = button.dataset.drill;
+      const id = button.dataset.id;
+
+      if (kind === 'game' || kind === 'user') {
+        const row = findSummaryRow(kind, id);
+        if (!row) return;
+        if (kind === 'game') openGameUsers(row);
+        else openUserSessions(row);
+        return;
+      }
+
+      const frame = drillStack[drillStack.length - 1];
+      if (kind === 'game-user' && frame?.type === 'game-users') {
+        const user = (frame.game.users || []).find((row) => String(row.userId) === String(id));
+        if (user) {
+          pushDrill({
+            type: 'sessions',
+            title: user.username + ' · ' + frame.game.gameName,
+            sessions: user.sessions || [],
+          });
+        }
+        return;
+      }
+
+      if (kind === 'session' && frame?.type === 'sessions') {
+        const session = (frame.sessions || []).find((row) => String(row.sessionId) === String(id));
+        if (session) openSessionGraph(session);
+      }
+    }
+
+    function renderDashboard(data) {
+      const d = data?.data || {};
+      currentDashboardData = d;
+      const feedbacks = d.userFeedbacks || [];
+      const totalFeedbackCount = feedbacks.reduce((s, r) => s + Number(r.feedBackCount || 0), 0);
+      const avgFeedbackRating = feedbacks.length
+        ? feedbacks.reduce((s, r) => s + Number(r.avgRating || 0), 0) / feedbacks.length
+        : 0;
+
+      $('kpiGrid').innerHTML = [
+        { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged), icon: '💰', tone: 'kpi-money' },
+        { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed), icon: '💸', tone: 'kpi-redeem' },
+        { label: 'Game Users', value: fmtInt(gameUsersCount(d.totalGameUsers)), icon: '👥', tone: 'kpi-users' },
+        {
+          label: 'Whole Game RTP',
+          value: fmtRtp(d.wholeGameRtp?.rtp),
+          sub: 'Bet $' + fmtMoney(d.wholeGameRtp?.totalBet) + ' · Win $' + fmtMoney(d.wholeGameRtp?.totalWin),
+          icon: '🎰',
+          tone: 'kpi-rtp',
+        },
+        {
+          label: 'User Feedbacks',
+          value: fmtInt(totalFeedbackCount),
+          sub: feedbacks.length ? 'Avg rating ' + avgFeedbackRating.toFixed(1) + ' · ' + feedbacks.length + ' users' : 'No feedback yet',
+          icon: '⭐',
+          tone: 'kpi-feedback',
+        },
+      ].map((k) =>
+        '<div class="kpi ' + (k.tone || '') + '">' +
+        '<div class="kpi-head"><div class="kpi-label">' + k.label + '</div><span class="kpi-icon">' + (k.icon || '📊') + '</span></div>' +
+        '<div class="kpi-value">' + k.value + '</div>' +
+        (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') + '</div>'
+      ).join('');
+
+      const gameRtpCols = [
+        { label: 'Game', render: (r) => escHtml(r.gameName) },
+        { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+        { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+        { label: 'RTP', render: (r) => rtpBar(r.rtp, r.targetRtp) },
+        { label: 'Target', render: (r) => '<span class="badge muted">' + fmtRtp(r.targetRtp) + '</span>' },
+        {
+          label: 'Status',
+          render: (r) => Number(r.rtp) >= Number(r.targetRtp)
+            ? '<span class="badge warn">Above target</span>'
+            : '<span class="badge ok">Below target</span>',
+        },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('game', r.gameId, Number(r.totalSpin) > 0, 'View game users and sessions'),
+        },
+      ];
+
+      const userRtpCols = [
+        { label: 'Username', render: (r) => escHtml(r.username) },
+        { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
+        { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+        { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('user', r.userId, Number(r.totalSpin) > 0, 'View user sessions'),
+        },
+      ];
+
+      renderTable('rtpByGameWrap', d.rtpByGame, gameRtpCols);
+      renderTable('rtpByUserWrap', d.rtpByUser, userRtpCols);
+      renderTable('gamesAboveTargetWrap', d.gamesAboveTargetRtp, gameRtpCols);
+      renderTable('usersRtpHighWrap', d.usersRtpAboveOrEqualOne, userRtpCols);
+      gamesTargetRtpData = d.gamesTargetRtp || [];
+      renderGamesTargetRtpTable();
+      userFeedbacksData = feedbacks;
+      renderUserFeedbacksTable();
+
+      setRowCount('countRtpGame', d.rtpByGame);
+      setRowCount('countRtpUser', d.rtpByUser);
+      setRowCount('countAboveTarget', d.gamesAboveTargetRtp);
+      setRowCount('countUsersHigh', d.usersRtpAboveOrEqualOne);
+
+      const filteredTargetRtpCount = filterGamesTargetRtp(gamesTargetRtpData).length;
+      const filteredFeedbacksCount = filterUserFeedbacks(userFeedbacksData).length;
+      renderSectionNav([
+        { id: 'sec-rtp-game', label: 'RTP by Game', count: (d.rtpByGame || []).length, icon: '🎮' },
+        { id: 'sec-rtp-user', label: 'RTP by User', count: (d.rtpByUser || []).length, icon: '👤' },
+        { id: 'sec-above-target', label: 'Above Target', count: (d.gamesAboveTargetRtp || []).length, icon: '📈', tone: 'warn' },
+        { id: 'sec-users-high', label: 'Users RTP ≥100%', count: (d.usersRtpAboveOrEqualOne || []).length, icon: '🔥', tone: 'ok' },
+        { id: 'sec-feedbacks', label: 'User Feedbacks', count: filteredFeedbacksCount, icon: '⭐', tone: 'feedback' },
+        { id: 'sec-target-rtp', label: 'Game Target RTP', count: filteredTargetRtpCount, icon: '🎯' },
+      ]);
+
+      $('jsonView').textContent = JSON.stringify(data, null, 2);
+      show($('dashboard'), true);
+    }
+
+    function setError(message) {
+      const el = $('fetchError');
+      if (!message) { el.textContent = ''; show(el, false); return; }
+      el.textContent = message;
+      show(el, true);
+    }
+
+    function isStaticServer404(text) {
+      return /Error code:\s*404/i.test(text) && /File not found/i.test(text);
+    }
+
+    function parseSummaryResponse(res, text) {
+      let json;
+      try { json = text ? JSON.parse(text) : null; } catch {
+        if (isStaticServer404(text)) {
+          throw new Error('STATIC_404');
+        }
+        throw new Error('Response is not valid JSON.\n' + text.slice(0, 300));
+      }
+      if (!res.ok) throw new Error(json?.message || ('HTTP ' + res.status));
+      if (!json?.success) throw new Error(json?.message || 'API returned success: false');
+      return json;
+    }
+
+    async function fetchSummaryFrom(origin) {
+      const url = origin.replace(/\/$/, '') + '/api/dashboard/internal/summary';
+      const headers = { Accept: 'application/json' };
+      if (lastSummaryEtag) headers['If-None-Match'] = lastSummaryEtag;
+
+      const res = await fetch(url, { headers });
+
+      if (res.status === 304) {
+        return { notModified: true, url, origin, etag: lastSummaryEtag };
+      }
+
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      const etag = res.headers.get('ETag') || res.headers.get('etag');
+      if (etag) lastSummaryEtag = etag;
+      return { json, url, origin, notModified: false, etag };
+    }
+
+    function applySummaryResponse(json, isAutoRefresh) {
+      const changed = !lastSummaryJson || !responsesEqual(lastSummaryJson, json);
+      lastSummaryJson = json;
+
+      if (!changed) {
+        const time = new Date().toLocaleTimeString();
+        setConn('ok', 'API · up to date · ' + time);
+        setError('');
+        if (!isAutoRefresh) showLoadToast('No changes at ' + time);
+        return false;
+      }
+
+      pushResponseHistory(json);
+      if (!drillStack.length) renderDashboard(json);
+      else currentDashboardData = json?.data || {};
+      const time = new Date().toLocaleTimeString();
+      setConn('ok', 'API · last updated ' + time);
+      setError('');
+      showLoadToast((isAutoRefresh ? 'Data reloaded' : 'Data loaded') + ' at ' + time);
+      return true;
+    }
+
+    const REFRESH_SEC = 40;
+    let secondsLeft = REFRESH_SEC;
+    let isLoading = false;
+    let isRefreshPaused = false;
+    let toastTimer = null;
+
+    function updatePauseButtonUi() {
+      const btn = $('pauseRefreshBtn');
+      if (!btn) return;
+      show(btn, !isDemoMode());
+      btn.textContent = isRefreshPaused ? 'Resume' : 'Pause';
+      btn.setAttribute('aria-pressed', isRefreshPaused ? 'true' : 'false');
+    }
+
+    function setRefreshPaused(paused) {
+      isRefreshPaused = paused;
+      updatePauseButtonUi();
+      updateRefreshTimer();
+    }
+
+    function toggleRefreshPaused() {
+      setRefreshPaused(!isRefreshPaused);
+    }
+
+    function updateRefreshTimer() {
+      const el = $('refreshTimer');
+      if (isDemoMode()) {
+        el.textContent = 'Demo — auto-refresh off';
+        return;
+      }
+      if (isLoading) {
+        el.innerHTML = 'Reloading data…';
+        return;
+      }
+      if (isTabHidden && !isDemoMode()) {
+        el.textContent = 'Auto-refresh paused (tab hidden)';
+        return;
+      }
+      if (isRefreshPaused) {
+        el.innerHTML = 'Auto-refresh paused · <strong id="refreshSeconds">' + secondsLeft + '</strong>s when resumed';
+        return;
+      }
+      el.innerHTML = 'Next refresh in <strong id="refreshSeconds">' + secondsLeft + '</strong>s';
+    }
+
+    function resetRefreshTimer() {
+      secondsLeft = REFRESH_SEC;
+      updateRefreshTimer();
+    }
+
+    function showLoadToast(message) {
+      const toast = $('loadToast');
+      toast.textContent = message;
+      show(toast, true);
+      toast.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => show(toast, false), 300);
+      }, 3500);
+    }
+
+    function startRefreshClock() {
+      setInterval(() => {
+        if (isDemoMode() || isLoading || isRefreshPaused || isTabHidden) return;
+        secondsLeft -= 1;
+        if (secondsLeft <= 0) {
+          loadData(true);
+          return;
+        }
+        updateRefreshTimer();
+      }, 1000);
+    }
+
+    function loadDemoData(isAutoRefresh = false) {
+      setError('');
+      clearResponseHistory();
+      renderDashboard(DEMO_SUMMARY);
+      const time = new Date().toLocaleTimeString();
+      setConn('ok', 'Demo data · ' + time);
+      if (!isAutoRefresh) {
+        showLoadToast('Demo data loaded at ' + time);
+      }
+      updateRefreshTimer();
+    }
+
+    async function loadApiData(isAutoRefresh = false) {
+      isLoading = true;
+      if (!isAutoRefresh) setError('');
+      if (!isAutoRefresh) $('loadBtn').disabled = true;
+      setConn('busy', isAutoRefresh ? 'Refreshing…' : 'Loading…');
+      updateRefreshTimer();
+
+      try {
+        const origin = apiOrigin();
+        const result = await fetchSummaryFrom(origin);
+        if (result.notModified) {
+          const time = new Date().toLocaleTimeString();
+          setConn('ok', 'API · up to date · ' + time);
+          setError('');
+          if (!isAutoRefresh) showLoadToast('No changes at ' + time);
+          resetRefreshTimer();
+          return;
+        }
+        applySummaryResponse(result.json, isAutoRefresh);
+        resetRefreshTimer();
+      } catch (err) {
+        setConn('err', isAutoRefresh ? 'Refresh failed' : 'Failed');
+        let msg = err.message || String(err);
+        const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+        if (msg === 'STATIC_404') {
+          msg = 'You started python -m http.server — that cannot proxy /api.\n\n'
+            + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.';
+        } else if (msg === 'Failed to fetch') {
+          msg = isLocal
+            ? ('Cannot reach API.\n\n'
+              + '1. .NET backend must run on http://localhost:5036\n'
+              + '2. Double-click start.bat (not python -m http.server)\n'
+              + '3. Or switch Data source to Demo to preview without the backend')
+            : ('Cannot reach API.\n\n'
+              + 'The dashboard proxies /api to https://gamevault222.com/api/\n'
+              + 'Check that the live API is up, then retry Load.\n'
+              + 'Or switch Data source to Demo to preview without the backend');
+        } else if (/Proxy error/i.test(msg) || /WinError 10061/i.test(msg)) {
+          msg = isLocal
+            ? ('Backend not reachable at http://localhost:5036\n\n'
+              + 'Start the .NET API, then click Load or wait for auto-refresh.\n'
+              + 'Showing last successful data if available.')
+            : ('Backend not reachable at https://gamevault222.com\n\n'
+              + 'Check the live API, then click Load or wait for auto-refresh.\n'
+              + 'Showing last successful data if available.');
+        }
+        if (!isAutoRefresh) {
+          setError(msg);
+          show($('dashboard'), false);
+        } else if (responseHistory.length > 0) {
+          setError('');
+        } else {
+          setError(msg);
+        }
+        if (isAutoRefresh) {
+          resetRefreshTimer();
+        }
+      } finally {
+        isLoading = false;
+        if (!isAutoRefresh) $('loadBtn').disabled = false;
+        updateRefreshTimer();
+      }
+    }
+
+    async function loadData(isAutoRefresh = false) {
+      if (isLoading) return;
+      updateDataSourceUi();
+      if (isDemoMode()) {
+        loadDemoData(isAutoRefresh);
+        return;
+      }
+      await loadApiData(isAutoRefresh);
+    }
+
+    $('loadBtn').addEventListener('click', () => {
+      resetRefreshTimer();
+      loadData(false);
+    });
+    $('pauseRefreshBtn').addEventListener('click', () => {
+      toggleRefreshPaused();
+    });
+    $('dataSource').addEventListener('change', () => {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      resetRefreshTimer();
+      if (isDemoMode()) clearResponseHistory();
+      loadData(false);
+    });
+    $('responseHistory').addEventListener('change', () => {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      showHistoryAt(Number($('responseHistory').value));
+    });
+    $('targetRtpFilter').addEventListener('change', () => {
+      renderGamesTargetRtpTable(true);
+    });
+    $('feedbackFilterBtn').addEventListener('click', () => {
+      applyFeedbackDateFilter();
+    });
+    $('feedbackClearFilterBtn').addEventListener('click', () => {
+      clearFeedbackDateFilter();
+    });
+    $('feedbackDateFrom').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFeedbackDateFilter();
+    });
+    $('feedbackDateTo').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') applyFeedbackDateFilter();
+    });
+    $('toggleJsonBtn').addEventListener('click', () => {
+      if (isDiffVisible) return;
+      const visible = !$('jsonCard').classList.contains('hidden');
+      show($('jsonCard'), !visible);
+      $('toggleJsonBtn').textContent = visible ? 'Show JSON' : 'Hide JSON';
+    });
+    $('toggleDiffBtn').addEventListener('click', () => {
+      isDiffVisible = !isDiffVisible;
+      updateDiffPanel();
+      if (isDiffVisible) {
+        $('diffCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    $('dashboard').addEventListener('click', (e) => {
+      const button = e.target.closest('[data-drill]');
+      if (button && !button.disabled && !isDrillLoading) handleDrillClick(button);
+    });
+    $('drillBackBtn').addEventListener('click', () => {
+      drillStack.pop();
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      if (drillStack.length) renderDrillView();
+      else setDashboardViewMode();
+    });
+    $('spinZoomInBtn').addEventListener('click', () => zoomSpinChart(0.65, 0.5));
+    $('spinZoomOutBtn').addEventListener('click', () => zoomSpinChart(1.45, 0.5));
+    $('spinZoomResetBtn').addEventListener('click', () => resetSpinChartZoom());
+    $('spinChart').addEventListener('mousemove', onSpinChartPointerMove);
+    $('spinChart').addEventListener('mousedown', onSpinChartPointerDown);
+    $('spinChart').addEventListener('mouseleave', () => {
+      onSpinChartPointerUp();
+      hideSpinChartTooltip();
+    });
+    window.addEventListener('mouseup', onSpinChartPointerUp);
+    $('spinChart').addEventListener('wheel', onSpinChartWheel, { passive: false });
+    window.addEventListener('resize', () => {
+      if (drillStack[drillStack.length - 1]?.type === 'spins') {
+        hideSpinChartTooltip();
+        renderSpinChart(activeChartSpins);
+      }
+    });
+
+    function initPage() {
+      isDiffVisible = false;
+      drillStack = [];
+      isTabHidden = document.hidden;
+      clearResponseHistory();
+      setDefaultFeedbackDateFilter();
+      updateFeedbackFilterHint();
+      updateDataSourceUi();
+      startRefreshClock();
+      loadData(false);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      isTabHidden = document.hidden;
+      updateRefreshTimer();
+    });
+
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        isDiffVisible = false;
+        clearResponseHistory();
+        loadData(false);
+      }
+    });
+
+    initPage();
+  </script>
+</body>
+</html>
