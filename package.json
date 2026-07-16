@@ -1,5 +1,0 @@
-{
-  "name": "internal-dashboard",
-  "private": true,
-  "description": "Game Vault 2.0 internal dashboard (static UI + /api proxy to gamevault222.com)"
-}
