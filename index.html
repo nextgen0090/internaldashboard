@@ -403,10 +403,15 @@
       padding: 0.55rem 0.65rem;
     }
 
-    .inline-field input[type="date"] {
+    .inline-field input[type="date"],
+    .inline-field input[type="search"] {
       width: auto;
       min-width: 150px;
       padding: 0.55rem 0.65rem;
+    }
+
+    .inline-field input[type="search"] {
+      min-width: 180px;
     }
 
     .section-toolbar-inline .section-toolbar-actions {
@@ -663,6 +668,18 @@
       line-height: 1.35;
     }
 
+    .kpi-sub .kpi-bet,
+    .kpi-bet {
+      color: #42a5f5;
+      font-weight: 600;
+    }
+
+    .kpi-sub .kpi-win,
+    .kpi-win {
+      color: #66bb6a;
+      font-weight: 600;
+    }
+
     .section-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -709,14 +726,15 @@
     }
 
     th {
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 0.74rem;
+      color: var(--text);
+      font-weight: 800;
+      font-size: 0.82rem;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       position: sticky;
       top: 0;
       background: rgba(35, 47, 62, 0.98);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .table-wrap {
@@ -742,11 +760,21 @@
       transform: translateY(6px);
     }
 
-    #targetRtpFilter {
+    #targetRtpFilter,
+    #feedbackStarFilter,
+    #rtpByGameTargetFilter,
+    #gamesAboveTargetFilter,
+    #rtpByUserMinFilter,
+    #usersHighMinFilter {
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    #targetRtpFilter:focus {
+    #targetRtpFilter:focus,
+    #feedbackStarFilter:focus,
+    #rtpByGameTargetFilter:focus,
+    #gamesAboveTargetFilter:focus,
+    #rtpByUserMinFilter:focus,
+    #usersHighMinFilter:focus {
       border-color: rgba(66, 165, 245, 0.65);
       box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.15);
       outline: none;
@@ -899,6 +927,13 @@
       background: linear-gradient(180deg, rgba(102, 187, 106, 0.95), rgba(102, 187, 106, 0.35));
       border-top: 2px solid #66bb6a;
       height: 8px;
+    }
+    .spin-chart-legend .leg-free {
+      background: #ffc107;
+      box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.35);
+    }
+    .spin-chart-legend .leg-paid {
+      background: #42a5f5;
     }
 
     .spin-chart-zoom {
@@ -1171,20 +1206,91 @@
 
       <div class="section-grid">
         <section class="card" id="sec-rtp-game">
-          <h2>RTP by Game <span class="row-count" id="countRtpGame"></span></h2>
-          <div class="table-wrap" id="rtpByGameWrap"></div>
+          <div class="section-header-row">
+            <h2>RTP by Game <span class="row-count" id="countRtpGame"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="rtpByGameSearch">Search</label>
+                <input type="search" id="rtpByGameSearch" placeholder="Game, spins, RTP" autocomplete="off" />
+              </div>
+              <div class="inline-field">
+                <label for="rtpByGameTargetFilter">Target RTP</label>
+                <select id="rtpByGameTargetFilter">
+                  <option value="all">All</option>
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="80">80%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap smooth-update" id="rtpByGameWrap"></div>
         </section>
         <section class="card" id="sec-rtp-user">
-          <h2>RTP by User <span class="row-count" id="countRtpUser"></span></h2>
-          <div class="table-wrap" id="rtpByUserWrap"></div>
+          <div class="section-header-row">
+            <h2>RTP by User <span class="row-count" id="countRtpUser"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="rtpByUserSearch">Search</label>
+                <input type="search" id="rtpByUserSearch" placeholder="Username, spins, RTP" autocomplete="off" />
+              </div>
+              <div class="inline-field">
+                <label for="rtpByUserMinFilter">Min RTP</label>
+                <select id="rtpByUserMinFilter">
+                  <option value="all">All</option>
+                  <option value="50">≥ 50%</option>
+                  <option value="100">≥ 100%</option>
+                  <option value="200">≥ 200%</option>
+                  <option value="300">≥ 300%</option>
+                  <option value="500">≥ 500%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap smooth-update" id="rtpByUserWrap"></div>
         </section>
         <section class="card" id="sec-above-target">
-          <h2>Games Above Target RTP <span class="row-count" id="countAboveTarget"></span></h2>
-          <div class="table-wrap" id="gamesAboveTargetWrap"></div>
+          <div class="section-header-row">
+            <h2>Games Above Target RTP <span class="row-count" id="countAboveTarget"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="gamesAboveTargetSearch">Search</label>
+                <input type="search" id="gamesAboveTargetSearch" placeholder="Game, spins, RTP" autocomplete="off" />
+              </div>
+              <div class="inline-field">
+                <label for="gamesAboveTargetFilter">Target RTP</label>
+                <select id="gamesAboveTargetFilter">
+                  <option value="all">All</option>
+                  <option value="60">60%</option>
+                  <option value="70">70%</option>
+                  <option value="80">80%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap smooth-update" id="gamesAboveTargetWrap"></div>
         </section>
         <section class="card" id="sec-users-high">
-          <h2>Users RTP &ge; 100% <span class="row-count" id="countUsersHigh"></span></h2>
-          <div class="table-wrap" id="usersRtpHighWrap"></div>
+          <div class="section-header-row">
+            <h2>Users RTP &ge; 100% <span class="row-count" id="countUsersHigh"></span></h2>
+            <div class="section-toolbar section-toolbar-inline">
+              <div class="inline-field">
+                <label for="usersHighSearch">Search</label>
+                <input type="search" id="usersHighSearch" placeholder="Username, spins, RTP" autocomplete="off" />
+              </div>
+              <div class="inline-field">
+                <label for="usersHighMinFilter">Min RTP</label>
+                <select id="usersHighMinFilter">
+                  <option value="all">All (≥100%)</option>
+                  <option value="100">≥ 100%</option>
+                  <option value="200">≥ 200%</option>
+                  <option value="300">≥ 300%</option>
+                  <option value="500">≥ 500%</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap smooth-update" id="usersRtpHighWrap"></div>
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-feedbacks">
           <div class="section-header-row">
@@ -1197,6 +1303,17 @@
               <div class="inline-field">
                 <label for="feedbackDateTo">To</label>
                 <input type="date" id="feedbackDateTo" />
+              </div>
+              <div class="inline-field">
+                <label for="feedbackStarFilter">Stars</label>
+                <select id="feedbackStarFilter">
+                  <option value="all">All</option>
+                  <option value="5">5 ★</option>
+                  <option value="4">4 ★</option>
+                  <option value="3">3 ★</option>
+                  <option value="2">2 ★</option>
+                  <option value="1">1 ★</option>
+                </select>
               </div>
               <div class="section-toolbar-actions">
                 <button type="button" id="feedbackFilterBtn">Filter</button>
@@ -1238,7 +1355,8 @@
           <div class="spin-chart-panel">
             <div class="spin-chart-toolbar">
               <div class="spin-chart-legend">
-                <span><i class="leg-bet" aria-hidden="true"></i> Bet</span>
+                <span><i class="leg-bet" aria-hidden="true"></i> Bet (paid)</span>
+                <span><i class="leg-free" aria-hidden="true"></i> Free spin</span>
                 <span><i class="leg-win" aria-hidden="true"></i> Win</span>
               </div>
               <div class="spin-chart-zoom">
@@ -1268,9 +1386,14 @@
     let historyViewIndex = 0;
     let isDiffVisible = false;
     let gamesTargetRtpData = [];
+    let rtpByGameData = [];
+    let gamesAboveTargetData = [];
+    let rtpByUserData = [];
+    let usersRtpHighData = [];
     let userFeedbacksData = [];
     let feedbackDateFromActive = '';
     let feedbackDateToActive = '';
+    let feedbackStarActive = 'all';
     let lastSummaryEtag = '';
     let lastSummaryJson = null;
     let isTabHidden = document.hidden;
@@ -1385,7 +1508,8 @@
       data: {
         totalRecharged: 125430.50,
         totalRedeemed: 98210.25,
-        totalGameUsers: { count: 1842, users: [] },
+        totalUsers: 1842,
+        totalGameUsers: { count: 12, users: [] },
         wholeGameRtp: { totalBet: 890120.00, totalWin: 801108.00, rtp: 0.90 },
         rtpByGame: [
           {
@@ -1652,8 +1776,18 @@
       });
     }
 
+    function filterFeedbacksByStar(feedbacks) {
+      if (!Array.isArray(feedbacks)) return [];
+      if (!feedbackStarActive || feedbackStarActive === 'all') return feedbacks;
+      const target = Number(feedbackStarActive);
+      if (Number.isNaN(target)) return feedbacks;
+      return feedbacks.filter((f) => Number(f.ratingStar) === target);
+    }
+
     function getVisibleFeedbacksForUser(userRow) {
-      return sortFeedbacksByDate(filterFeedbacksByDate(getUserFeedbacksList(userRow)));
+      return sortFeedbacksByDate(
+        filterFeedbacksByStar(filterFeedbacksByDate(getUserFeedbacksList(userRow)))
+      );
     }
 
     function localDateInputValue(d = new Date()) {
@@ -1685,17 +1819,22 @@
     function updateFeedbackFilterHint() {
       const hint = $('feedbackFilterHint');
       if (!hint) return;
+      const parts = [];
       if (!feedbackDateFromActive && !feedbackDateToActive) {
-        hint.textContent = '· all dates';
-        return;
-      }
-      const from = formatFilterDateLabel(feedbackDateFromActive);
-      const to = formatFilterDateLabel(feedbackDateToActive);
-      if (feedbackDateFromActive && feedbackDateToActive && feedbackDateFromActive === feedbackDateToActive) {
-        hint.textContent = '· ' + from + ' only';
+        parts.push('all dates');
       } else {
-        hint.textContent = '· ' + from + ' – ' + to;
+        const from = formatFilterDateLabel(feedbackDateFromActive);
+        const to = formatFilterDateLabel(feedbackDateToActive);
+        if (feedbackDateFromActive && feedbackDateToActive && feedbackDateFromActive === feedbackDateToActive) {
+          parts.push(from + ' only');
+        } else {
+          parts.push(from + ' – ' + to);
+        }
       }
+      if (feedbackStarActive && feedbackStarActive !== 'all') {
+        parts.push(feedbackStarActive + ' ★');
+      }
+      hint.textContent = '· ' + parts.join(' · ');
     }
 
     function isTodayDate(d) {
@@ -1845,7 +1984,9 @@
     }
 
     function matchesFeedbackDateFilter(row) {
-      if (!feedbackDateFromActive && !feedbackDateToActive) return true;
+      const hasDate = !!(feedbackDateFromActive || feedbackDateToActive);
+      const hasStar = !!(feedbackStarActive && feedbackStarActive !== 'all');
+      if (!hasDate && !hasStar) return true;
       return getVisibleFeedbacksForUser(row).length > 0;
     }
 
@@ -1880,6 +2021,7 @@
     function applyFeedbackDateFilter() {
       feedbackDateFromActive = $('feedbackDateFrom')?.value || '';
       feedbackDateToActive = $('feedbackDateTo')?.value || '';
+      feedbackStarActive = $('feedbackStarFilter')?.value || 'all';
       updateFeedbackFilterHint();
       renderUserFeedbacksTable(true);
     }
@@ -1887,8 +2029,10 @@
     function clearFeedbackDateFilter() {
       feedbackDateFromActive = '';
       feedbackDateToActive = '';
+      feedbackStarActive = 'all';
       if ($('feedbackDateFrom')) $('feedbackDateFrom').value = '';
       if ($('feedbackDateTo')) $('feedbackDateTo').value = '';
+      if ($('feedbackStarFilter')) $('feedbackStarFilter').value = 'all';
       updateFeedbackFilterHint();
       renderUserFeedbacksTable(true);
     }
@@ -2056,7 +2200,8 @@
       const scalars = [
         { key: 'totalRecharged', label: 'Total Recharged' },
         { key: 'totalRedeemed', label: 'Total Redeemed' },
-        { key: 'totalGameUsers', label: 'Game Users' },
+        { key: 'totalUsers', label: 'Total Users' },
+        { key: 'totalGameUsers', label: 'Online Users' },
       ];
       for (const s of scalars) {
         const oldVal = s.key === 'totalGameUsers'
@@ -2228,10 +2373,188 @@
       return Math.abs(pct - want) < 0.01;
     }
 
+    function filterByTargetRtp(rows, filter) {
+      if (!Array.isArray(rows)) return [];
+      if (!filter || filter === 'all') return rows;
+      return rows.filter((r) => matchesTargetRtpFilter(r.targetRtp, filter));
+    }
+
     function filterGamesTargetRtp(rows) {
       const filter = $('targetRtpFilter')?.value || 'all';
+      return filterByTargetRtp(rows, filter);
+    }
+
+    function withSmoothTableUpdate(wrapId, countId, apply, smooth) {
+      const wrap = $(wrapId);
+      const countEl = $(countId);
+      if (!smooth || !wrap) {
+        apply();
+        return;
+      }
+      wrap.classList.add('is-updating');
+      if (countEl) countEl.classList.add('is-updating');
+      window.setTimeout(() => {
+        apply();
+        wrap.classList.remove('is-updating');
+        if (countEl) countEl.classList.remove('is-updating');
+      }, 160);
+    }
+
+    function getGameRtpColumns() {
+      return [
+        { label: 'Game', render: (r) => escHtml(r.gameName) },
+        { label: 'Total Bet', render: (r) => '<span class="kpi-bet">$' + fmtMoney(r.totalBet) + '</span>' },
+        { label: 'Total Win', render: (r) => '<span class="kpi-win">$' + fmtMoney(r.totalWin) + '</span>' },
+        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+        { label: 'RTP', render: (r) => rtpBar(r.rtp, r.targetRtp) },
+        { label: 'Target', render: (r) => '<span class="badge muted">' + fmtRtp(r.targetRtp) + '</span>' },
+        {
+          label: 'Status',
+          render: (r) => Number(r.rtp) >= Number(r.targetRtp)
+            ? '<span class="badge warn">Above target</span>'
+            : '<span class="badge ok">Below target</span>',
+        },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('game', r.gameId, Number(r.totalSpin) > 0, 'View game users and sessions'),
+        },
+      ];
+    }
+
+    function getUserRtpColumns() {
+      return [
+        { label: 'Username', render: (r) => escHtml(r.username) },
+        { label: 'Total Bet', render: (r) => '<span class="kpi-bet">$' + fmtMoney(r.totalBet) + '</span>' },
+        { label: 'Total Win', render: (r) => '<span class="kpi-win">$' + fmtMoney(r.totalWin) + '</span>' },
+        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
+        { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
+        {
+          label: 'Graph',
+          render: (r) => graphIconButton('user', r.userId, Number(r.totalSpin) > 0, 'View user sessions'),
+        },
+      ];
+    }
+
+    function filterByMinRtp(rows, filter) {
       if (!Array.isArray(rows)) return [];
-      return rows.filter((r) => matchesTargetRtpFilter(r.targetRtp, filter));
+      if (!filter || filter === 'all') return rows;
+      const minPct = Number(filter);
+      if (Number.isNaN(minPct)) return rows;
+      return rows.filter((r) => {
+        const pct = targetRtpToPercent(r.rtp);
+        return pct != null && pct >= minPct;
+      });
+    }
+
+    function matchesUserRtpSearch(row, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+
+      const username = String(row.username || '').toLowerCase();
+      if (username.includes(q)) return true;
+
+      const spins = String(row.totalSpin ?? '');
+      if (spins.includes(q)) return true;
+
+      const rtpPct = targetRtpToPercent(row.rtp);
+      if (rtpPct != null) {
+        const pctFixed = rtpPct.toFixed(2);
+        const pctRounded = String(Math.round(rtpPct * 100) / 100);
+        const candidates = [
+          pctFixed,
+          pctRounded,
+          String(rtpPct),
+          pctFixed + '%',
+          Math.round(rtpPct) + '%',
+          Math.round(rtpPct).toString(),
+        ];
+        if (candidates.some((c) => c.toLowerCase().includes(q))) return true;
+      }
+
+      return false;
+    }
+
+    function matchesGameRtpSearch(row, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+
+      const gameName = String(row.gameName || '').toLowerCase();
+      if (gameName.includes(q)) return true;
+
+      const spins = String(row.totalSpin ?? '');
+      if (spins.includes(q)) return true;
+
+      const rtpPct = targetRtpToPercent(row.rtp);
+      if (rtpPct != null) {
+        const pctFixed = rtpPct.toFixed(2);
+        const candidates = [
+          pctFixed,
+          String(Math.round(rtpPct * 100) / 100),
+          String(rtpPct),
+          pctFixed + '%',
+          Math.round(rtpPct) + '%',
+          Math.round(rtpPct).toString(),
+        ];
+        if (candidates.some((c) => c.toLowerCase().includes(q))) return true;
+      }
+
+      return false;
+    }
+
+    function filterGameRtpRows(rows, targetFilter, searchQuery) {
+      return filterByTargetRtp(rows, targetFilter).filter((r) => matchesGameRtpSearch(r, searchQuery));
+    }
+
+    function filterUserRtpRows(rows, minFilter, searchQuery) {
+      return filterByMinRtp(rows, minFilter).filter((r) => matchesUserRtpSearch(r, searchQuery));
+    }
+
+    function renderRtpByUserTable(smooth = false) {
+      const filter = $('rtpByUserMinFilter')?.value || 'all';
+      const search = $('rtpByUserSearch')?.value || '';
+      const filtered = filterUserRtpRows(rtpByUserData, filter, search);
+      withSmoothTableUpdate('rtpByUserWrap', 'countRtpUser', () => {
+        renderTable('rtpByUserWrap', filtered, getUserRtpColumns());
+        setRowCount('countRtpUser', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-rtp-user"]');
+        if (navLink) updateSectionNavCount('sec-rtp-user', filtered.length);
+      }, smooth);
+    }
+
+    function renderUsersRtpHighTable(smooth = false) {
+      const filter = $('usersHighMinFilter')?.value || 'all';
+      const search = $('usersHighSearch')?.value || '';
+      const filtered = filterUserRtpRows(usersRtpHighData, filter, search);
+      withSmoothTableUpdate('usersRtpHighWrap', 'countUsersHigh', () => {
+        renderTable('usersRtpHighWrap', filtered, getUserRtpColumns());
+        setRowCount('countUsersHigh', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-users-high"]');
+        if (navLink) updateSectionNavCount('sec-users-high', filtered.length);
+      }, smooth);
+    }
+
+    function renderRtpByGameTable(smooth = false) {
+      const filter = $('rtpByGameTargetFilter')?.value || 'all';
+      const search = $('rtpByGameSearch')?.value || '';
+      const filtered = filterGameRtpRows(rtpByGameData, filter, search);
+      withSmoothTableUpdate('rtpByGameWrap', 'countRtpGame', () => {
+        renderTable('rtpByGameWrap', filtered, getGameRtpColumns());
+        setRowCount('countRtpGame', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-rtp-game"]');
+        if (navLink) updateSectionNavCount('sec-rtp-game', filtered.length);
+      }, smooth);
+    }
+
+    function renderGamesAboveTargetTable(smooth = false) {
+      const filter = $('gamesAboveTargetFilter')?.value || 'all';
+      const search = $('gamesAboveTargetSearch')?.value || '';
+      const filtered = filterGameRtpRows(gamesAboveTargetData, filter, search);
+      withSmoothTableUpdate('gamesAboveTargetWrap', 'countAboveTarget', () => {
+        renderTable('gamesAboveTargetWrap', filtered, getGameRtpColumns());
+        setRowCount('countAboveTarget', filtered);
+        const navLink = $('sectionNav')?.querySelector('a[href="#sec-above-target"]');
+        if (navLink) updateSectionNavCount('sec-above-target', filtered.length);
+      }, smooth);
     }
 
     function renderGamesTargetRtpTable(smooth = false) {
@@ -2240,29 +2563,12 @@
         { label: 'Game', key: 'gameName' },
         { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
       ];
-      const wrap = $('gamesTargetRtpWrap');
-      const countEl = $('countTargetRtp');
-
-      const apply = () => {
+      withSmoothTableUpdate('gamesTargetRtpWrap', 'countTargetRtp', () => {
         renderTable('gamesTargetRtpWrap', filtered, columns);
         setRowCount('countTargetRtp', filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-target-rtp"]');
         if (navLink) updateSectionNavCount('sec-target-rtp', filtered.length);
-      };
-
-      if (!smooth || !wrap) {
-        apply();
-        return;
-      }
-
-      wrap.classList.add('is-updating');
-      if (countEl) countEl.classList.add('is-updating');
-
-      window.setTimeout(() => {
-        apply();
-        wrap.classList.remove('is-updating');
-        if (countEl) countEl.classList.remove('is-updating');
-      }, 160);
+      }, smooth);
     }
 
     function renderTable(containerId, rows, columns) {
@@ -2328,8 +2634,8 @@
           { label: 'Started', render: (r) => escHtml(fmtFeedbackDateTime(r.startedAt)) },
           { label: 'Game', render: (r) => escHtml(r.gameName) },
           { label: 'Username', render: (r) => escHtml(r.username) },
-          { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
-          { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
+          { label: 'Total Bet', render: (r) => '<span class="kpi-bet">$' + fmtMoney(r.totalBet) + '</span>' },
+          { label: 'Total Win', render: (r) => '<span class="kpi-win">$' + fmtMoney(r.totalWin) + '</span>' },
           { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
           { label: 'RTP', render: (r) => fmtRtp(r.rtp) },
           {
@@ -2344,13 +2650,19 @@
       const spins = session.spinLogs || [];
       const totalBet = spins.reduce((sum, spin) => sum + Number(spin.betAmount || 0), 0);
       const totalWin = spins.reduce((sum, spin) => sum + Number(spin.winAmount || 0), 0);
+      const freeSpinCount = spins.filter(isSpinFree).length;
+      const paidSpinCount = spins.length - freeSpinCount;
       $('drillTitle').textContent = session.username + ' · ' + session.gameName + ' · Spin Graph';
-      $('drillMeta').textContent = spins.length + ' spin' + (spins.length === 1 ? '' : 's');
+      $('drillMeta').textContent =
+        spins.length + ' spin' + (spins.length === 1 ? '' : 's') +
+        ' · ' + freeSpinCount + ' free · ' + paidSpinCount + ' paid';
       $('chartSummary').innerHTML = [
         ['Session Total Bet', '$' + fmtMoney(totalBet || session.totalBet)],
         ['Session Total Win', '$' + fmtMoney(totalWin || session.totalWin)],
         ['Session RTP', fmtRtp(totalBet ? totalWin / totalBet : session.rtp)],
         ['Spins', fmtInt(spins.length)],
+        ['Free Spins', fmtInt(freeSpinCount)],
+        ['Paid Spins', fmtInt(paidSpinCount)],
         ['Started', fmtFeedbackDateTime(session.startedAt)],
       ].map((item) =>
         '<div class="chart-stat"><span>' + escHtml(item[0]) + '</span><strong>' + escHtml(item[1]) + '</strong></div>'
@@ -2358,6 +2670,10 @@
       activeChartSpins = spins;
       resetSpinChartZoom(spins.length, false);
       window.requestAnimationFrame(() => renderSpinChart(spins));
+    }
+
+    function isSpinFree(spin) {
+      return spin?.isFreeSpin === true || spin?.IsFreeSpin === true;
     }
 
     function resetSpinChartZoom(spinCount = activeChartSpins.length, redraw = true) {
@@ -2494,14 +2810,27 @@
         ctx.fillText('$' + fmtNum(value), pad.left - 8, y + 3);
       }
 
-      // Bet bars
+      // Bet bars — amber for free spins, blue for paid
       visibleSpins.forEach((spin, i) => {
         const cx = xCenter(i);
         const bet = Number(spin.betAmount || 0);
         const betY = yAt(bet);
+        const free = isSpinFree(spin);
         const active = (viewStart + i) === hoverIndex;
-        ctx.fillStyle = active ? 'rgba(66, 165, 245, 0.95)' : 'rgba(66, 165, 245, 0.55)';
-        ctx.fillRect(cx - barW / 2, betY, barW, pad.top + plotH - betY);
+        const baseY = pad.top + plotH;
+        if (free) {
+          ctx.fillStyle = active ? 'rgba(255, 193, 7, 0.95)' : 'rgba(255, 193, 7, 0.7)';
+          if (bet > 0) {
+            ctx.fillRect(cx - barW / 2, betY, barW, baseY - betY);
+          } else {
+            // Free spins often have $0 bet — still mark the slot
+            const markerH = Math.max(6, Math.min(12, barW + 2));
+            ctx.fillRect(cx - barW / 2, baseY - markerH, barW, markerH);
+          }
+        } else {
+          ctx.fillStyle = active ? 'rgba(66, 165, 245, 0.95)' : 'rgba(66, 165, 245, 0.55)';
+          ctx.fillRect(cx - barW / 2, betY, barW, baseY - betY);
+        }
       });
 
       // Win area + line
@@ -2533,11 +2862,26 @@
         ctx.lineWidth = 2;
         ctx.lineJoin = 'round';
         ctx.stroke();
+
+        // Mark free-spin win points in amber so they stand out on the line
+        visibleSpins.forEach((spin, i) => {
+          if (!isSpinFree(spin)) return;
+          const x = xCenter(i);
+          const y = yAt(spin.winAmount);
+          ctx.beginPath();
+          ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffc107';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(12, 18, 27, 0.9)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        });
       }
 
       if (hoverIndex >= viewStart && hoverIndex <= viewEnd) {
         const localIndex = hoverIndex - viewStart;
         const spin = spins[hoverIndex];
+        const free = isSpinFree(spin);
         const cx = xCenter(localIndex);
         const winY = yAt(spin.winAmount);
         const betY = yAt(spin.betAmount);
@@ -2553,7 +2897,7 @@
 
         ctx.beginPath();
         ctx.arc(cx, betY, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = '#42a5f5';
+        ctx.fillStyle = free ? '#ffc107' : '#42a5f5';
         ctx.fill();
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1.5;
@@ -2561,7 +2905,7 @@
 
         ctx.beginPath();
         ctx.arc(cx, winY, 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#66bb6a';
+        ctx.fillStyle = free ? '#ffc107' : '#66bb6a';
         ctx.fill();
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1.8;
@@ -2648,6 +2992,7 @@
 
       tooltip.innerHTML =
         '<strong>Spin ' + escHtml(spin.spinIndex) + '</strong>' +
+        '<div class="chart-tooltip-row"><span>Type</span><b>' + (isSpinFree(spin) ? 'Free spin' : 'Paid spin') + '</b></div>' +
         '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount)) + '</b></div>' +
         '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount)) + '</b></div>' +
         '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter)) + '</b></div>' +
@@ -2899,11 +3244,18 @@
       $('kpiGrid').innerHTML = [
         { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged), icon: '💰', tone: 'kpi-money' },
         { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed), icon: '💸', tone: 'kpi-redeem' },
-        { label: 'Game Users', value: fmtInt(gameUsersCount(d.totalGameUsers)), icon: '👥', tone: 'kpi-users' },
+        {
+          label: 'Users',
+          value: fmtInt(gameUsersCount(d.totalGameUsers)),
+          sub: 'Total users ' + fmtInt(d.totalUsers),
+          icon: '👥',
+          tone: 'kpi-users',
+        },
         {
           label: 'Whole Game RTP',
           value: fmtRtp(d.wholeGameRtp?.rtp),
-          sub: 'Bet $' + fmtMoney(d.wholeGameRtp?.totalBet) + ' · Win $' + fmtMoney(d.wholeGameRtp?.totalWin),
+          sub: '<span class="kpi-bet">Bet $' + fmtMoney(d.wholeGameRtp?.totalBet) + '</span>' +
+            ' · <span class="kpi-win">Win $' + fmtMoney(d.wholeGameRtp?.totalWin) + '</span>',
           icon: '🎰',
           tone: 'kpi-rtp',
         },
@@ -2921,58 +3273,46 @@
         (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') + '</div>'
       ).join('');
 
-      const gameRtpCols = [
-        { label: 'Game', render: (r) => escHtml(r.gameName) },
-        { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
-        { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
-        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
-        { label: 'RTP', render: (r) => rtpBar(r.rtp, r.targetRtp) },
-        { label: 'Target', render: (r) => '<span class="badge muted">' + fmtRtp(r.targetRtp) + '</span>' },
-        {
-          label: 'Status',
-          render: (r) => Number(r.rtp) >= Number(r.targetRtp)
-            ? '<span class="badge warn">Above target</span>'
-            : '<span class="badge ok">Below target</span>',
-        },
-        {
-          label: 'Graph',
-          render: (r) => graphIconButton('game', r.gameId, Number(r.totalSpin) > 0, 'View game users and sessions'),
-        },
-      ];
-
-      const userRtpCols = [
-        { label: 'Username', render: (r) => escHtml(r.username) },
-        { label: 'Total Bet', render: (r) => '$' + fmtMoney(r.totalBet) },
-        { label: 'Total Win', render: (r) => '$' + fmtMoney(r.totalWin) },
-        { label: 'Spins', render: (r) => fmtInt(r.totalSpin) },
-        { label: 'RTP', render: (r) => rtpBar(r.rtp, 1) },
-        {
-          label: 'Graph',
-          render: (r) => graphIconButton('user', r.userId, Number(r.totalSpin) > 0, 'View user sessions'),
-        },
-      ];
-
-      renderTable('rtpByGameWrap', d.rtpByGame, gameRtpCols);
-      renderTable('rtpByUserWrap', d.rtpByUser, userRtpCols);
-      renderTable('gamesAboveTargetWrap', d.gamesAboveTargetRtp, gameRtpCols);
-      renderTable('usersRtpHighWrap', d.usersRtpAboveOrEqualOne, userRtpCols);
+      rtpByGameData = d.rtpByGame || [];
+      gamesAboveTargetData = d.gamesAboveTargetRtp || [];
+      rtpByUserData = d.rtpByUser || [];
+      usersRtpHighData = d.usersRtpAboveOrEqualOne || [];
+      renderRtpByGameTable();
+      renderRtpByUserTable();
+      renderGamesAboveTargetTable();
+      renderUsersRtpHighTable();
       gamesTargetRtpData = d.gamesTargetRtp || [];
       renderGamesTargetRtpTable();
       userFeedbacksData = feedbacks;
       renderUserFeedbacksTable();
 
-      setRowCount('countRtpGame', d.rtpByGame);
-      setRowCount('countRtpUser', d.rtpByUser);
-      setRowCount('countAboveTarget', d.gamesAboveTargetRtp);
-      setRowCount('countUsersHigh', d.usersRtpAboveOrEqualOne);
-
+      const filteredRtpByGameCount = filterGameRtpRows(
+        rtpByGameData,
+        $('rtpByGameTargetFilter')?.value || 'all',
+        $('rtpByGameSearch')?.value || ''
+      ).length;
+      const filteredRtpByUserCount = filterUserRtpRows(
+        rtpByUserData,
+        $('rtpByUserMinFilter')?.value || 'all',
+        $('rtpByUserSearch')?.value || ''
+      ).length;
+      const filteredAboveTargetCount = filterGameRtpRows(
+        gamesAboveTargetData,
+        $('gamesAboveTargetFilter')?.value || 'all',
+        $('gamesAboveTargetSearch')?.value || ''
+      ).length;
+      const filteredUsersHighCount = filterUserRtpRows(
+        usersRtpHighData,
+        $('usersHighMinFilter')?.value || 'all',
+        $('usersHighSearch')?.value || ''
+      ).length;
       const filteredTargetRtpCount = filterGamesTargetRtp(gamesTargetRtpData).length;
       const filteredFeedbacksCount = filterUserFeedbacks(userFeedbacksData).length;
       renderSectionNav([
-        { id: 'sec-rtp-game', label: 'RTP by Game', count: (d.rtpByGame || []).length, icon: '🎮' },
-        { id: 'sec-rtp-user', label: 'RTP by User', count: (d.rtpByUser || []).length, icon: '👤' },
-        { id: 'sec-above-target', label: 'Above Target', count: (d.gamesAboveTargetRtp || []).length, icon: '📈', tone: 'warn' },
-        { id: 'sec-users-high', label: 'Users RTP ≥100%', count: (d.usersRtpAboveOrEqualOne || []).length, icon: '🔥', tone: 'ok' },
+        { id: 'sec-rtp-game', label: 'RTP by Game', count: filteredRtpByGameCount, icon: '🎮' },
+        { id: 'sec-rtp-user', label: 'RTP by User', count: filteredRtpByUserCount, icon: '👤' },
+        { id: 'sec-above-target', label: 'Above Target', count: filteredAboveTargetCount, icon: '📈', tone: 'warn' },
+        { id: 'sec-users-high', label: 'Users RTP ≥100%', count: filteredUsersHighCount, icon: '🔥', tone: 'ok' },
         { id: 'sec-feedbacks', label: 'User Feedbacks', count: filteredFeedbacksCount, icon: '⭐', tone: 'feedback' },
         { id: 'sec-target-rtp', label: 'Game Target RTP', count: filteredTargetRtpCount, icon: '🎯' },
       ]);
@@ -3229,11 +3569,71 @@
     $('targetRtpFilter').addEventListener('change', () => {
       renderGamesTargetRtpTable(true);
     });
+    $('rtpByGameTargetFilter').addEventListener('change', () => {
+      renderRtpByGameTable(true);
+    });
+    $('gamesAboveTargetFilter').addEventListener('change', () => {
+      renderGamesAboveTargetTable(true);
+    });
+    $('rtpByUserMinFilter').addEventListener('change', () => {
+      renderRtpByUserTable(true);
+    });
+    $('usersHighMinFilter').addEventListener('change', () => {
+      renderUsersRtpHighTable(true);
+    });
+
+    let rtpByUserSearchTimer = null;
+    let usersHighSearchTimer = null;
+    let rtpByGameSearchTimer = null;
+    let gamesAboveTargetSearchTimer = null;
+    $('rtpByUserSearch').addEventListener('input', () => {
+      window.clearTimeout(rtpByUserSearchTimer);
+      rtpByUserSearchTimer = window.setTimeout(() => renderRtpByUserTable(true), 160);
+    });
+    $('usersHighSearch').addEventListener('input', () => {
+      window.clearTimeout(usersHighSearchTimer);
+      usersHighSearchTimer = window.setTimeout(() => renderUsersRtpHighTable(true), 160);
+    });
+    $('rtpByGameSearch').addEventListener('input', () => {
+      window.clearTimeout(rtpByGameSearchTimer);
+      rtpByGameSearchTimer = window.setTimeout(() => renderRtpByGameTable(true), 160);
+    });
+    $('gamesAboveTargetSearch').addEventListener('input', () => {
+      window.clearTimeout(gamesAboveTargetSearchTimer);
+      gamesAboveTargetSearchTimer = window.setTimeout(() => renderGamesAboveTargetTable(true), 160);
+    });
+    $('rtpByUserSearch').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        window.clearTimeout(rtpByUserSearchTimer);
+        renderRtpByUserTable(true);
+      }
+    });
+    $('usersHighSearch').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        window.clearTimeout(usersHighSearchTimer);
+        renderUsersRtpHighTable(true);
+      }
+    });
+    $('rtpByGameSearch').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        window.clearTimeout(rtpByGameSearchTimer);
+        renderRtpByGameTable(true);
+      }
+    });
+    $('gamesAboveTargetSearch').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        window.clearTimeout(gamesAboveTargetSearchTimer);
+        renderGamesAboveTargetTable(true);
+      }
+    });
     $('feedbackFilterBtn').addEventListener('click', () => {
       applyFeedbackDateFilter();
     });
     $('feedbackClearFilterBtn').addEventListener('click', () => {
       clearFeedbackDateFilter();
+    });
+    $('feedbackStarFilter').addEventListener('change', () => {
+      applyFeedbackDateFilter();
     });
     $('feedbackDateFrom').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') applyFeedbackDateFilter();
