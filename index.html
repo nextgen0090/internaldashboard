@@ -2370,7 +2370,15 @@
     function targetRtpToPercent(value) {
       const n = Number(value);
       if (Number.isNaN(n)) return null;
+      // Targets are usually 0.6–0.8 (ratio) or sometimes already 60–80.
       return n <= 1 ? n * 100 : n;
+    }
+
+    /** Actual RTP is always a ratio (1 = 100%, can be > 1). Same as fmtRtp. */
+    function rtpToPercent(value) {
+      const n = Number(value);
+      if (Number.isNaN(n)) return null;
+      return n * 100;
     }
 
     function matchesTargetRtpFilter(targetRtp, filter) {
@@ -2378,7 +2386,7 @@
       const pct = targetRtpToPercent(targetRtp);
       const want = Number(filter);
       if (pct == null || Number.isNaN(want)) return false;
-      return Math.abs(pct - want) < 0.01;
+      return Math.round(pct) === Math.round(want);
     }
 
     function filterByTargetRtp(rows, filter) {
@@ -2387,24 +2395,56 @@
       return rows.filter((r) => matchesTargetRtpFilter(r.targetRtp, filter));
     }
 
+    function uniqueTargetRtpPercents(rows) {
+      const set = new Set();
+      for (const row of rows || []) {
+        const pct = targetRtpToPercent(row.targetRtp);
+        if (pct == null) continue;
+        set.add(Math.round(pct));
+      }
+      return Array.from(set).sort((a, b) => a - b);
+    }
+
+    function populateTargetRtpSelect(selectId, rows) {
+      const el = $(selectId);
+      if (!el) return;
+      const previous = el.value || 'all';
+      // Always keep the standard options; also include any extra targets from data.
+      const standard = [60, 70, 80];
+      const fromData = uniqueTargetRtpPercents(rows);
+      const percents = Array.from(new Set([...standard, ...fromData])).sort((a, b) => a - b);
+      el.innerHTML = '<option value="all">All</option>' + percents
+        .map((p) => '<option value="' + p + '">' + p + '%</option>')
+        .join('');
+      const stillValid = Array.from(el.options).some((o) => o.value === previous);
+      el.value = stillValid ? previous : 'all';
+    }
+
     function filterGamesTargetRtp(rows) {
       const filter = $('targetRtpFilter')?.value || 'all';
       return filterByTargetRtp(rows, filter);
     }
 
+    const smoothUpdateTimers = {};
     function withSmoothTableUpdate(wrapId, countId, apply, smooth) {
       const wrap = $(wrapId);
       const countEl = $(countId);
+      window.clearTimeout(smoothUpdateTimers[wrapId]);
       if (!smooth || !wrap) {
+        wrap?.classList.remove('is-updating');
+        countEl?.classList.remove('is-updating');
         apply();
         return;
       }
       wrap.classList.add('is-updating');
       if (countEl) countEl.classList.add('is-updating');
-      window.setTimeout(() => {
-        apply();
-        wrap.classList.remove('is-updating');
-        if (countEl) countEl.classList.remove('is-updating');
+      smoothUpdateTimers[wrapId] = window.setTimeout(() => {
+        try {
+          apply();
+        } finally {
+          wrap.classList.remove('is-updating');
+          if (countEl) countEl.classList.remove('is-updating');
+        }
       }, 160);
     }
 
@@ -2449,7 +2489,7 @@
       const minPct = Number(filter);
       if (Number.isNaN(minPct)) return rows;
       return rows.filter((r) => {
-        const pct = targetRtpToPercent(r.rtp);
+        const pct = rtpToPercent(r.rtp);
         return pct != null && pct >= minPct;
       });
     }
@@ -2464,7 +2504,7 @@
       const spins = String(row.totalSpin ?? '');
       if (spins.includes(q)) return true;
 
-      const rtpPct = targetRtpToPercent(row.rtp);
+      const rtpPct = rtpToPercent(row.rtp);
       if (rtpPct != null) {
         const pctFixed = rtpPct.toFixed(2);
         const pctRounded = String(Math.round(rtpPct * 100) / 100);
@@ -2492,7 +2532,7 @@
       const spins = String(row.totalSpin ?? '');
       if (spins.includes(q)) return true;
 
-      const rtpPct = targetRtpToPercent(row.rtp);
+      const rtpPct = rtpToPercent(row.rtp);
       if (rtpPct != null) {
         const pctFixed = rtpPct.toFixed(2);
         const candidates = [
@@ -2522,7 +2562,7 @@
       const search = $('rtpByUserSearch')?.value || '';
       const filtered = filterUserRtpRows(rtpByUserData, filter, search);
       withSmoothTableUpdate('rtpByUserWrap', 'countRtpUser', () => {
-        renderTable('rtpByUserWrap', filtered, getUserRtpColumns());
+        renderTable('rtpByUserWrap', filtered, getUserRtpColumns(), emptyFilterMessage('minRtp', filter));
         setRowCount('countRtpUser', filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-rtp-user"]');
         if (navLink) updateSectionNavCount('sec-rtp-user', filtered.length);
@@ -2534,7 +2574,7 @@
       const search = $('usersHighSearch')?.value || '';
       const filtered = filterUserRtpRows(usersRtpHighData, filter, search);
       withSmoothTableUpdate('usersRtpHighWrap', 'countUsersHigh', () => {
-        renderTable('usersRtpHighWrap', filtered, getUserRtpColumns());
+        renderTable('usersRtpHighWrap', filtered, getUserRtpColumns(), emptyFilterMessage('minRtp', filter));
         setRowCount('countUsersHigh', filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-users-high"]');
         if (navLink) updateSectionNavCount('sec-users-high', filtered.length);
@@ -2546,7 +2586,7 @@
       const search = $('rtpByGameSearch')?.value || '';
       const filtered = filterGameRtpRows(rtpByGameData, filter, search);
       withSmoothTableUpdate('rtpByGameWrap', 'countRtpGame', () => {
-        renderTable('rtpByGameWrap', filtered, getGameRtpColumns());
+        renderTable('rtpByGameWrap', filtered, getGameRtpColumns(), emptyFilterMessage('target', filter));
         setRowCount('countRtpGame', filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-rtp-game"]');
         if (navLink) updateSectionNavCount('sec-rtp-game', filtered.length);
@@ -2558,7 +2598,7 @@
       const search = $('gamesAboveTargetSearch')?.value || '';
       const filtered = filterGameRtpRows(gamesAboveTargetData, filter, search);
       withSmoothTableUpdate('gamesAboveTargetWrap', 'countAboveTarget', () => {
-        renderTable('gamesAboveTargetWrap', filtered, getGameRtpColumns());
+        renderTable('gamesAboveTargetWrap', filtered, getGameRtpColumns(), emptyFilterMessage('target', filter));
         setRowCount('countAboveTarget', filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-above-target"]');
         if (navLink) updateSectionNavCount('sec-above-target', filtered.length);
@@ -2579,10 +2619,10 @@
       }, smooth);
     }
 
-    function renderTable(containerId, rows, columns) {
+    function renderTable(containerId, rows, columns, emptyMessage = 'No data.') {
       const el = $(containerId);
       if (!Array.isArray(rows) || rows.length === 0) {
-        el.innerHTML = '<div class="empty">No data.</div>';
+        el.innerHTML = '<div class="empty">' + escHtml(emptyMessage) + '</div>';
         return;
       }
 
@@ -2592,6 +2632,13 @@
       ).join('');
 
       el.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+    }
+
+    function emptyFilterMessage(kind, filterValue) {
+      if (!filterValue || filterValue === 'all') return 'No data.';
+      if (kind === 'target') return 'No rows with Target RTP ' + filterValue + '%. Try All or another option.';
+      if (kind === 'minRtp') return 'No rows with RTP ≥ ' + filterValue + '%. Try All or a lower option.';
+      return 'No data.';
     }
 
     function pushDrill(frame) {
@@ -3285,11 +3332,16 @@
       gamesAboveTargetData = d.gamesAboveTargetRtp || [];
       rtpByUserData = d.rtpByUser || [];
       usersRtpHighData = d.usersRtpAboveOrEqualOne || [];
+      gamesTargetRtpData = d.gamesTargetRtp || [];
+
+      populateTargetRtpSelect('rtpByGameTargetFilter', rtpByGameData);
+      populateTargetRtpSelect('gamesAboveTargetFilter', gamesAboveTargetData);
+      populateTargetRtpSelect('targetRtpFilter', gamesTargetRtpData);
+
       renderRtpByGameTable();
       renderRtpByUserTable();
       renderGamesAboveTargetTable();
       renderUsersRtpHighTable();
-      gamesTargetRtpData = d.gamesTargetRtp || [];
       renderGamesTargetRtpTable();
       userFeedbacksData = feedbacks;
       renderUserFeedbacksTable();
@@ -3583,10 +3635,26 @@
     $('gamesAboveTargetFilter').addEventListener('change', () => {
       renderGamesAboveTargetTable(true);
     });
+    // Some browsers only fire reliably on input for selects in certain cases
+    $('rtpByGameTargetFilter').addEventListener('input', () => {
+      renderRtpByGameTable(true);
+    });
+    $('gamesAboveTargetFilter').addEventListener('input', () => {
+      renderGamesAboveTargetTable(true);
+    });
+    $('targetRtpFilter').addEventListener('input', () => {
+      renderGamesTargetRtpTable(true);
+    });
     $('rtpByUserMinFilter').addEventListener('change', () => {
       renderRtpByUserTable(true);
     });
     $('usersHighMinFilter').addEventListener('change', () => {
+      renderUsersRtpHighTable(true);
+    });
+    $('rtpByUserMinFilter').addEventListener('input', () => {
+      renderRtpByUserTable(true);
+    });
+    $('usersHighMinFilter').addEventListener('input', () => {
       renderUsersRtpHighTable(true);
     });
 
