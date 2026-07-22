@@ -1152,7 +1152,7 @@
             <span class="brand-mark">GV</span>
             <h1>Game Vault 2.0<span class="title-badge">Internal</span></h1>
           </div>
-          <p class="subtitle" id="subtitle">Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code></p>
+          <p class="subtitle" id="subtitle">Loads data from <code style="color:#b3d9ff">https://gamevault222.com/api/dashboard/internal/summary</code></p>
           <div class="status-row">
             <div class="status">
               <span class="dot" id="connDot"></span>
@@ -1488,7 +1488,7 @@
       const demo = isDemoMode();
       $('subtitle').innerHTML = demo
         ? 'Demo mode — sample data (no API call)'
-        : 'Loads data from <code style="color:#b3d9ff">/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · skips refresh when unchanged';
+        : 'Loads data from <code style="color:#b3d9ff">https://gamevault222.com/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · skips refresh when unchanged';
       updateHistoryDropdown();
       updatePauseButtonUi();
       updateDiffPanel();
@@ -1626,8 +1626,16 @@
       },
     };
 
+    const LIVE_API_ORIGIN = 'https://gamevault222.com';
+
     function apiOrigin() {
-      return window.location.origin;
+      // Local: use same-origin proxy (start.bat → localhost .NET).
+      // Deployed (Vercel): call gamevault222.com directly (avoids Vercel rewrite / Cloudflare 403).
+      const host = location.hostname;
+      if (/^(localhost|127\.0\.0\.1)$/i.test(host)) {
+        return window.location.origin;
+      }
+      return LIVE_API_ORIGIN;
     }
 
     function show(el, visible) {
@@ -3505,8 +3513,8 @@
               + '2. Double-click start.bat (not python -m http.server)\n'
               + '3. Or switch Data source to Demo to preview without the backend')
             : ('Cannot reach API.\n\n'
-              + 'The dashboard proxies /api to https://gamevault222.com/api/\n'
-              + 'Check that the live API is up, then retry Load.\n'
+              + 'Dashboard calls https://gamevault222.com/api/ directly.\n'
+              + 'Check that the live API is up and CORS allows this site.\n'
               + 'Or switch Data source to Demo to preview without the backend');
         } else if (/Proxy error/i.test(msg) || /WinError 10061/i.test(msg)) {
           msg = isLocal

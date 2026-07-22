@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://gamevault222.com/api/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/index.html",

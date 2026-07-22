@@ -13,7 +13,7 @@ echo.
 echo Local:  http://localhost:%PORT%
 echo API:    %BACKEND_URL%/api/*  (local .NET)
 echo.
-echo Vercel: /api/* proxies to https://gamevault222.com/api/*
+echo Vercel: fetches https://gamevault222.com/api/* directly
 echo Do NOT use: python -m http.server
 echo.
 
