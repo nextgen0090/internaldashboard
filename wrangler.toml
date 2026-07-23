@@ -2,7 +2,7 @@
 # Deploy: npm run deploy
 # Docs: https://developers.cloudflare.com/workers/static-assets/
 
-name = "internal-dashboard"
+name = "internaldashboard"
 compatibility_date = "2026-07-23"
 workers_dev = true
 

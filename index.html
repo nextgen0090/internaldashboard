@@ -2065,15 +2065,18 @@
       },
     };
 
+    // Production API host (never the Cloudflare workers.dev URL).
     const LIVE_API_ORIGIN = 'https://gamevault222.com';
 
+    function isLocalDevHost() {
+      const host = (location.hostname || '').toLowerCase();
+      return host === 'localhost' || host === '127.0.0.1';
+    }
+
     function apiOrigin() {
-      // Local: use same-origin proxy (start.bat → localhost .NET).
-      // Deployed (Cloudflare Worker / any host): call gamevault222.com directly.
-      const host = location.hostname;
-      if (/^(localhost|127\.0\.0\.1)$/i.test(host)) {
-        return window.location.origin;
-      }
+      // Local only: same-origin → start.bat proxy → localhost:5036
+      // Cloudflare / any hosted URL: always gamevault222.com
+      if (isLocalDevHost()) return window.location.origin;
       return LIVE_API_ORIGIN;
     }
 
@@ -5103,7 +5106,7 @@
       } catch (err) {
         setConn('err', isAutoRefresh ? 'Refresh failed' : 'Failed');
         let msg = err.message || String(err);
-        const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
+        const isLocal = isLocalDevHost();
         if (msg === 'STATIC_404') {
           msg = 'You started python -m http.server — that cannot proxy /api.\n\n'
             + 'Close that terminal (Ctrl+C), then double-click start.bat in this folder.';
