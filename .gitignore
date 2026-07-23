@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.vercel/
+package-lock.json
+.env
+.env.*
+*.log
