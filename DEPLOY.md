@@ -1,7 +1,7 @@
 # Deploy Internal Dashboard on Cloudflare
 
 Repo: `https://github.com/nextgen0090/internaldashboard.git`  
-Worker name (must match): `internal-dashboard` (see `wrangler.toml`)
+Worker name (must match): `internaldashboard` (see `wrangler.toml`)
 
 Production API: `https://gamevault222.com/api/...` (no change)
 
@@ -33,7 +33,7 @@ Push with GitHub Desktop → Cloudflare builds and deploys automatically.
 
 | Setting | Value |
 |--------|--------|
-| Project / Worker name | `internal-dashboard` (same as `wrangler.toml`) |
+| Project / Worker name | `internaldashboard` (same as `wrangler.toml` / your `*.workers.dev` URL) |
 | Production branch | `dev` (or `main` — whatever you push from Desktop) |
 | Root directory | `/` (repo root) |
 | Build command | *(leave empty)* — static site, no build |
@@ -47,11 +47,11 @@ Cloudflare installs npm deps from `package.json` and runs Wrangler.
 
 1. Edit files locally  
 2. **GitHub Desktop** → Commit → **Push origin**  
-3. Cloudflare auto-deploys (check **Workers & Pages** → `internal-dashboard` → **Deployments**)
+3. Cloudflare auto-deploys (check **Workers & Pages** → `internaldashboard` → **Deployments**)
 
 Live URL example:
 
-`https://internal-dashboard.<your-subdomain>.workers.dev`
+`https://internaldashboard.<your-subdomain>.workers.dev`
 
 ---
 
@@ -70,7 +70,7 @@ npm run deploy
 
 ## Optional: custom domain
 
-1. Cloudflare → **Workers & Pages** → **internal-dashboard**
+1. Cloudflare → **Workers & Pages** → **internaldashboard**
 2. **Settings** → **Domains & Routes** → Add  
    e.g. `internal.gamevault222.com`
 
