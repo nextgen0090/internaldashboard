@@ -620,6 +620,22 @@
       box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
     }
 
+    .kpi.kpi-clickable {
+      cursor: pointer;
+    }
+
+    .kpi.kpi-clickable:focus-visible {
+      outline: 2px solid var(--kpi-accent, var(--accent));
+      outline-offset: 2px;
+    }
+
+    .kpi.kpi-clickable .kpi-hint {
+      margin-top: 0.45rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
     .kpi-head {
       display: flex;
       align-items: center;
@@ -665,7 +681,11 @@
       margin-top: 0.45rem;
       font-size: 0.8rem;
       color: var(--muted);
-      line-height: 1.35;
+      line-height: 1.45;
+    }
+
+    .kpi-sub .kpi-line {
+      display: block;
     }
 
     .kpi-sub .kpi-bet,
@@ -809,6 +829,36 @@
 
     .rtp-bar.over > span { background: linear-gradient(90deg, #e65100, #ff9800); }
 
+    .cell-user {
+      color: #90caf9;
+      font-weight: 600;
+    }
+
+    .cell-game {
+      color: #ce93d8;
+      font-weight: 600;
+    }
+
+    .cell-id {
+      font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      word-break: break-all;
+      color: #8b9bb0;
+    }
+
+    .cell-id.user-id {
+      color: #64b5f6;
+    }
+
+    .cell-id.game-id {
+      color: #ba68c8;
+    }
+
+    .cell-empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
     .graph-btn {
       display: inline-flex;
       align-items: center;
@@ -940,6 +990,7 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      flex-wrap: wrap;
     }
 
     .spin-chart-zoom button {
@@ -953,6 +1004,31 @@
       color: var(--muted);
       font-size: 0.72rem;
       margin-left: 0.25rem;
+    }
+
+    .spin-chart-scroll-wrap {
+      margin-top: 0.55rem;
+      padding: 0 1rem 0 3.4rem;
+    }
+
+    .spin-chart-scroll-wrap.hidden {
+      display: none;
+    }
+
+    #spinChartScroller {
+      width: 100%;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #42a5f5;
+      transition: accent-color 0.2s ease;
+    }
+
+    #spinChartScroller::-webkit-slider-thumb {
+      transition: transform 0.12s ease;
+    }
+
+    #spinChartScroller:active::-webkit-slider-thumb {
+      transform: scale(1.15);
     }
 
     #spinChart {
@@ -1036,17 +1112,58 @@
       margin: 0;
       padding-left: 0;
       list-style: none;
+      max-width: 100%;
     }
 
     .feedback-dates li {
       margin: 0.15rem 0;
-      line-height: 1.35;
+      line-height: 1.4;
       font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: normal;
+      overflow-wrap: break-word;
     }
 
     .feedback-dates li + li {
       margin-top: 0.35rem;
+    }
+
+    #userFeedbacksWrap table {
+      table-layout: fixed;
+    }
+
+    #userFeedbacksWrap th,
+    #userFeedbacksWrap td {
+      vertical-align: top;
+      overflow: hidden;
+    }
+
+    #userFeedbacksWrap th:nth-child(1),
+    #userFeedbacksWrap td:nth-child(1) {
+      width: 24%;
+    }
+
+    #userFeedbacksWrap th:nth-child(2),
+    #userFeedbacksWrap td:nth-child(2) {
+      width: 12%;
+    }
+
+    #userFeedbacksWrap th:nth-child(3),
+    #userFeedbacksWrap td:nth-child(3) {
+      width: 18%;
+    }
+
+    #userFeedbacksWrap td:nth-child(2) {
+      color: #90caf9;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    #userFeedbacksWrap td:nth-child(3) {
+      font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+      font-size: 0.75rem;
+      color: #64b5f6;
+      word-break: break-all;
     }
 
     .feedback-date-today {
@@ -1179,6 +1296,7 @@
         </div>
         <div class="controls-actions">
           <button id="loadBtn" type="button">Load</button>
+          <button class="secondary" id="refreshPageBtn" type="button" title="Reload the page">Refresh</button>
           <button class="secondary" id="pauseRefreshBtn" type="button">Pause</button>
           <button class="secondary" id="toggleDiffBtn" type="button">Show Diff</button>
           <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
@@ -1360,13 +1478,19 @@
                 <span><i class="leg-win" aria-hidden="true"></i> Win</span>
               </div>
               <div class="spin-chart-zoom">
+                <button type="button" class="secondary" id="spinPanLeftBtn" title="Move left">‹</button>
                 <button type="button" class="secondary" id="spinZoomOutBtn" title="Zoom out">−</button>
                 <button type="button" class="secondary" id="spinZoomInBtn" title="Zoom in">+</button>
+                <button type="button" class="secondary" id="spinPanRightBtn" title="Move right">›</button>
                 <button type="button" class="secondary" id="spinZoomResetBtn" title="Reset zoom">Reset</button>
-                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag to pan</span>
+                <button type="button" id="spinDownloadReportBtn" title="Download a simple session report">⬇ Report</button>
+                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag or scroller to pan</span>
               </div>
             </div>
             <canvas id="spinChart" aria-label="Session spin bet and win chart"></canvas>
+            <div class="spin-chart-scroll-wrap hidden" id="spinChartScrollWrap">
+              <input type="range" id="spinChartScroller" min="0" max="0" value="0" step="1" aria-label="Pan spin graph" />
+            </div>
             <div class="chart-tooltip hidden" id="spinChartTooltip"></div>
           </div>
         </div>
@@ -1405,6 +1529,9 @@
     let chartViewStart = 0;
     let chartViewEnd = 0;
     let chartPanState = null;
+    let chartSmoothRaf = null;
+    let chartSmoothTargetStart = null;
+    let chartScrollDragging = false;
 
     function isDemoMode() {
       return $('dataSource').value === 'demo';
@@ -1479,6 +1606,7 @@
       historyViewIndex = Math.max(0, Math.min(index, responseHistory.length - 1));
       const entry = responseHistory[historyViewIndex];
       renderDashboard(entry.response);
+      if (drillStack.length) refreshOpenDrillFromLatest();
       const label = historyOptionLabel(historyViewIndex, entry.loadedAt);
       setConn('ok', 'Viewing ' + label);
       $('responseHistory').value = String(historyViewIndex);
@@ -1488,7 +1616,7 @@
       const demo = isDemoMode();
       $('subtitle').innerHTML = demo
         ? 'Demo mode — sample data (no API call)'
-        : 'Loads data from <code style="color:#b3d9ff">https://gamevault222.com/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · skips refresh when unchanged';
+        : 'Loads data from <code style="color:#b3d9ff">https://gamevault222.com/api/dashboard/internal/summary</code> · keeps last ' + HISTORY_MAX + ' responses · Load always fetches fresh';
       updateHistoryDropdown();
       updatePauseButtonUi();
       updateDiffPanel();
@@ -1509,7 +1637,23 @@
         totalRecharged: 125430.50,
         totalRedeemed: 98210.25,
         totalUsers: 1842,
-        totalGameUsers: { count: 12, users: [] },
+        totalGameUsers: {
+          count: 2,
+          users: [
+            {
+              userId: 'u1111111-1111-1111-1111-111111111101',
+              username: 'player_alpha',
+              gameId: 'g1111111-1111-1111-1111-111111111101',
+              gameName: 'Lucky Slots',
+            },
+            {
+              userId: 'u2222222-2222-2222-2222-222222222202',
+              username: 'player_beta',
+              gameId: 'g2222222-2222-2222-2222-222222222202',
+              gameName: 'Ocean King',
+            },
+          ],
+        },
         wholeGameRtp: { totalBet: 890120.00, totalWin: 801108.00, rtp: 0.90 },
         rtpByGame: [
           {
@@ -1713,7 +1857,7 @@
       return String(value);
     }
 
-    /** API may send totalGameUsers as a number or { count, users }. */
+    /** Read totalGameUsers.count from the API payload (no recalculation). */
     function gameUsersCount(value) {
       if (value == null) return 0;
       if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
@@ -1723,14 +1867,31 @@
       }
       if (typeof value === 'object') {
         const raw = value.count ?? value.Count;
-        if (raw != null) {
-          const n = Number(raw);
-          if (Number.isFinite(n)) return n;
-        }
-        if (Array.isArray(value.users)) return value.users.length;
-        if (Array.isArray(value.Users)) return value.Users.length;
+        const n = Number(raw);
+        return Number.isFinite(n) ? n : 0;
       }
       return 0;
+    }
+
+    function totalGameUsersPayload(data) {
+      if (!data || typeof data !== 'object') return null;
+      return data.totalGameUsers ?? data.TotalGameUsers ?? null;
+    }
+
+    /** Normalize totalGameUsers.users (camelCase or PascalCase). */
+    function gameUsersList(value) {
+      if (!value || typeof value !== 'object') return [];
+      const raw = Array.isArray(value.users)
+        ? value.users
+        : Array.isArray(value.Users)
+          ? value.Users
+          : [];
+      return raw.map((u) => ({
+        userId: u.userId ?? u.UserId ?? '',
+        username: u.username ?? u.Username ?? '',
+        gameId: u.gameId ?? u.GameId ?? '',
+        gameName: u.gameName ?? u.GameName ?? '',
+      }));
     }
 
     /** API field renamed: feedback (new) / message (demo & older payloads). */
@@ -1869,20 +2030,6 @@
       return years === 1 ? '1 year ago' : years + ' years ago';
     }
 
-    function fmtFeedbackDateTime(value) {
-      const d = parseFeedbackDate(value);
-      if (!d) return '—';
-      return d.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
-    }
-
     function renderFeedbackDateHtml(value) {
       const d = parseFeedbackDate(value);
       if (!d) return '<span class="empty">—</span>';
@@ -1953,15 +2100,49 @@
         return text;
       }
 
+      // Keep server timestamps without timezone as wall-clock (do NOT force UTC via Z),
+      // so dashboard shows the same clock time as the API response.
       if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
-        return text + 'T00:00:00Z';
+        return text + 'T00:00:00';
       }
 
       if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(text)) {
-        return text.replace(' ', 'T') + 'Z';
+        return text.replace(' ', 'T');
       }
 
       return text;
+    }
+
+    /** Format API datetime using the same clock values as the response string. */
+    function formatApiWallClockDateTime(value, withTime = true) {
+      if (value == null || value === '') return null;
+      const text = String(value).trim();
+      if (!text) return null;
+
+      // Explicit timezone → fall back to Date-based formatting.
+      if (/[zZ]$/.test(text) || /[+-]\d{2}:\d{2}$/.test(text)) return null;
+
+      const m = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+      if (!m) return null;
+
+      const year = Number(m[1]);
+      const month = Number(m[2]);
+      const day = Number(m[3]);
+      const hour = m[4] != null ? Number(m[4]) : null;
+      const minute = m[5] != null ? Number(m[5]) : 0;
+      const monthLong = new Date(year, month - 1, 1).toLocaleString(undefined, { month: 'long' });
+      const monthShort = new Date(year, month - 1, 1).toLocaleString(undefined, { month: 'short' });
+
+      if (!withTime || hour == null) {
+        return withTime
+          ? (day + ' ' + monthLong + ' ' + year)
+          : (monthShort + ' ' + day + ', ' + year);
+      }
+
+      const ampm = hour >= 12 ? 'pm' : 'am';
+      const h12 = hour % 12 || 12;
+      const mm = String(minute).padStart(2, '0');
+      return day + ' ' + monthLong + ' ' + year + ' at ' + h12 + ':' + mm + ' ' + ampm;
     }
 
     function parseFeedbackDate(value) {
@@ -1972,13 +2153,29 @@
     }
 
     function fmtFeedbackDate(value) {
+      const wall = formatApiWallClockDateTime(value, false);
+      if (wall) return wall;
       const d = parseFeedbackDate(value);
       if (!d) return '—';
       return d.toLocaleDateString(undefined, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+    }
+
+    function fmtFeedbackDateTime(value) {
+      const wall = formatApiWallClockDateTime(value, true);
+      if (wall) return wall;
+      const d = parseFeedbackDate(value);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
       });
     }
 
@@ -2049,8 +2246,18 @@
       const filtered = filterUserFeedbacks(userFeedbacksData);
       const columns = [
         { label: 'Date', render: (r) => feedbackDatesCell(r) },
-        { label: 'Username', key: 'username' },
-        { label: 'User ID', render: (r) => '<span title="' + escHtml(r.userId || '') + '">' + escHtml(r.userId || '') + '</span>' },
+        {
+          label: 'Username',
+          render: (r) => r.username
+            ? '<span class="cell-user">' + escHtml(r.username) + '</span>'
+            : '<span class="cell-empty">—</span>',
+        },
+        {
+          label: 'User ID',
+          render: (r) => r.userId
+            ? '<span class="cell-id user-id" title="' + escAttr(r.userId) + '">' + escHtml(r.userId) + '</span>'
+            : '<span class="cell-empty">—</span>',
+        },
         { label: 'Feedback Count', render: (r) => fmtInt(getVisibleFeedbacksForUser(r).length || r.feedBackCount) },
         { label: 'Avg Rating', render: (r) => feedbackAvgRatingCell(r) },
         { label: 'Ratings', render: (r) => feedbackStarsCell(r) },
@@ -2663,6 +2870,44 @@
       show($('drillTableWrap'), frame.type !== 'spins');
       show($('drillChartWrap'), frame.type === 'spins');
 
+      if (frame.type === 'online-users') {
+        const users = frame.users || [];
+        const onlineCount = gameUsersCount(totalGameUsersPayload(currentDashboardData));
+        $('drillTitle').textContent = 'Online Users';
+        $('drillMeta').textContent = onlineCount + ' user' + (onlineCount === 1 ? '' : 's');
+        renderTable('drillTableWrap', users, [
+          {
+            label: 'Username',
+            render: (r) => r.username
+              ? '<span class="cell-user">' + escHtml(r.username) + '</span>'
+              : '<span class="cell-empty">—</span>',
+          },
+          {
+            label: 'Game',
+            render: (r) => r.gameName
+              ? '<span class="cell-game">' + escHtml(r.gameName) + '</span>'
+              : '<span class="cell-empty">No active game</span>',
+          },
+          {
+            label: 'User ID',
+            render: (r) => r.userId
+              ? '<span class="cell-id user-id">' + escHtml(r.userId) + '</span>'
+              : '<span class="cell-empty">—</span>',
+          },
+          {
+            label: 'Game ID',
+            render: (r) => r.gameId && String(r.gameId) !== '00000000-0000-0000-0000-000000000000'
+              ? '<span class="cell-id game-id">' + escHtml(r.gameId) + '</span>'
+              : '<span class="cell-empty">—</span>',
+          },
+          {
+            label: 'Sessions',
+            render: (r) => graphIconButton('online-user', r.userId, !!r.userId, 'View user sessions'),
+          },
+        ], 'No online users.');
+        return;
+      }
+
       if (frame.type === 'game-users') {
         const users = frame.game.users || [];
         $('drillTitle').textContent = frame.game.gameName + ' · Users';
@@ -2731,7 +2976,152 @@
       return spin?.isFreeSpin === true || spin?.IsFreeSpin === true;
     }
 
+    function safeReportFilename(parts) {
+      return parts
+        .map((p) => String(p || 'report').trim())
+        .join('_')
+        .replace(/[^\w.-]+/g, '_')
+        .replace(/_+/g, '_')
+        .slice(0, 80);
+    }
+
+    function buildSessionSpinReportHtml(session, spins) {
+      const rows = Array.isArray(spins) ? spins : [];
+      const totalBet = rows.reduce((sum, s) => sum + Number(s.betAmount || 0), 0);
+      const totalWin = rows.reduce((sum, s) => sum + Number(s.winAmount || 0), 0);
+      const rtp = totalBet ? totalWin / totalBet : Number(session?.rtp || 0);
+      const freeCount = rows.filter(isSpinFree).length;
+      const paidCount = rows.length - freeCount;
+      const profit = totalWin - totalBet;
+      const biggestWin = rows.reduce((best, s) => {
+        const win = Number(s.winAmount || 0);
+        if (!best || win > Number(best.winAmount || 0)) return s;
+        return best;
+      }, null);
+
+      const plainSummary = [
+        'Player ' + (session?.username || 'Unknown') + ' played ' + (session?.gameName || 'Unknown game') + '.',
+        'This session had ' + rows.length + ' spins (' + paidCount + ' paid, ' + freeCount + ' free).',
+        'Total bet was $' + fmtMoney(totalBet) + ' and total win was $' + fmtMoney(totalWin) + '.',
+        'Session RTP is ' + fmtRtp(rtp) + ' (' + (profit >= 0 ? 'player ahead' : 'player behind') + ' by $' + fmtMoney(Math.abs(profit)) + ').',
+        biggestWin
+          ? 'Biggest win was $' + fmtMoney(biggestWin.winAmount) + ' on spin ' + fmtInt(biggestWin.spinIndex) +
+            (isSpinFree(biggestWin) ? ' (free spin).' : ' (paid spin).')
+          : '',
+      ].filter(Boolean).join(' ');
+
+      const spinRowsHtml = rows.map((s) => {
+        const free = isSpinFree(s);
+        return '<tr class="' + (free ? 'free' : 'paid') + '">' +
+          '<td>' + escHtml(fmtInt(s.spinIndex)) + '</td>' +
+          '<td>' + (free ? 'Free' : 'Paid') + '</td>' +
+          '<td>$' + escHtml(fmtMoney(s.betAmount)) + '</td>' +
+          '<td>$' + escHtml(fmtMoney(s.winAmount)) + '</td>' +
+          '<td>$' + escHtml(fmtMoney(s.balanceAfter)) + '</td>' +
+          '<td>' + escHtml(fmtFeedbackDateTime(s.createdAt)) + '</td>' +
+          '</tr>';
+      }).join('');
+
+      const generatedAt = new Date().toLocaleString();
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Session Spin Report — ${escHtml(session?.username || '')} — ${escHtml(session?.gameName || '')}</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 28px; color: #152033; background: #f5f7fb; }
+    .wrap { max-width: 980px; margin: 0 auto; background: #fff; border: 1px solid #dbe3ef; border-radius: 14px; padding: 28px; }
+    h1 { margin: 0 0 6px; font-size: 1.45rem; }
+    .sub { color: #5b6b81; margin-bottom: 18px; font-size: 0.95rem; }
+    .summary { background: #eef5ff; border: 1px solid #cfe0ff; border-radius: 12px; padding: 14px 16px; line-height: 1.5; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; }
+    .card span { display: block; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .card strong { font-size: 1.05rem; }
+    .bet { color: #1565c0; }
+    .win { color: #2e7d32; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e6edf5; }
+    th { background: #f1f5f9; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; }
+    tr.free td:nth-child(2) { color: #b8860b; font-weight: 600; }
+    tr.paid td:nth-child(2) { color: #1565c0; font-weight: 600; }
+    .footer { margin-top: 16px; color: #7b8798; font-size: 0.8rem; }
+    @media print { body { background: #fff; padding: 0; } .wrap { border: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Session Spin Report</h1>
+    <div class="sub">
+      ${escHtml(session?.username || 'Unknown user')} · ${escHtml(session?.gameName || 'Unknown game')}<br/>
+      Started: ${escHtml(fmtFeedbackDateTime(session?.startedAt))} · Generated: ${escHtml(generatedAt)}
+    </div>
+
+    <div class="summary">${escHtml(plainSummary)}</div>
+
+    <div class="grid">
+      <div class="card"><span>Total Bet</span><strong class="bet">$${escHtml(fmtMoney(totalBet))}</strong></div>
+      <div class="card"><span>Total Win</span><strong class="win">$${escHtml(fmtMoney(totalWin))}</strong></div>
+      <div class="card"><span>Session RTP</span><strong>${escHtml(fmtRtp(rtp))}</strong></div>
+      <div class="card"><span>Net</span><strong>${profit >= 0 ? '+' : '-'}$${escHtml(fmtMoney(Math.abs(profit)))}</strong></div>
+      <div class="card"><span>Spins</span><strong>${escHtml(fmtInt(rows.length))}</strong></div>
+      <div class="card"><span>Paid Spins</span><strong>${escHtml(fmtInt(paidCount))}</strong></div>
+      <div class="card"><span>Free Spins</span><strong>${escHtml(fmtInt(freeCount))}</strong></div>
+    </div>
+
+    <h2 style="font-size:1.05rem;margin:0 0 10px;">Spin details</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Spin #</th>
+          <th>Type</th>
+          <th>Bet</th>
+          <th>Win</th>
+          <th>Balance After</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${spinRowsHtml || '<tr><td colspan="6">No spins.</td></tr>'}
+      </tbody>
+    </table>
+    <div class="footer">Game Vault Internal Dashboard · simple session report</div>
+  </div>
+</body>
+</html>`;
+    }
+
+    function downloadSessionSpinReport() {
+      const frame = drillStack[drillStack.length - 1];
+      if (!frame || frame.type !== 'spins' || !frame.session) {
+        setError('Open a session spin graph first, then download the report.');
+        return;
+      }
+      const session = frame.session;
+      const spins = session.spinLogs || activeChartSpins || [];
+      const html = buildSessionSpinReportHtml(session, spins);
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = localDateInputValue() + '_' + new Date().toTimeString().slice(0, 8).replace(/:/g, '');
+      a.href = url;
+      a.download = safeReportFilename([
+        'spin_report',
+        session.username,
+        session.gameName,
+        stamp,
+      ]) + '.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showLoadToast('Report downloaded');
+    }
+
     function resetSpinChartZoom(spinCount = activeChartSpins.length, redraw = true) {
+      stopChartSmoothPan(true);
       const n = Math.max(0, Number(spinCount) || 0);
       chartViewStart = 0;
       chartViewEnd = Math.max(0, n - 1);
@@ -2739,6 +3129,102 @@
       hoveredSpinIndex = -1;
       updateSpinZoomControls();
       if (redraw && activeChartSpins.length) renderSpinChart(activeChartSpins);
+    }
+
+    function chartWindowSize() {
+      return Math.max(1, Math.round(chartViewEnd - chartViewStart + 1));
+    }
+
+    function stopChartSmoothPan(snapToTarget = false) {
+      if (chartSmoothRaf) {
+        cancelAnimationFrame(chartSmoothRaf);
+        chartSmoothRaf = null;
+      }
+      if (snapToTarget && chartSmoothTargetStart != null) {
+        const n = activeChartSpins.length;
+        const windowSize = chartWindowSize();
+        let s = chartSmoothTargetStart;
+        let e = s + windowSize - 1;
+        if (s < 0) {
+          s = 0;
+          e = windowSize - 1;
+        }
+        if (n && e > n - 1) {
+          e = n - 1;
+          s = Math.max(0, e - windowSize + 1);
+        }
+        chartViewStart = s;
+        chartViewEnd = e;
+      }
+      chartSmoothTargetStart = null;
+    }
+
+    function setChartViewWindow(start, options = {}) {
+      const n = activeChartSpins.length;
+      if (!n) return;
+      const windowSize = options.windowSize || chartWindowSize();
+      let s = Number(start) || 0;
+      let e = s + windowSize - 1;
+      if (s < 0) {
+        s = 0;
+        e = windowSize - 1;
+      }
+      if (e > n - 1) {
+        e = n - 1;
+        s = Math.max(0, e - windowSize + 1);
+      }
+      chartViewStart = s;
+      chartViewEnd = e;
+      updateSpinZoomControls({ syncScroller: options.syncScroller !== false });
+      if (options.redraw !== false) {
+        hideSpinChartTooltip();
+        renderSpinChart(activeChartSpins, options.hoverIndex ?? -1);
+      }
+    }
+
+    function animateChartToStart(targetStart) {
+      const n = activeChartSpins.length;
+      if (!n) return;
+      const windowSize = chartWindowSize();
+      if (windowSize >= n) return;
+
+      let s = Number(targetStart) || 0;
+      const maxStart = Math.max(0, n - windowSize);
+      if (s < 0) s = 0;
+      if (s > maxStart) s = maxStart;
+      chartSmoothTargetStart = s;
+
+      if (chartSmoothRaf) return;
+
+      const tick = () => {
+        const target = chartSmoothTargetStart;
+        if (target == null || !activeChartSpins.length) {
+          chartSmoothRaf = null;
+          return;
+        }
+        const size = chartWindowSize();
+        const cur = chartViewStart;
+        const diff = target - cur;
+        if (Math.abs(diff) < 0.04) {
+          chartViewStart = target;
+          chartViewEnd = target + size - 1;
+          chartSmoothRaf = null;
+          chartSmoothTargetStart = null;
+          updateSpinZoomControls({ syncScroller: !chartScrollDragging });
+          hideSpinChartTooltip();
+          renderSpinChart(activeChartSpins, -1);
+          return;
+        }
+        // Ease toward target for smooth slider / pan motion
+        chartViewStart = cur + diff * 0.32;
+        chartViewEnd = chartViewStart + size - 1;
+        updateSpinZoomControls({ syncScroller: false });
+        hideSpinChartTooltip();
+        renderSpinChart(activeChartSpins, -1);
+        chartSmoothRaf = requestAnimationFrame(tick);
+      };
+
+      chartSmoothRaf = requestAnimationFrame(tick);
     }
 
     function clampChartView(start, end, spinCount) {
@@ -2769,36 +3255,93 @@
       return { start: s, end: e };
     }
 
-    function updateSpinZoomControls() {
+    function updateSpinZoomControls(options = {}) {
+      const syncScroller = options.syncScroller !== false;
       const n = activeChartSpins.length;
       const hint = $('spinZoomHint');
       const zoomInBtn = $('spinZoomInBtn');
       const zoomOutBtn = $('spinZoomOutBtn');
       const resetBtn = $('spinZoomResetBtn');
+      const panLeftBtn = $('spinPanLeftBtn');
+      const panRightBtn = $('spinPanRightBtn');
+      const scrollWrap = $('spinChartScrollWrap');
+      const scroller = $('spinChartScroller');
+
       if (!n) {
-        if (hint) hint.textContent = 'Scroll to zoom · drag to pan';
+        if (hint) hint.textContent = 'Scroll to zoom · drag or scroller to pan';
         if (zoomInBtn) zoomInBtn.disabled = true;
         if (zoomOutBtn) zoomOutBtn.disabled = true;
         if (resetBtn) resetBtn.disabled = true;
+        if (panLeftBtn) panLeftBtn.disabled = true;
+        if (panRightBtn) panRightBtn.disabled = true;
+        if (scrollWrap) scrollWrap.classList.add('hidden');
         return;
       }
-      const visible = chartViewEnd - chartViewStart + 1;
-      const fullyZoomedOut = chartViewStart <= 0 && chartViewEnd >= n - 1;
+
+      const visible = chartWindowSize();
+      const fullyZoomedOut = chartViewStart <= 0.001 && chartViewEnd >= n - 1 - 0.001;
       const minWindow = Math.min(n, Math.max(6, Math.ceil(n * 0.08)));
+      const canPan = !fullyZoomedOut;
+      const displayStart = Math.floor(chartViewStart) + 1;
+      const displayEnd = Math.min(n, Math.ceil(chartViewEnd) + 1);
+
       if (hint) {
         hint.textContent = fullyZoomedOut
-          ? 'Scroll to zoom · drag to pan'
-          : 'Spins ' + fmtInt(chartViewStart + 1) + '–' + fmtInt(chartViewEnd + 1) + ' of ' + fmtInt(n);
+          ? 'Scroll to zoom · drag or scroller to pan'
+          : 'Spins ' + fmtInt(displayStart) + '–' + fmtInt(displayEnd) + ' of ' + fmtInt(n);
       }
       if (zoomInBtn) zoomInBtn.disabled = visible <= minWindow;
       if (zoomOutBtn) zoomOutBtn.disabled = fullyZoomedOut;
       if (resetBtn) resetBtn.disabled = fullyZoomedOut;
+      if (panLeftBtn) panLeftBtn.disabled = !canPan || chartViewStart <= 0.001;
+      if (panRightBtn) panRightBtn.disabled = !canPan || chartViewEnd >= n - 1 - 0.001;
+
+      if (scrollWrap) scrollWrap.classList.toggle('hidden', !canPan);
+      if (scroller && canPan) {
+        const maxStart = Math.max(0, n - visible);
+        scroller.min = '0';
+        scroller.max = String(maxStart);
+        scroller.step = '1';
+        if (syncScroller && !chartScrollDragging && document.activeElement !== scroller) {
+          scroller.value = String(Math.round(chartViewStart));
+        }
+      }
+    }
+
+    function panSpinChart(direction) {
+      const n = activeChartSpins.length;
+      if (!n) return;
+      const visible = chartWindowSize();
+      if (visible >= n) return;
+      const step = Math.max(1, Math.floor(visible * 0.25));
+      const delta = direction < 0 ? -step : step;
+      animateChartToStart(chartViewStart + delta);
+    }
+
+    function onSpinChartScrollerInput() {
+      const scroller = $('spinChartScroller');
+      const n = activeChartSpins.length;
+      if (!scroller || !n) return;
+      const visible = chartWindowSize();
+      if (visible >= n) return;
+      chartScrollDragging = true;
+      animateChartToStart(Number(scroller.value) || 0);
+    }
+
+    function onSpinChartScrollerEnd() {
+      chartScrollDragging = false;
+      if (chartSmoothTargetStart != null) {
+        animateChartToStart(chartSmoothTargetStart);
+      } else {
+        updateSpinZoomControls({ syncScroller: true });
+      }
     }
 
     function zoomSpinChart(factor, anchorRatio = 0.5) {
+      stopChartSmoothPan(true);
       const n = activeChartSpins.length;
       if (!n) return;
-      const visible = chartViewEnd - chartViewStart + 1;
+      const visible = chartWindowSize();
       const nextVisible = Math.round(visible * factor);
       const anchor = chartViewStart + anchorRatio * (visible - 1);
       const half = (nextVisible - 1) / 2;
@@ -2814,9 +3357,16 @@
       const canvas = $('spinChart');
       if (!canvas || !Array.isArray(spins) || !spins.length || canvas.offsetParent === null) return;
 
-      if (chartViewEnd < chartViewStart || chartViewEnd >= spins.length) {
+      const n = spins.length;
+      const windowSize = Math.max(1, Math.min(n, chartWindowSize()));
+      if (!Number.isFinite(chartViewStart) || !Number.isFinite(chartViewEnd) || chartViewEnd < chartViewStart) {
         chartViewStart = 0;
-        chartViewEnd = spins.length - 1;
+        chartViewEnd = n - 1;
+      }
+      if (chartViewStart < 0) chartViewStart = 0;
+      if (chartViewEnd > n - 1) {
+        chartViewEnd = n - 1;
+        chartViewStart = Math.max(0, chartViewEnd - windowSize + 1);
       }
 
       const width = Math.max(canvas.parentElement.clientWidth - 32, 320);
@@ -2834,17 +3384,25 @@
       const pad = { left: 58, right: 18, top: 18, bottom: 42 };
       const plotW = width - pad.left - pad.right;
       const plotH = height - pad.top - pad.bottom;
-      const viewStart = chartViewStart;
-      const viewEnd = chartViewEnd;
-      const visibleSpins = spins.slice(viewStart, viewEnd + 1);
+
+      // Fractional start enables smooth slider pan between whole spins.
+      const viewStartExact = chartViewStart;
+      const viewEndExact = chartViewStart + windowSize - 1;
+      const floorStart = Math.max(0, Math.floor(viewStartExact));
+      const ceilEnd = Math.min(n - 1, Math.ceil(viewEndExact));
+      const visibleSpins = spins.slice(floorStart, ceilEnd + 1);
       const visibleCount = visibleSpins.length;
+      if (!visibleCount) return;
+
       const bets = visibleSpins.map((s) => Number(s.betAmount || 0));
       const wins = visibleSpins.map((s) => Number(s.winAmount || 0));
       const maxValue = Math.max(1, ...bets, ...wins) * 1.08;
-      const slotW = plotW / visibleCount;
+      const slotW = plotW / windowSize;
       const barW = Math.max(2, Math.min(18, slotW * 0.42));
-      const xCenter = (i) => pad.left + (i + 0.5) * slotW;
+      const shiftX = -(viewStartExact - floorStart) * slotW;
+      const xCenter = (localIndex) => pad.left + (localIndex + 0.5) * slotW + shiftX;
       const yAt = (value) => pad.top + plotH - (Number(value || 0) / maxValue) * plotH;
+      const globalIndex = (localIndex) => floorStart + localIndex;
 
       // Soft plot background
       ctx.fillStyle = 'rgba(255,255,255,0.015)';
@@ -2865,20 +3423,24 @@
         ctx.fillText('$' + fmtNum(value), pad.left - 8, y + 3);
       }
 
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(pad.left, pad.top, plotW, plotH + 8);
+      ctx.clip();
+
       // Bet bars — amber for free spins, blue for paid
       visibleSpins.forEach((spin, i) => {
         const cx = xCenter(i);
         const bet = Number(spin.betAmount || 0);
         const betY = yAt(bet);
         const free = isSpinFree(spin);
-        const active = (viewStart + i) === hoverIndex;
+        const active = globalIndex(i) === hoverIndex;
         const baseY = pad.top + plotH;
         if (free) {
           ctx.fillStyle = active ? 'rgba(255, 193, 7, 0.95)' : 'rgba(255, 193, 7, 0.7)';
           if (bet > 0) {
             ctx.fillRect(cx - barW / 2, betY, barW, baseY - betY);
           } else {
-            // Free spins often have $0 bet — still mark the slot
             const markerH = Math.max(6, Math.min(12, barW + 2));
             ctx.fillRect(cx - barW / 2, baseY - markerH, barW, markerH);
           }
@@ -2918,7 +3480,6 @@
         ctx.lineJoin = 'round';
         ctx.stroke();
 
-        // Mark free-spin win points in amber so they stand out on the line
         visibleSpins.forEach((spin, i) => {
           if (!isSpinFree(spin)) return;
           const x = xCenter(i);
@@ -2933,8 +3494,8 @@
         });
       }
 
-      if (hoverIndex >= viewStart && hoverIndex <= viewEnd) {
-        const localIndex = hoverIndex - viewStart;
+      if (hoverIndex >= floorStart && hoverIndex <= ceilEnd) {
+        const localIndex = hoverIndex - floorStart;
         const spin = spins[hoverIndex];
         const free = isSpinFree(spin);
         const cx = xCenter(localIndex);
@@ -2966,22 +3527,20 @@
         ctx.lineWidth = 1.8;
         ctx.stroke();
       }
+      ctx.restore();
 
-      // X labels — first, mid (when zoomed), last
+      // X labels
       ctx.fillStyle = '#8b9bb0';
       ctx.textAlign = 'left';
-      const firstSpin = visibleSpins[0];
-      const lastSpin = visibleSpins[visibleCount - 1];
-      const firstLabel = 'Spin ' + fmtInt(firstSpin.spinIndex ?? viewStart + 1);
-      const lastLabel = 'Spin ' + fmtInt(lastSpin.spinIndex ?? viewEnd + 1);
+      const firstLabel = 'Spin ' + fmtInt(Math.floor(viewStartExact) + 1);
+      const lastLabel = 'Spin ' + fmtInt(Math.min(n, Math.ceil(viewEndExact) + 1));
       ctx.fillText(firstLabel, pad.left, height - 14);
       ctx.fillText(lastLabel, width - pad.right - ctx.measureText(lastLabel).width, height - 14);
-      if (visibleCount > 12) {
-        const mid = Math.floor(visibleCount / 2);
-        const midSpin = visibleSpins[mid];
-        const midLabel = 'Spin ' + fmtInt(midSpin.spinIndex ?? viewStart + mid + 1);
+      if (windowSize > 12) {
+        const midGlobal = Math.round((viewStartExact + viewEndExact) / 2);
+        const midLabel = 'Spin ' + fmtInt(midGlobal + 1);
         ctx.textAlign = 'center';
-        ctx.fillText(midLabel, xCenter(mid), height - 14);
+        ctx.fillText(midLabel, pad.left + plotW / 2, height - 14);
       }
 
       canvas._chartMeta = {
@@ -2992,20 +3551,25 @@
         slotW,
         width,
         height,
-        viewStart,
-        viewEnd,
-        xAt: (globalIndex) => xCenter(globalIndex - viewStart),
+        viewStart: viewStartExact,
+        viewEnd: viewEndExact,
+        floorStart,
+        windowSize,
+        shiftX,
+        xAt: (globalIdx) => xCenter(globalIdx - floorStart),
         yAt,
         localXAt: xCenter,
       };
-      updateSpinZoomControls();
+      updateSpinZoomControls({ syncScroller: !chartScrollDragging && !chartSmoothRaf });
     }
 
     function spinIndexFromPointer(meta, x) {
       if (!meta?.spins?.length) return -1;
-      const local = Math.floor((x - meta.pad.left) / meta.slotW);
-      if (local < 0 || local > meta.viewEnd - meta.viewStart) return -1;
-      return meta.viewStart + local;
+      const local = Math.floor((x - meta.pad.left - (meta.shiftX || 0)) / meta.slotW);
+      if (local < 0 || local >= (meta.windowSize || 0)) return -1;
+      const idx = (meta.floorStart || 0) + local;
+      if (idx < 0 || idx >= meta.spins.length) return -1;
+      return idx;
     }
 
     function updateSpinChartTooltip(e) {
@@ -3097,8 +3661,9 @@
       const canvas = $('spinChart');
       const meta = canvas?._chartMeta;
       if (!meta?.spins?.length || e.button !== 0) return;
-      const visible = meta.viewEnd - meta.viewStart + 1;
+      const visible = chartWindowSize();
       if (visible >= meta.spins.length) return;
+      stopChartSmoothPan(true);
       chartPanState = {
         startX: e.clientX,
         originStart: chartViewStart,
@@ -3116,7 +3681,7 @@
         return;
       }
       const deltaPx = e.clientX - chartPanState.startX;
-      const deltaSpins = Math.round(-deltaPx / chartPanState.slotW);
+      const deltaSpins = -deltaPx / chartPanState.slotW;
       const n = activeChartSpins.length;
       const windowSize = chartPanState.originEnd - chartPanState.originStart + 1;
       let s = chartPanState.originStart + deltaSpins;
@@ -3129,10 +3694,10 @@
         eIdx = n - 1;
         s = Math.max(0, eIdx - windowSize + 1);
       }
-      if (s !== chartViewStart || eIdx !== chartViewEnd) {
+      if (Math.abs(s - chartViewStart) > 0.001 || Math.abs(eIdx - chartViewEnd) > 0.001) {
         chartViewStart = s;
         chartViewEnd = eIdx;
-        updateSpinZoomControls();
+        updateSpinZoomControls({ syncScroller: true });
         renderSpinChart(activeChartSpins, -1);
       }
     }
@@ -3165,6 +3730,29 @@
       const text = await res.text();
       const json = parseSummaryResponse(res, text);
       return json.data?.spinLogs || [];
+    }
+
+    function openOnlineUsers() {
+      const payload = totalGameUsersPayload(currentDashboardData);
+      pushDrill({
+        type: 'online-users',
+        users: gameUsersList(payload),
+      });
+    }
+
+    /** Keep open drill views in sync when summary data reloads (Load / auto-refresh). */
+    function refreshOpenDrillFromLatest() {
+      if (!drillStack.length || !currentDashboardData) return;
+
+      let changed = false;
+      for (const frame of drillStack) {
+        if (frame.type === 'online-users') {
+          frame.users = gameUsersList(totalGameUsersPayload(currentDashboardData));
+          changed = true;
+        }
+      }
+
+      if (changed) renderDrillView();
     }
 
     async function openUserSessions(userRow) {
@@ -3269,6 +3857,12 @@
       }
 
       const frame = drillStack[drillStack.length - 1];
+      if (kind === 'online-user' && frame?.type === 'online-users') {
+        const user = (frame.users || []).find((row) => String(row.userId) === String(id));
+        if (user) openUserSessions(user);
+        return;
+      }
+
       if (kind === 'game-user' && frame?.type === 'game-users') {
         const user = (frame.game.users || []).find((row) => String(row.userId) === String(id));
         if (user) {
@@ -3300,17 +3894,20 @@
         { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged), icon: '💰', tone: 'kpi-money' },
         { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed), icon: '💸', tone: 'kpi-redeem' },
         {
-          label: 'Users',
-          value: fmtInt(gameUsersCount(d.totalGameUsers)),
-          sub: 'Total users ' + fmtInt(d.totalUsers),
+          label: 'Online Users',
+          value: fmtInt(gameUsersCount(totalGameUsersPayload(d))),
+          sub: 'Total users ' + fmtInt(d.totalUsers ?? d.TotalUsers),
           icon: '👥',
           tone: 'kpi-users',
+          clickable: true,
+          kpiKey: 'online-users',
+          hint: 'Click to view online users',
         },
         {
           label: 'Whole Game RTP',
           value: fmtRtp(d.wholeGameRtp?.rtp),
-          sub: '<span class="kpi-bet">Bet $' + fmtMoney(d.wholeGameRtp?.totalBet) + '</span>' +
-            ' · <span class="kpi-win">Win $' + fmtMoney(d.wholeGameRtp?.totalWin) + '</span>',
+          sub: '<span class="kpi-line kpi-bet">Bet $' + fmtMoney(d.wholeGameRtp?.totalBet) + '</span>' +
+            '<span class="kpi-line kpi-win">Win $' + fmtMoney(d.wholeGameRtp?.totalWin) + '</span>',
           icon: '🎰',
           tone: 'kpi-rtp',
         },
@@ -3322,10 +3919,16 @@
           tone: 'kpi-feedback',
         },
       ].map((k) =>
-        '<div class="kpi ' + (k.tone || '') + '">' +
+        '<div class="kpi ' + (k.tone || '') + (k.clickable ? ' kpi-clickable' : '') + '"' +
+        (k.clickable
+          ? ' role="button" tabindex="0" data-kpi="' + escAttr(k.kpiKey) + '" title="' + escAttr(k.hint || '') + '"'
+          : '') +
+        '>' +
         '<div class="kpi-head"><div class="kpi-label">' + k.label + '</div><span class="kpi-icon">' + (k.icon || '📊') + '</span></div>' +
         '<div class="kpi-value">' + k.value + '</div>' +
-        (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') + '</div>'
+        (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') +
+        (k.hint ? '<div class="kpi-hint">' + escHtml(k.hint) + '</div>' : '') +
+        '</div>'
       ).join('');
 
       rtpByGameData = d.rtpByGame || [];
@@ -3405,12 +4008,26 @@
       return json;
     }
 
-    async function fetchSummaryFrom(origin) {
-      const url = origin.replace(/\/$/, '') + '/api/dashboard/internal/summary';
-      const headers = { Accept: 'application/json' };
-      if (lastSummaryEtag) headers['If-None-Match'] = lastSummaryEtag;
+    async function fetchSummaryFrom(origin, { forceFresh = false } = {}) {
+      const base = origin.replace(/\/$/, '') + '/api/dashboard/internal/summary';
+      const url = forceFresh
+        ? base + (base.includes('?') ? '&' : '?') + '_=' + Date.now()
+        : base;
 
-      const res = await fetch(url, { headers });
+      const headers = {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
+      };
+      // Only send ETag on background refresh; manual Load always asks for a full body.
+      if (!forceFresh && lastSummaryEtag) {
+        headers['If-None-Match'] = lastSummaryEtag;
+      }
+
+      const res = await fetch(url, {
+        headers,
+        cache: 'no-store',
+      });
 
       if (res.status === 304) {
         return { notModified: true, url, origin, etag: lastSummaryEtag };
@@ -3423,11 +4040,11 @@
       return { json, url, origin, notModified: false, etag };
     }
 
-    function applySummaryResponse(json, isAutoRefresh) {
+    function applySummaryResponse(json, isAutoRefresh, { forceApply = false } = {}) {
       const changed = !lastSummaryJson || !responsesEqual(lastSummaryJson, json);
       lastSummaryJson = json;
 
-      if (!changed) {
+      if (!changed && !forceApply) {
         const time = new Date().toLocaleTimeString();
         setConn('ok', 'API · up to date · ' + time);
         setError('');
@@ -3436,8 +4053,8 @@
       }
 
       pushResponseHistory(json);
-      if (!drillStack.length) renderDashboard(json);
-      else currentDashboardData = json?.data || {};
+      renderDashboard(json);
+      if (drillStack.length) refreshOpenDrillFromLatest();
       const time = new Date().toLocaleTimeString();
       setConn('ok', 'API · last updated ' + time);
       setError('');
@@ -3523,6 +4140,7 @@
       setError('');
       clearResponseHistory();
       renderDashboard(DEMO_SUMMARY);
+      if (drillStack.length) refreshOpenDrillFromLatest();
       const time = new Date().toLocaleTimeString();
       setConn('ok', 'Demo data · ' + time);
       if (!isAutoRefresh) {
@@ -3540,7 +4158,9 @@
 
       try {
         const origin = apiOrigin();
-        const result = await fetchSummaryFrom(origin);
+        // Manual Load always bypasses ETag/304 and browser cache, and always redraws UI.
+        const forceFresh = !isAutoRefresh;
+        const result = await fetchSummaryFrom(origin, { forceFresh });
         if (result.notModified) {
           const time = new Date().toLocaleTimeString();
           setConn('ok', 'API · up to date · ' + time);
@@ -3549,7 +4169,7 @@
           resetRefreshTimer();
           return;
         }
-        applySummaryResponse(result.json, isAutoRefresh);
+        applySummaryResponse(result.json, isAutoRefresh, { forceApply: forceFresh });
         resetRefreshTimer();
       } catch (err) {
         setConn('err', isAutoRefresh ? 'Refresh failed' : 'Failed');
@@ -3608,6 +4228,9 @@
     $('loadBtn').addEventListener('click', () => {
       resetRefreshTimer();
       loadData(false);
+    });
+    $('refreshPageBtn').addEventListener('click', () => {
+      window.location.reload();
     });
     $('pauseRefreshBtn').addEventListener('click', () => {
       toggleRefreshPaused();
@@ -3731,20 +4354,43 @@
       }
     });
     $('dashboard').addEventListener('click', (e) => {
+      const kpi = e.target.closest('[data-kpi]');
+      if (kpi && !isDrillLoading) {
+        if (kpi.dataset.kpi === 'online-users') openOnlineUsers();
+        return;
+      }
       const button = e.target.closest('[data-drill]');
       if (button && !button.disabled && !isDrillLoading) handleDrillClick(button);
+    });
+    $('dashboard').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const kpi = e.target.closest('[data-kpi]');
+      if (!kpi || isDrillLoading) return;
+      e.preventDefault();
+      if (kpi.dataset.kpi === 'online-users') openOnlineUsers();
     });
     $('drillBackBtn').addEventListener('click', () => {
       drillStack.pop();
       activeChartSpins = [];
       resetSpinChartZoom(0, false);
       hideSpinChartTooltip();
-      if (drillStack.length) renderDrillView();
-      else setDashboardViewMode();
+      if (drillStack.length) {
+        renderDrillView();
+      } else {
+        if (lastSummaryJson) renderDashboard(lastSummaryJson);
+        setDashboardViewMode();
+      }
     });
     $('spinZoomInBtn').addEventListener('click', () => zoomSpinChart(0.65, 0.5));
     $('spinZoomOutBtn').addEventListener('click', () => zoomSpinChart(1.45, 0.5));
     $('spinZoomResetBtn').addEventListener('click', () => resetSpinChartZoom());
+    $('spinDownloadReportBtn').addEventListener('click', () => downloadSessionSpinReport());
+    $('spinPanLeftBtn').addEventListener('click', () => panSpinChart(-1));
+    $('spinPanRightBtn').addEventListener('click', () => panSpinChart(1));
+    $('spinChartScroller').addEventListener('input', onSpinChartScrollerInput);
+    $('spinChartScroller').addEventListener('change', onSpinChartScrollerEnd);
+    $('spinChartScroller').addEventListener('mouseup', onSpinChartScrollerEnd);
+    $('spinChartScroller').addEventListener('touchend', onSpinChartScrollerEnd);
     $('spinChart').addEventListener('mousemove', onSpinChartPointerMove);
     $('spinChart').addEventListener('mousedown', onSpinChartPointerDown);
     $('spinChart').addEventListener('mouseleave', () => {
