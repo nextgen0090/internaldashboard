@@ -1,0 +1,13 @@
+{
+  "name": "internal-dashboard",
+  "private": true,
+  "description": "Game Vault internal dashboard — Cloudflare Worker static assets",
+  "scripts": {
+    "dev:cf": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "whoami": "wrangler whoami"
+  },
+  "devDependencies": {
+    "wrangler": "^4.28.0"
+  }
+}

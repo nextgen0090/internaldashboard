@@ -477,6 +477,20 @@
       box-shadow: none;
     }
 
+    .controls-actions button.is-active,
+    .controls-actions a.btn-link.is-active {
+      background: linear-gradient(135deg, #1565c0, #42a5f5);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 20px rgba(66, 165, 245, 0.25);
+    }
+
+    .controls-actions button.is-active:hover:not(:disabled),
+    .controls-actions a.btn-link.is-active:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(66, 165, 245, 0.32);
+    }
+
     a.btn-link {
       display: inline-flex;
       align-items: center;
@@ -675,6 +689,25 @@
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.02em;
+    }
+
+    .kpi-value.kpi-value-stack {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.45;
+    }
+
+    .kpi-value.kpi-value-stack .kpi-line {
+      display: block;
+    }
+
+    .kpi-value .kpi-recharge {
+      color: #66bb6a;
+    }
+
+    .kpi-value .kpi-redeem-amt {
+      color: #ffa726;
     }
 
     .kpi-sub {
@@ -899,6 +932,188 @@
     .drill-toolbar h2 {
       margin: 0;
       flex: 1;
+    }
+
+    #drillOwnerTxToolbar {
+      margin-bottom: 0.75rem;
+    }
+
+    .pager-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 0.65rem 0 0;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .pager-bar .pager-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .pager-bar button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .badge-tx-recharge {
+      background: rgba(102, 187, 106, 0.18);
+      color: #81c784;
+    }
+
+    .badge-tx-redeem {
+      background: rgba(255, 167, 38, 0.18);
+      color: #ffb74d;
+    }
+
+    .owner-tx-type-btns {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .owner-tx-type-btn.is-active {
+      background: rgba(66, 165, 245, 0.28);
+      border-color: rgba(66, 165, 245, 0.65);
+      color: #e3f2fd;
+      font-weight: 700;
+    }
+
+    .owner-tx-type-btn[data-owner-type="recharge"].is-active {
+      background: rgba(102, 187, 106, 0.28);
+      border-color: rgba(102, 187, 106, 0.65);
+      color: #c8e6c9;
+    }
+
+    .owner-tx-type-btn[data-owner-type="redeem"].is-active {
+      background: rgba(255, 167, 38, 0.28);
+      border-color: rgba(255, 167, 38, 0.65);
+      color: #ffe0b2;
+    }
+
+    #maintenanceTableWrap tr.maint-row-selected {
+      background: rgba(66, 165, 245, 0.16);
+    }
+
+    #maintenanceTableWrap tr.maint-row-selected td {
+      box-shadow: inset 0 0 0 1px rgba(66, 165, 245, 0.35);
+    }
+
+    #maintenanceTableWrap tr.maint-row-selected td:first-child {
+      border-left: 3px solid #42a5f5;
+    }
+
+    #maintenanceTableWrap .maint-select-btn.is-selected {
+      background: rgba(66, 165, 245, 0.28);
+      border-color: rgba(66, 165, 245, 0.65);
+      color: #e3f2fd;
+      font-weight: 700;
+    }
+
+    .maint-editor {
+      margin-top: 0.85rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .maint-editor-title {
+      display: none;
+    }
+
+    .maint-editor-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.55rem 0.7rem;
+    }
+
+    .maint-field {
+      min-width: 0;
+    }
+
+    .maint-field-type {
+      flex: 0 0 8.5rem;
+    }
+
+    .maint-field-time {
+      flex: 1 1 14rem;
+      min-width: 13rem;
+    }
+
+    .maint-field label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .maint-field select,
+    .maint-field input[type="date"],
+    .maint-field input[type="text"] {
+      width: 100%;
+      min-height: 2.15rem;
+    }
+
+    .maint-datetime {
+      display: grid;
+      grid-template-columns: 1.15fr 0.75fr auto;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .maint-datetime input[type="text"] {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+    }
+
+    .maint-datetime .secondary {
+      min-height: 2.15rem;
+      padding: 0 0.65rem;
+    }
+
+    .maint-actions {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.4rem;
+      margin-left: auto;
+      padding-bottom: 0.05rem;
+    }
+
+    .maint-actions button {
+      min-width: 5.5rem;
+      min-height: 2.15rem;
+    }
+
+    .maint-hint {
+      margin: 0.45rem 0 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .maint-field-type,
+      .maint-field-time {
+        flex: 1 1 100%;
+      }
+
+      .maint-actions {
+        margin-left: 0;
+        width: 100%;
+      }
     }
 
     .chart-summary {
@@ -1275,7 +1490,7 @@
               <span class="dot" id="connDot"></span>
               <span id="connText">Not loaded</span>
             </div>
-            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">40</strong>s</div>
+            <div class="refresh-timer" id="refreshTimer">Next refresh in <strong id="refreshSeconds">20</strong>s</div>
           </div>
         </div>
       </div>
@@ -1295,11 +1510,13 @@
           </select>
         </div>
         <div class="controls-actions">
+          <button class="secondary" id="homeBtn" type="button" title="Back to home dashboard">Home</button>
           <button id="loadBtn" type="button">Load</button>
           <button class="secondary" id="refreshPageBtn" type="button" title="Reload the page">Refresh</button>
           <button class="secondary" id="pauseRefreshBtn" type="button">Pause</button>
           <button class="secondary" id="toggleDiffBtn" type="button">Show Diff</button>
           <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
+          <button class="secondary" id="maintenanceBtn" type="button" title="Open maintenance settings">Maintenance</button>
           <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
         </div>
       </div>
@@ -1461,11 +1678,84 @@
       </div>
       </div>
 
+      <section class="card hidden" id="maintenanceCard">
+        <div class="drill-toolbar">
+          <button type="button" class="secondary" id="maintenanceHomeBtn">← Home</button>
+          <h2>Maintenance Settings <span class="row-count" id="countMaintenance"></span></h2>
+          <div class="section-toolbar-actions">
+            <button type="button" class="secondary" id="maintenanceReloadBtn">Reload</button>
+          </div>
+        </div>
+        <div class="table-wrap smooth-update" id="maintenanceTableWrap"></div>
+        <div class="maint-editor">
+          <div class="maint-editor-row">
+            <div class="maint-field maint-field-type">
+              <label for="maintType">Type</label>
+              <select id="maintType">
+                <option value="Backend">Backend</option>
+                <option value="Dashboard">Dashboard</option>
+                <option value="Games">Games</option>
+              </select>
+            </div>
+            <div class="maint-field maint-field-time">
+              <label>Start (24h)</label>
+              <div class="maint-datetime">
+                <input type="date" id="maintStartDate" />
+                <input type="text" id="maintStartTime" inputmode="numeric" placeholder="HH:mm" maxlength="5" title="24-hour time, e.g. 21:05" />
+                <button type="button" class="secondary" id="maintStartNowBtn" title="Set start to current time">Now</button>
+              </div>
+            </div>
+            <div class="maint-field maint-field-time">
+              <label>End (24h)</label>
+              <div class="maint-datetime">
+                <input type="date" id="maintEndDate" />
+                <input type="text" id="maintEndTime" inputmode="numeric" placeholder="HH:mm" maxlength="5" title="24-hour time, e.g. 21:05" />
+                <button type="button" class="secondary" id="maintEndNowBtn" title="Set end to current time">Now</button>
+              </div>
+            </div>
+            <div class="maint-actions">
+              <button type="button" id="maintSaveBtn">Save</button>
+              <button type="button" class="secondary" id="maintClearBtn">Turn Off</button>
+            </div>
+          </div>
+          <p class="maint-hint" id="maintHint">Select a row, set times (24h), then Save — or Turn Off.</p>
+        </div>
+      </section>
+
       <section class="card hidden" id="drillDownCard">
         <div class="drill-toolbar">
           <button type="button" class="secondary" id="drillBackBtn">← Back</button>
           <h2 id="drillTitle">Session details</h2>
           <span class="row-count" id="drillMeta"></span>
+        </div>
+        <div class="hidden" id="drillOwnerTxToolbar">
+          <div class="section-toolbar section-toolbar-inline">
+            <div class="inline-field">
+              <label>Type</label>
+              <div class="owner-tx-type-btns" role="group" aria-label="Transaction type">
+                <button type="button" class="secondary owner-tx-type-btn is-active" data-owner-type="all">All</button>
+                <button type="button" class="secondary owner-tx-type-btn" data-owner-type="recharge">Recharge</button>
+                <button type="button" class="secondary owner-tx-type-btn" data-owner-type="redeem">Redeem</button>
+              </div>
+            </div>
+            <div class="inline-field">
+              <label for="ownerTxAccount">Account</label>
+              <input type="search" id="ownerTxAccount" placeholder="Account name" autocomplete="off" />
+            </div>
+            <div class="inline-field">
+              <label for="ownerTxFrom">From</label>
+              <input type="date" id="ownerTxFrom" />
+            </div>
+            <div class="inline-field">
+              <label for="ownerTxTo">To</label>
+              <input type="date" id="ownerTxTo" />
+            </div>
+            <div class="section-toolbar-actions">
+              <button type="button" id="ownerTxFilterBtn">Filter</button>
+              <button type="button" class="secondary" id="ownerTxClearBtn">Clear</button>
+            </div>
+          </div>
+          <div class="pager-bar" id="ownerTxPager"></div>
         </div>
         <div class="table-wrap tall" id="drillTableWrap"></div>
         <div class="hidden" id="drillChartWrap">
@@ -1509,12 +1799,15 @@
     let responseHistory = [];
     let historyViewIndex = 0;
     let isDiffVisible = false;
+    let isMaintenanceVisible = false;
     let gamesTargetRtpData = [];
     let rtpByGameData = [];
     let gamesAboveTargetData = [];
     let rtpByUserData = [];
     let usersRtpHighData = [];
     let userFeedbacksData = [];
+    let maintenanceSettingsData = [];
+    let selectedMaintenanceType = '';
     let feedbackDateFromActive = '';
     let feedbackDateToActive = '';
     let feedbackStarActive = 'all';
@@ -1636,6 +1929,8 @@
       data: {
         totalRecharged: 125430.50,
         totalRedeemed: 98210.25,
+        ownerTotalRecharged: 210500.00,
+        ownerTotalRedeemed: 155300.75,
         totalUsers: 1842,
         totalGameUsers: {
           count: 2,
@@ -1774,7 +2069,7 @@
 
     function apiOrigin() {
       // Local: use same-origin proxy (start.bat → localhost .NET).
-      // Deployed (Vercel): call gamevault222.com directly (avoids Vercel rewrite / Cloudflare 403).
+      // Deployed (Cloudflare Worker / any host): call gamevault222.com directly.
       const host = location.hostname;
       if (/^(localhost|127\.0\.0\.1)$/i.test(host)) {
         return window.location.origin;
@@ -1837,7 +2132,8 @@
     function formatDiffValue(fieldKey, value) {
       if (value == null || value === '') return '—';
       if (fieldKey === 'rtp' || fieldKey === 'targetRtp') return fmtRtp(value);
-      if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed') {
+      if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed'
+        || fieldKey === 'ownerTotalRecharged' || fieldKey === 'ownerTotalRedeemed') {
         return '$' + fmtMoney(value);
       }
       if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount') return fmtInt(value);
@@ -2114,7 +2410,7 @@
     }
 
     /** Format API datetime using the same clock values as the response string. */
-    function formatApiWallClockDateTime(value, withTime = true) {
+    function formatApiWallClockDateTime(value, withTime = true, use24Hour = false) {
       if (value == null || value === '') return null;
       const text = String(value).trim();
       if (!text) return null;
@@ -2139,9 +2435,13 @@
           : (monthShort + ' ' + day + ', ' + year);
       }
 
+      const mm = String(minute).padStart(2, '0');
+      if (use24Hour) {
+        return day + ' ' + monthLong + ' ' + year + ' at ' + String(hour).padStart(2, '0') + ':' + mm;
+      }
+
       const ampm = hour >= 12 ? 'pm' : 'am';
       const h12 = hour % 12 || 12;
-      const mm = String(minute).padStart(2, '0');
       return day + ' ' + monthLong + ' ' + year + ' at ' + h12 + ':' + mm + ' ' + ampm;
     }
 
@@ -2173,10 +2473,57 @@
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        hour: '2-digit',
+        hour: 'numeric',
         minute: '2-digit',
-        hour12: true,
       });
+    }
+
+    /** Maintenance times always show 24-hour clock (e.g. 21:00, not 9 PM). */
+    function fmtMaintenanceDateTime(value) {
+      if (value == null || value === '') return '';
+      const wall = formatApiWallClockDateTime(value, true, true);
+      if (wall) return wall;
+      const d = parseFeedbackDate(value);
+      if (!d) return '';
+      const pad = (n) => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+        ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    function parseMaintenanceInstant(value) {
+      if (value == null || value === '') return null;
+      const text = String(value).trim();
+      const m = text.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (m) {
+        const d = new Date(
+          Number(m[1].slice(0, 4)),
+          Number(m[1].slice(5, 7)) - 1,
+          Number(m[1].slice(8, 10)),
+          Number(m[2]),
+          Number(m[3]),
+          Number(m[4] || 0)
+        );
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      const d = parseFeedbackDate(value);
+      if (!d || Number.isNaN(d.getTime())) return null;
+      return d;
+    }
+
+    /** Live when times are empty or current time is outside [start, end]. */
+    function isMaintenanceWindowActive(row) {
+      const start = parseMaintenanceInstant(row?.startTime ?? row?.StartTime);
+      const end = parseMaintenanceInstant(row?.endTime ?? row?.EndTime);
+      if (!start || !end) return false;
+      const now = Date.now();
+      return now >= start.getTime() && now <= end.getTime();
+    }
+
+    function fmtMaintenanceStatusBadge(row) {
+      if (isMaintenanceWindowActive(row)) {
+        return '<span class="badge badge-tx-redeem">Maintenance</span>';
+      }
+      return '<span class="badge badge-tx-recharge">Live</span>';
     }
 
     function getFeedbackRowDate(row) {
@@ -2415,6 +2762,8 @@
       const scalars = [
         { key: 'totalRecharged', label: 'Total Recharged' },
         { key: 'totalRedeemed', label: 'Total Redeemed' },
+        { key: 'ownerTotalRecharged', label: 'Owner Total Recharged' },
+        { key: 'ownerTotalRedeemed', label: 'Owner Total Redeemed' },
         { key: 'totalUsers', label: 'Total Users' },
         { key: 'totalGameUsers', label: 'Online Users' },
       ];
@@ -2483,17 +2832,81 @@
         '<div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div></div>';
     }
 
+    function goHome() {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      isDiffVisible = false;
+      isMaintenanceVisible = false;
+      const diffBtn = $('toggleDiffBtn');
+      if (diffBtn && !diffBtn.disabled) {
+        const changeMatch = diffBtn.textContent.match(/\((\d+)\)/);
+        diffBtn.textContent = 'Show Diff' + (changeMatch ? ' (' + changeMatch[1] + ')' : '');
+      }
+      show($('jsonCard'), false);
+      const jsonBtn = $('toggleJsonBtn');
+      if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      setError('');
+      if (lastSummaryJson) renderDashboard(lastSummaryJson);
+      else if (isDemoMode()) renderDashboard(DEMO_SUMMARY);
+      setDashboardViewMode();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openMaintenancePage() {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      isDiffVisible = false;
+      isMaintenanceVisible = true;
+      show($('jsonCard'), false);
+      const jsonBtn = $('toggleJsonBtn');
+      if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      setDashboardViewMode();
+      loadMaintenanceSettings();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function setDashboardViewMode() {
       const inDrillMode = drillStack.length > 0;
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
-      show($('mainDashboard'), !inDiffMode && !inDrillMode);
+      const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
+      show($('mainDashboard'), !inDiffMode && !inDrillMode && !inMaintenanceMode);
       show($('diffCard'), inDiffMode);
       show($('drillDownCard'), inDrillMode);
-      if (inDiffMode || inDrillMode) {
+      show($('maintenanceCard'), inMaintenanceMode);
+      if (!inDrillMode || drillStack[drillStack.length - 1]?.type !== 'owner-transactions') {
+        show($('drillOwnerTxToolbar'), false);
+      }
+      if (inDiffMode || inDrillMode || inMaintenanceMode) {
         show($('jsonCard'), false);
         const jsonBtn = $('toggleJsonBtn');
         if (jsonBtn) jsonBtn.textContent = 'Show JSON';
       }
+      updateControlsHighlight();
+    }
+
+    function updateControlsHighlight() {
+      const inDrillMode = drillStack.length > 0;
+      const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
+      const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
+      const jsonVisible = !$('jsonCard')?.classList.contains('hidden');
+      const onHome = !inDrillMode && !inDiffMode && !inMaintenanceMode;
+
+      const setActive = (id, active) => {
+        const el = $(id);
+        if (!el) return;
+        el.classList.toggle('is-active', !!active);
+        el.setAttribute('aria-pressed', active ? 'true' : 'false');
+      };
+
+      setActive('homeBtn', onHome);
+      setActive('toggleDiffBtn', inDiffMode);
+      setActive('toggleJsonBtn', jsonVisible && onHome);
+      setActive('maintenanceBtn', inMaintenanceMode);
+      setActive('pauseRefreshBtn', isRefreshPaused && !isDemoMode());
     }
 
     function updateDiffPanel() {
@@ -2826,7 +3239,7 @@
       }, smooth);
     }
 
-    function renderTable(containerId, rows, columns, emptyMessage = 'No data.') {
+    function renderTable(containerId, rows, columns, emptyMessage = 'No data.', options = {}) {
       const el = $(containerId);
       if (!Array.isArray(rows) || rows.length === 0) {
         el.innerHTML = '<div class="empty">' + escHtml(emptyMessage) + '</div>';
@@ -2834,9 +3247,13 @@
       }
 
       const head = '<tr>' + columns.map((c) => '<th>' + c.label + '</th>').join('') + '</tr>';
-      const body = rows.map((row) =>
-        '<tr>' + columns.map((c) => '<td>' + (c.render ? c.render(row) : escHtml(row[c.key] ?? '')) + '</td>').join('') + '</tr>'
-      ).join('');
+      const body = rows.map((row) => {
+        const rowClass = options.getRowClass ? options.getRowClass(row) : '';
+        const trOpen = rowClass ? '<tr class="' + escAttr(rowClass) + '">' : '<tr>';
+        return trOpen +
+          columns.map((c) => '<td>' + (c.render ? c.render(row) : escHtml(row[c.key] ?? '')) + '</td>').join('') +
+          '</tr>';
+      }).join('');
 
       el.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
     }
@@ -2851,6 +3268,7 @@
     function pushDrill(frame) {
       drillStack.push(frame);
       isDiffVisible = false;
+      isMaintenanceVisible = false;
       renderDrillView();
     }
 
@@ -2869,6 +3287,12 @@
 
       show($('drillTableWrap'), frame.type !== 'spins');
       show($('drillChartWrap'), frame.type === 'spins');
+      show($('drillOwnerTxToolbar'), frame.type === 'owner-transactions');
+
+      if (frame.type === 'owner-transactions') {
+        renderOwnerTransactionsDrill(frame);
+        return;
+      }
 
       if (frame.type === 'online-users') {
         const users = frame.users || [];
@@ -3740,6 +4164,228 @@
       });
     }
 
+    async function fetchOwnerTransactions({ type = 'all', page = 1, pageSize = 25, account = '', from = '', to = '' } = {}) {
+      if (isDemoMode()) {
+        const demo = buildDemoOwnerTransactions();
+        let rows = demo;
+        if (type === 'recharge') rows = demo.filter((r) => r.type === 'Recharge');
+        if (type === 'redeem') rows = demo.filter((r) => r.type === 'Redeem');
+        if (account) {
+          const q = account.toLowerCase();
+          rows = rows.filter((r) => String(r.account || '').toLowerCase().includes(q));
+        }
+        const totalCount = rows.length;
+        const start = (Math.max(1, page) - 1) * pageSize;
+        return {
+          items: rows.slice(start, start + pageSize),
+          totalCount,
+          page: Math.max(1, page),
+          pageSize,
+          type,
+        };
+      }
+
+      const params = new URLSearchParams();
+      params.set('type', type || 'all');
+      params.set('page', String(page || 1));
+      params.set('pageSize', String(pageSize || 25));
+      if (account) params.set('account', account);
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/owner-transactions?' + params.toString();
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+        cache: 'no-store',
+      });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      const data = json.data || {};
+      return {
+        items: data.items || data.Items || [],
+        totalCount: Number(data.totalCount ?? data.TotalCount ?? 0),
+        page: Number(data.page ?? data.Page ?? page),
+        pageSize: Number(data.pageSize ?? data.PageSize ?? pageSize),
+        type: data.type || data.Type || type,
+      };
+    }
+
+    function buildDemoOwnerTransactions() {
+      return [
+        {
+          type: 'Recharge', id: 'd1', ticket: 'T-1001', actor: 'cashier', account: 'player_alpha',
+          date: '2026-07-23T10:00:00', amount: 100, before: 50, after: 150, cashier: 'store1', remark: 'Demo top-up',
+        },
+        {
+          type: 'Redeem', id: 'd2', ticket: 'T-1002', actor: 'cashier', account: 'player_alpha',
+          date: '2026-07-22T16:30:00', amount: 40, before: 150, after: 110, cashier: 'store1', remark: 'Demo cashout',
+        },
+        {
+          type: 'Recharge', id: 'd3', ticket: 'T-1003', actor: 'player', account: 'player_beta',
+          date: '2026-07-21T09:15:00', amount: 200, before: 0, after: 200, cashier: 'owner', remark: '',
+        },
+        {
+          type: 'Redeem', id: 'd4', ticket: 'T-1004', actor: 'cashier', account: 'player_beta',
+          date: '2026-07-20T12:00:00', amount: 75, before: 200, after: 125, cashier: 'store2', remark: '',
+        },
+      ];
+    }
+
+    function getSelectedOwnerTxType() {
+      const active = document.querySelector('.owner-tx-type-btn.is-active');
+      return active?.dataset.ownerType || 'all';
+    }
+
+    function setOwnerTxTypeButtons(type) {
+      const selected = type || 'all';
+      document.querySelectorAll('.owner-tx-type-btn').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.dataset.ownerType === selected);
+      });
+    }
+
+    function syncOwnerTxToolbar(frame) {
+      setOwnerTxTypeButtons(frame.txType || 'all');
+      if ($('ownerTxAccount')) $('ownerTxAccount').value = frame.account || '';
+      if ($('ownerTxFrom')) $('ownerTxFrom').value = frame.from || '';
+      if ($('ownerTxTo')) $('ownerTxTo').value = frame.to || '';
+    }
+
+    function renderOwnerTxPager(frame) {
+      const pager = $('ownerTxPager');
+      if (!pager) return;
+      const total = Number(frame.totalCount || 0);
+      const page = Number(frame.page || 1);
+      const pageSize = Number(frame.pageSize || 25);
+      const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+      const fromRow = total === 0 ? 0 : (page - 1) * pageSize + 1;
+      const toRow = Math.min(page * pageSize, total);
+      pager.innerHTML =
+        '<span>Showing ' + fmtInt(fromRow) + '–' + fmtInt(toRow) + ' of ' + fmtInt(total) + '</span>' +
+        '<div class="pager-actions">' +
+        '<button type="button" class="secondary" data-owner-page="prev"' + (page <= 1 ? ' disabled' : '') + '>Prev</button>' +
+        '<span>Page ' + fmtInt(page) + ' / ' + fmtInt(totalPages) + '</span>' +
+        '<button type="button" class="secondary" data-owner-page="next"' + (page >= totalPages ? ' disabled' : '') + '>Next</button>' +
+        '</div>';
+    }
+
+    function renderOwnerTransactionsDrill(frame) {
+      syncOwnerTxToolbar(frame);
+      renderOwnerTxPager(frame);
+      $('drillTitle').textContent = 'Owner Recharge & Redeem';
+      const total = Number(frame.totalCount || 0);
+      $('drillMeta').textContent = fmtInt(total) + ' record' + (total === 1 ? '' : 's');
+
+      const items = (frame.items || []).map((r) => ({
+        type: r.type ?? r.Type ?? '',
+        id: r.id ?? r.Id ?? '',
+        ticket: r.ticket ?? r.Ticket ?? '',
+        actor: r.actor ?? r.Actor ?? '',
+        account: r.account ?? r.Account ?? '',
+        date: r.date ?? r.Date ?? '',
+        amount: r.amount ?? r.Amount ?? 0,
+        before: r.before ?? r.Before ?? 0,
+        after: r.after ?? r.After ?? 0,
+        cashier: r.cashier ?? r.Cashier ?? '',
+        remark: r.remark ?? r.Remark ?? '',
+      }));
+
+      renderTable('drillTableWrap', items, [
+        {
+          label: 'Type',
+          render: (r) => {
+            const t = String(r.type || '');
+            const cls = t.toLowerCase() === 'redeem' ? 'badge-tx-redeem' : 'badge-tx-recharge';
+            return '<span class="badge ' + cls + '">' + escHtml(t || '—') + '</span>';
+          },
+        },
+        { label: 'Date', render: (r) => escHtml(fmtFeedbackDateTime(r.date) || '—') },
+        {
+          label: 'Account',
+          render: (r) => r.account
+            ? '<span class="cell-user">' + escHtml(r.account) + '</span>'
+            : '<span class="cell-empty">—</span>',
+        },
+        {
+          label: 'Amount',
+          render: (r) => {
+            const isRedeem = String(r.type || '').toLowerCase() === 'redeem';
+            const cls = isRedeem ? 'kpi-redeem-amt' : 'kpi-recharge';
+            return '<span class="' + cls + '">$' + fmtMoney(r.amount) + '</span>';
+          },
+        },
+        { label: 'Before', render: (r) => '$' + fmtMoney(r.before) },
+        { label: 'After', render: (r) => '$' + fmtMoney(r.after) },
+        { label: 'Actor', key: 'actor' },
+        { label: 'Cashier', key: 'cashier' },
+        { label: 'Ticket', key: 'ticket' },
+        { label: 'Remark', key: 'remark' },
+      ], frame.loading ? 'Loading…' : 'No records.');
+    }
+
+    async function loadOwnerTransactionsPage(overrides = {}) {
+      const frame = drillStack[drillStack.length - 1];
+      if (!frame || frame.type !== 'owner-transactions' || isDrillLoading) return;
+
+      const next = {
+        txType: overrides.txType ?? frame.txType ?? 'all',
+        page: overrides.page ?? frame.page ?? 1,
+        pageSize: overrides.pageSize ?? frame.pageSize ?? 25,
+        account: overrides.account ?? frame.account ?? '',
+        from: overrides.from ?? frame.from ?? '',
+        to: overrides.to ?? frame.to ?? '',
+      };
+
+      isDrillLoading = true;
+      frame.loading = true;
+      $('drillMeta').textContent = 'Loading…';
+      try {
+        const data = await fetchOwnerTransactions({
+          type: next.txType,
+          page: next.page,
+          pageSize: next.pageSize,
+          account: next.account,
+          from: next.from,
+          to: next.to,
+        });
+        Object.assign(frame, {
+          txType: data.type || next.txType,
+          page: data.page,
+          pageSize: data.pageSize,
+          account: next.account,
+          from: next.from,
+          to: next.to,
+          items: data.items,
+          totalCount: data.totalCount,
+          loading: false,
+        });
+        renderDrillView();
+      } catch (err) {
+        frame.loading = false;
+        setError(err.message || 'Failed to load owner transactions');
+        renderDrillView();
+      } finally {
+        isDrillLoading = false;
+      }
+    }
+
+    async function openOwnerTransactions() {
+      if (isDrillLoading) return;
+      const frame = {
+        type: 'owner-transactions',
+        txType: 'all',
+        page: 1,
+        pageSize: 25,
+        account: '',
+        from: '',
+        to: '',
+        items: [],
+        totalCount: 0,
+        loading: true,
+      };
+      pushDrill(frame);
+      await loadOwnerTransactionsPage({ page: 1 });
+    }
+
     /** Keep open drill views in sync when summary data reloads (Load / auto-refresh). */
     function refreshOpenDrillFromLatest() {
       if (!drillStack.length || !currentDashboardData) return;
@@ -3891,8 +4537,33 @@
         : 0;
 
       $('kpiGrid').innerHTML = [
-        { label: 'Total Recharged', value: '$' + fmtMoney(d.totalRecharged), icon: '💰', tone: 'kpi-money' },
-        { label: 'Total Redeemed', value: '$' + fmtMoney(d.totalRedeemed), icon: '💸', tone: 'kpi-redeem' },
+        {
+          label: 'Owner Totals',
+          value:
+            '<span class="kpi-line kpi-recharge">Recharged $' + fmtMoney(d.ownerTotalRecharged ?? d.OwnerTotalRecharged) + '</span>' +
+            '<span class="kpi-line kpi-redeem-amt">Redeemed $' + fmtMoney(d.ownerTotalRedeemed ?? d.OwnerTotalRedeemed) + '</span>',
+          sub: 'All records (owner stats)',
+          icon: '🏦',
+          tone: 'kpi-money',
+          valueHtml: true,
+          clickable: true,
+          kpiKey: 'owner-totals',
+          hint: 'Click to view recharge & redeem records',
+        },
+        {
+          label: 'Total Recharged',
+          value: '$' + fmtMoney(d.totalRecharged),
+          sub: 'Player only',
+          icon: '💰',
+          tone: 'kpi-money',
+        },
+        {
+          label: 'Total Redeemed',
+          value: '$' + fmtMoney(d.totalRedeemed),
+          sub: 'Player only',
+          icon: '💸',
+          tone: 'kpi-redeem',
+        },
         {
           label: 'Online Users',
           value: fmtInt(gameUsersCount(totalGameUsersPayload(d))),
@@ -3925,7 +4596,7 @@
           : '') +
         '>' +
         '<div class="kpi-head"><div class="kpi-label">' + k.label + '</div><span class="kpi-icon">' + (k.icon || '📊') + '</span></div>' +
-        '<div class="kpi-value">' + k.value + '</div>' +
+        '<div class="kpi-value' + (k.valueHtml ? ' kpi-value-stack' : '') + '">' + k.value + '</div>' +
         (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') +
         (k.hint ? '<div class="kpi-hint">' + escHtml(k.hint) + '</div>' : '') +
         '</div>'
@@ -3989,6 +4660,263 @@
       if (!message) { el.textContent = ''; show(el, false); return; }
       el.textContent = message;
       show(el, true);
+    }
+
+    function parseMaintenanceParts(value) {
+      if (value == null || value === '') return { date: '', time: '' };
+      const text = String(value).trim();
+      const m = text.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})/);
+      if (m) return { date: m[1], time: m[2] + ':' + m[3] };
+      const d = parseFeedbackDate(value);
+      if (!d || Number.isNaN(d.getTime())) return { date: '', time: '' };
+      const pad = (n) => String(n).padStart(2, '0');
+      return {
+        date: d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()),
+        time: pad(d.getHours()) + ':' + pad(d.getMinutes()),
+      };
+    }
+
+    function normalizeTime24h(raw) {
+      const text = String(raw || '').trim();
+      if (!text) return '';
+      const m = text.match(/^(\d{1,2}):(\d{2})$/);
+      if (!m) return '';
+      const hh = Number(m[1]);
+      const mm = Number(m[2]);
+      if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return '';
+      return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+    }
+
+    function getMaintenanceDateTime(prefix) {
+      const date = ($(prefix + 'Date')?.value || '').trim();
+      const time = normalizeTime24h($(prefix + 'Time')?.value || '');
+      if (!date || !time) return null;
+      // ISO local (T) so ASP.NET System.Text.Json can bind DateTime
+      return date + 'T' + time + ':00';
+    }
+
+    function setMaintenanceDateTime(prefix, value) {
+      const parts = parseMaintenanceParts(value);
+      if ($(prefix + 'Date')) $(prefix + 'Date').value = parts.date;
+      if ($(prefix + 'Time')) $(prefix + 'Time').value = parts.time;
+    }
+
+    function clearMaintenanceDateTime(prefix) {
+      if ($(prefix + 'Date')) $(prefix + 'Date').value = '';
+      if ($(prefix + 'Time')) $(prefix + 'Time').value = '';
+    }
+
+    function setMaintenanceFieldToNow(prefix) {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      if ($(prefix + 'Date')) {
+        $(prefix + 'Date').value =
+          now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+      }
+      if ($(prefix + 'Time')) {
+        $(prefix + 'Time').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
+      }
+      selectedMaintenanceType = String($('maintType')?.value || 'Backend');
+      renderMaintenanceTable();
+      if ($('maintHint')) {
+        const type = $('maintType')?.value || 'Backend';
+        $('maintHint').textContent =
+          'Editing ' + type + ' · ' + (prefix === 'maintStart' ? 'start' : 'end') +
+          ' set to ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' (24h)';
+      }
+    }
+
+    function fillMaintenanceForm(row, { highlightOnly = false } = {}) {
+      if (!row) return;
+      const type = row.maintenanceType ?? row.MaintenanceType ?? 'Backend';
+      selectedMaintenanceType = String(type);
+      const enabled = isMaintenanceWindowActive(row);
+      if ($('maintType')) $('maintType').value = type;
+      if (!highlightOnly) {
+        setMaintenanceDateTime('maintStart', row.startTime ?? row.StartTime);
+        setMaintenanceDateTime('maintEnd', row.endTime ?? row.EndTime);
+      }
+      if ($('maintHint')) {
+        $('maintHint').textContent = enabled
+          ? ('Editing ' + type + ' · currently Maintenance')
+          : ('Editing ' + type + ' · currently Live');
+      }
+      renderMaintenanceTable();
+    }
+
+    function selectMaintenanceType(type) {
+      const row = (maintenanceSettingsData || []).find(
+        (r) => String(r.maintenanceType ?? r.MaintenanceType) === String(type)
+      );
+      if (row) fillMaintenanceForm(row);
+      else {
+        selectedMaintenanceType = String(type || '');
+        renderMaintenanceTable();
+      }
+    }
+
+    function renderMaintenanceTable() {
+      const rows = maintenanceSettingsData || [];
+      setRowCount('countMaintenance', rows);
+      renderTable('maintenanceTableWrap', rows, [
+        {
+          label: 'Type',
+          render: (r) => '<strong>' + escHtml(r.maintenanceType ?? r.MaintenanceType ?? '—') + '</strong>',
+        },
+        {
+          label: 'Status',
+          render: (r) => fmtMaintenanceStatusBadge(r),
+        },
+        {
+          label: 'Start',
+          render: (r) => {
+            const text = fmtMaintenanceDateTime(r.startTime ?? r.StartTime);
+            return text ? escHtml(text) : '<span class="cell-empty">—</span>';
+          },
+        },
+        {
+          label: 'End',
+          render: (r) => {
+            const text = fmtMaintenanceDateTime(r.endTime ?? r.EndTime);
+            return text ? escHtml(text) : '<span class="cell-empty">—</span>';
+          },
+        },
+        {
+          label: 'Updated',
+          render: (r) => escHtml(fmtMaintenanceDateTime(r.lastUpdatedAt ?? r.LastUpdatedAt) || '—'),
+        },
+        {
+          label: 'By',
+          render: (r) => escHtml(r.updatedBy ?? r.UpdatedBy ?? '—'),
+        },
+        {
+          label: 'Edit',
+          render: (r) => {
+            const type = String(r.maintenanceType ?? r.MaintenanceType ?? '');
+            const selected = selectedMaintenanceType && type === selectedMaintenanceType;
+            return '<button type="button" class="secondary maint-select-btn' +
+              (selected ? ' is-selected' : '') +
+              '" data-maint-edit="' + escAttr(type) + '">' +
+              (selected ? 'Selected' : 'Select') +
+              '</button>';
+          },
+        },
+      ], 'No maintenance rows.', {
+        getRowClass: (r) => {
+          const type = String(r.maintenanceType ?? r.MaintenanceType ?? '');
+          return selectedMaintenanceType && type === selectedMaintenanceType
+            ? 'maint-row-selected'
+            : '';
+        },
+      });
+    }
+
+    async function loadMaintenanceSettings() {
+      if (isDemoMode()) {
+        maintenanceSettingsData = [
+          { maintenanceType: 'Backend', isMaintenance: false, startTime: null, endTime: null, updatedBy: 'demo' },
+          { maintenanceType: 'Dashboard', isMaintenance: false, startTime: null, endTime: null, updatedBy: 'demo' },
+          { maintenanceType: 'Games', isMaintenance: false, startTime: null, endTime: null, updatedBy: 'demo' },
+        ];
+        renderMaintenanceTable();
+        return;
+      }
+      try {
+        const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/maintenance';
+        const res = await fetch(url, {
+          headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+          cache: 'no-store',
+        });
+        const text = await res.text();
+        const json = parseSummaryResponse(res, text);
+        maintenanceSettingsData = Array.isArray(json.data) ? json.data : (json.data?.items || []);
+        renderMaintenanceTable();
+      } catch (err) {
+        maintenanceSettingsData = [];
+        renderMaintenanceTable();
+        if ($('maintHint')) $('maintHint').textContent = err.message || 'Failed to load maintenance settings';
+      }
+    }
+
+    async function saveMaintenanceSetting({ turnOff = false } = {}) {
+      const type = $('maintType')?.value || 'Backend';
+      selectedMaintenanceType = String(type);
+      const isOn = !turnOff;
+      const startValue = getMaintenanceDateTime('maintStart');
+      const endValue = getMaintenanceDateTime('maintEnd');
+
+      if (isOn && !startValue) {
+        setError('Start date and 24h time (HH:mm) are required when enabling maintenance.');
+        return;
+      }
+      if (($('maintStartTime')?.value || '').trim() && !normalizeTime24h($('maintStartTime').value)) {
+        setError('Start time must be 24-hour HH:mm (e.g. 21:05).');
+        return;
+      }
+      if (($('maintEndTime')?.value || '').trim() && !normalizeTime24h($('maintEndTime').value)) {
+        setError('End time must be 24-hour HH:mm (e.g. 21:05).');
+        return;
+      }
+
+      const body = {
+        maintenanceType: type,
+        isMaintenance: isOn,
+        startTime: isOn ? startValue : null,
+        endTime: isOn ? endValue : null,
+      };
+
+      if (isDemoMode()) {
+        maintenanceSettingsData = (maintenanceSettingsData || []).map((row) => {
+          if ((row.maintenanceType || row.MaintenanceType) !== type) return row;
+          return {
+            ...row,
+            isMaintenance: isOn,
+            startTime: body.startTime,
+            endTime: body.endTime,
+            updatedBy: 'demo',
+            lastUpdatedAt: new Date().toISOString(),
+          };
+        });
+        renderMaintenanceTable();
+        showLoadToast('Demo maintenance saved for ' + type);
+        return;
+      }
+
+      const btn = $('maintSaveBtn');
+      if (btn) btn.disabled = true;
+      try {
+        setError('');
+        const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/maintenance';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+          },
+          cache: 'no-store',
+          body: JSON.stringify(body),
+        });
+        const text = await res.text();
+        let json;
+        try { json = text ? JSON.parse(text) : null; } catch {
+          throw new Error('Response is not valid JSON.\n' + text.slice(0, 300));
+        }
+        if (!res.ok || !json?.success) {
+          let msg = json?.message || json?.title || ('HTTP ' + res.status);
+          if (json?.errors && typeof json.errors === 'object') {
+            const parts = Object.values(json.errors).flat().filter(Boolean);
+            if (parts.length) msg = parts.join(' ');
+          }
+          throw new Error(msg);
+        }
+        showLoadToast((isOn ? 'Maintenance ON' : 'Maintenance OFF') + ' · ' + type);
+        await loadMaintenanceSettings();
+      } catch (err) {
+        setError(err.message || 'Failed to save maintenance setting');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     function isStaticServer404(text) {
@@ -4062,7 +4990,7 @@
       return true;
     }
 
-    const REFRESH_SEC = 40;
+    const REFRESH_SEC = 20;
     let secondsLeft = REFRESH_SEC;
     let isLoading = false;
     let isRefreshPaused = false;
@@ -4074,6 +5002,7 @@
       show(btn, !isDemoMode());
       btn.textContent = isRefreshPaused ? 'Resume' : 'Pause';
       btn.setAttribute('aria-pressed', isRefreshPaused ? 'true' : 'false');
+      updateControlsHighlight();
     }
 
     function setRefreshPaused(paused) {
@@ -4229,6 +5158,35 @@
       resetRefreshTimer();
       loadData(false);
     });
+    $('homeBtn').addEventListener('click', () => {
+      goHome();
+    });
+    $('maintenanceBtn')?.addEventListener('click', () => {
+      openMaintenancePage();
+    });
+    $('maintenanceHomeBtn')?.addEventListener('click', () => {
+      goHome();
+    });
+    $('maintenanceReloadBtn')?.addEventListener('click', () => loadMaintenanceSettings());
+    $('maintSaveBtn')?.addEventListener('click', () => saveMaintenanceSetting({ turnOff: false }));
+    $('maintType')?.addEventListener('change', () => {
+      selectMaintenanceType($('maintType').value);
+    });
+    $('maintStartNowBtn')?.addEventListener('click', () => setMaintenanceFieldToNow('maintStart'));
+    $('maintEndNowBtn')?.addEventListener('click', () => setMaintenanceFieldToNow('maintEnd'));
+    $('maintStartTime')?.addEventListener('blur', () => {
+      const normalized = normalizeTime24h($('maintStartTime').value);
+      if (normalized) $('maintStartTime').value = normalized;
+    });
+    $('maintEndTime')?.addEventListener('blur', () => {
+      const normalized = normalizeTime24h($('maintEndTime').value);
+      if (normalized) $('maintEndTime').value = normalized;
+    });
+    $('maintClearBtn')?.addEventListener('click', () => {
+      clearMaintenanceDateTime('maintStart');
+      clearMaintenanceDateTime('maintEnd');
+      saveMaintenanceSetting({ turnOff: true });
+    });
     $('refreshPageBtn').addEventListener('click', () => {
       window.location.reload();
     });
@@ -4345,18 +5303,36 @@
       const visible = !$('jsonCard').classList.contains('hidden');
       show($('jsonCard'), !visible);
       $('toggleJsonBtn').textContent = visible ? 'Show JSON' : 'Hide JSON';
+      updateControlsHighlight();
     });
     $('toggleDiffBtn').addEventListener('click', () => {
       isDiffVisible = !isDiffVisible;
+      if (isDiffVisible) isMaintenanceVisible = false;
       updateDiffPanel();
       if (isDiffVisible) {
         $('diffCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
     $('dashboard').addEventListener('click', (e) => {
+      const editBtn = e.target.closest('[data-maint-edit]');
+      if (editBtn) {
+        selectMaintenanceType(editBtn.dataset.maintEdit);
+        return;
+      }
+      const ownerPageBtn = e.target.closest('[data-owner-page]');
+      if (ownerPageBtn && !ownerPageBtn.disabled && !isDrillLoading) {
+        const frame = drillStack[drillStack.length - 1];
+        if (frame?.type === 'owner-transactions') {
+          const dir = ownerPageBtn.dataset.ownerPage;
+          const page = Number(frame.page || 1);
+          loadOwnerTransactionsPage({ page: dir === 'next' ? page + 1 : Math.max(1, page - 1) });
+        }
+        return;
+      }
       const kpi = e.target.closest('[data-kpi]');
       if (kpi && !isDrillLoading) {
         if (kpi.dataset.kpi === 'online-users') openOnlineUsers();
+        else if (kpi.dataset.kpi === 'owner-totals') openOwnerTransactions();
         return;
       }
       const button = e.target.closest('[data-drill]');
@@ -4368,6 +5344,39 @@
       if (!kpi || isDrillLoading) return;
       e.preventDefault();
       if (kpi.dataset.kpi === 'online-users') openOnlineUsers();
+      else if (kpi.dataset.kpi === 'owner-totals') openOwnerTransactions();
+    });
+    $('ownerTxFilterBtn')?.addEventListener('click', () => {
+      loadOwnerTransactionsPage({
+        page: 1,
+        txType: getSelectedOwnerTxType(),
+        account: ($('ownerTxAccount')?.value || '').trim(),
+        from: $('ownerTxFrom')?.value || '',
+        to: $('ownerTxTo')?.value || '',
+      });
+    });
+    $('ownerTxClearBtn')?.addEventListener('click', () => {
+      setOwnerTxTypeButtons('all');
+      if ($('ownerTxAccount')) $('ownerTxAccount').value = '';
+      if ($('ownerTxFrom')) $('ownerTxFrom').value = '';
+      if ($('ownerTxTo')) $('ownerTxTo').value = '';
+      loadOwnerTransactionsPage({ page: 1, txType: 'all', account: '', from: '', to: '' });
+    });
+    document.querySelectorAll('.owner-tx-type-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.ownerType || 'all';
+        setOwnerTxTypeButtons(type);
+        loadOwnerTransactionsPage({
+          page: 1,
+          txType: type,
+          account: ($('ownerTxAccount')?.value || '').trim(),
+          from: $('ownerTxFrom')?.value || '',
+          to: $('ownerTxTo')?.value || '',
+        });
+      });
+    });
+    $('ownerTxAccount')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('ownerTxFilterBtn')?.click();
     });
     $('drillBackBtn').addEventListener('click', () => {
       drillStack.pop();

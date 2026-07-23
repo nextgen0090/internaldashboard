@@ -40,6 +40,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
         self.send_error(404)
 
+    def do_PUT(self):
+        if self.path.startswith("/api/"):
+            self._proxy("PUT")
+            return
+        self.send_error(404)
+
     def do_OPTIONS(self):
         if self.path.startswith("/api/"):
             self.send_response(204)
@@ -50,10 +56,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
         self.send_header(
             "Access-Control-Allow-Headers",
-            "Authorization, Accept, Content-Type, If-None-Match, If-Modified-Since",
+            "Authorization, Accept, Content-Type, If-None-Match, If-Modified-Since, Cache-Control, Pragma",
         )
         self.send_header("Access-Control-Expose-Headers", "ETag, Last-Modified")
 
@@ -82,7 +88,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             headers["If-Modified-Since"] = if_modified_since
 
         body = None
-        if method == "POST":
+        if method in ("POST", "PUT", "PATCH"):
             length = int(self.headers.get("Content-Length", "0"))
             body = self.rfile.read(length) if length else None
 

@@ -1,0 +1,14 @@
+# Cloudflare Worker — static Internal Dashboard
+# Deploy: npm run deploy
+# Docs: https://developers.cloudflare.com/workers/static-assets/
+
+name = "internal-dashboard"
+compatibility_date = "2026-07-23"
+workers_dev = true
+
+[assets]
+directory = "."
+not_found_handling = "single-page-application"
+
+# Optional custom domain (uncomment after adding route in Cloudflare dashboard):
+# routes = [{ pattern = "internal.yourdomain.com/*", zone_name = "yourdomain.com" }]

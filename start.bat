@@ -13,7 +13,8 @@ echo.
 echo Local:  http://localhost:%PORT%
 echo API:    %BACKEND_URL%/api/*  (local .NET)
 echo.
-echo Vercel: fetches https://gamevault222.com/api/* directly
+echo Cloudflare Worker: fetches https://gamevault222.com/api/* directly
+echo Deploy: npm run deploy  (see DEPLOY.md)
 echo Do NOT use: python -m http.server
 echo.
 
