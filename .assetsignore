@@ -8,6 +8,7 @@ server.py
 start.bat
 vercel.json
 wrangler.toml
+worker.js
 package.json
 package-lock.json
 .gitignore

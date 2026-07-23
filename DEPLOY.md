@@ -18,6 +18,7 @@ Push with GitHub Desktop → Cloudflare builds and deploys automatically.
 3. Branch: use **`dev`** (or create/switch to **`main`** if you prefer production on `main`)
 4. Include at least:
    - `index.html`
+   - `worker.js`
    - `wrangler.toml`
    - `package.json`
    - `.assetsignore`
@@ -52,6 +53,34 @@ Cloudflare installs npm deps from `package.json` and runs Wrangler.
 Live URL example:
 
 `https://internaldashboard.<your-subdomain>.workers.dev`
+
+---
+
+## IP allowlist (only listed IPs can open the page)
+
+The Worker checks `CF-Connecting-IP` before serving the dashboard.
+
+### Add / change IPs
+
+1. Open `wrangler.toml`
+2. Edit:
+
+```toml
+[vars]
+ALLOWED_IPS = "203.0.113.10,198.51.100.25"
+```
+
+- Comma-separated list  
+- Prefix ok: `"203.0.113."` allows that block  
+- Find your IP: open https://www.cloudflare.com/cdn-cgi/trace → line `ip=`
+
+3. Commit + push (or `npm run deploy`)
+
+### If blocked
+
+You get **403** with your IP printed — add that IP to `ALLOWED_IPS` and redeploy.
+
+Until you replace `REPLACE_WITH_YOUR_IP`, **everyone** (including you) is denied.
 
 ---
 
@@ -97,7 +126,8 @@ npm run deploy
 | File | Role |
 |------|------|
 | `index.html` | Dashboard UI |
-| `wrangler.toml` | Worker name + static assets |
+| `worker.js` | IP allowlist gate |
+| `wrangler.toml` | Worker name, assets, `ALLOWED_IPS` |
 | `package.json` | Wrangler dependency for CI deploy |
 | `.assetsignore` | Do not upload `server.py`, `start.bat`, etc. |
 | `_headers` | No-cache for HTML |

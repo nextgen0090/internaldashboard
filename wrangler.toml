@@ -1,14 +1,22 @@
-# Cloudflare Worker — static Internal Dashboard
+# Cloudflare Worker — static Internal Dashboard + IP allowlist
 # Deploy: npm run deploy
-# Docs: https://developers.cloudflare.com/workers/static-assets/
 
 name = "internaldashboard"
+main = "worker.js"
 compatibility_date = "2026-07-23"
 workers_dev = true
 
 [assets]
 directory = "."
+binding = "ASSETS"
+run_worker_first = true
 not_found_handling = "single-page-application"
 
+# Comma-separated IPs (spaces ok). All listed IPs can open this Worker.
+# Find each public IP: https://www.cloudflare.com/cdn-cgi/trace  → line "ip="
+# Prefix match: "203.0.113." allows that whole block
+# Redeploy after every change.
+[vars]
+ALLOWED_IPS = "119.152.233.192"
 # Optional custom domain (uncomment after adding route in Cloudflare dashboard):
 # routes = [{ pattern = "internal.yourdomain.com/*", zone_name = "yourdomain.com" }]
