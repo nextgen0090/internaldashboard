@@ -66,15 +66,10 @@ function denyPage({ title, detail, ip }) {
   <title>${safeTitle} · Internal Dashboard</title>
   <style>
     :root {
-      --bg0: #070b12;
-      --bg1: #101826;
-      --card: rgba(18, 28, 42, 0.92);
-      --border: rgba(120, 144, 168, 0.28);
-      --text: #e8eef7;
-      --muted: #9aabbd;
-      --danger: #ef5350;
-      --danger-soft: rgba(239, 83, 80, 0.14);
-      --accent: #42a5f5;
+      --text: #f2f6fc;
+      --muted: rgba(210, 222, 236, 0.78);
+      --danger: #ff6b6b;
+      --accent: #7ec8ff;
     }
     * { box-sizing: border-box; }
     html, body {
@@ -89,38 +84,60 @@ function denyPage({ title, detail, ip }) {
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(66, 165, 245, 0.16), transparent 55%),
-        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(239, 83, 80, 0.1), transparent 50%),
-        linear-gradient(160deg, var(--bg0), var(--bg1));
+        radial-gradient(circle at 18% 22%, rgba(66, 165, 245, 0.42), transparent 34%),
+        radial-gradient(circle at 82% 18%, rgba(239, 83, 80, 0.28), transparent 32%),
+        radial-gradient(circle at 70% 78%, rgba(126, 87, 194, 0.35), transparent 36%),
+        radial-gradient(circle at 28% 82%, rgba(38, 166, 154, 0.22), transparent 30%),
+        linear-gradient(145deg, #050910 0%, #0d1624 45%, #121a2b 100%);
+      background-attachment: fixed;
     }
     .card {
       width: min(440px, 100%);
-      padding: 2rem 1.75rem 1.65rem;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--card);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      padding: 2.1rem 1.85rem 1.75rem;
+      border-radius: 22px;
       text-align: center;
+      background: linear-gradient(
+        155deg,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.06) 45%,
+        rgba(255, 255, 255, 0.03) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
     }
     .icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 1.15rem;
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 1.2rem;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: var(--danger-soft);
-      border: 1px solid rgba(239, 83, 80, 0.35);
+      background: linear-gradient(
+        145deg,
+        rgba(255, 107, 107, 0.35),
+        rgba(255, 107, 107, 0.12)
+      );
+      border: 1px solid rgba(255, 140, 140, 0.45);
+      box-shadow:
+        0 8px 24px rgba(239, 83, 80, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       color: var(--danger);
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       font-weight: 700;
       line-height: 1;
     }
     h1 {
       margin: 0 0 0.55rem;
-      font-size: 1.45rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
     }
     p {
       margin: 0;
@@ -129,12 +146,15 @@ function denyPage({ title, detail, ip }) {
       line-height: 1.55;
     }
     .ip-box {
-      margin-top: 1.35rem;
-      padding: 0.85rem 1rem;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.28);
+      margin-top: 1.4rem;
+      padding: 0.9rem 1.05rem;
+      border-radius: 14px;
       text-align: left;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     .ip-box span {
       display: block;
@@ -142,20 +162,21 @@ function denyPage({ title, detail, ip }) {
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: rgba(210, 222, 236, 0.7);
       margin-bottom: 0.35rem;
     }
     .ip-box code {
       font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: 1.08rem;
+      font-weight: 650;
       color: var(--accent);
+      text-shadow: 0 0 18px rgba(126, 200, 255, 0.35);
       word-break: break-all;
     }
     .hint {
-      margin-top: 1.15rem;
+      margin-top: 1.2rem;
       font-size: 0.8rem;
-      color: var(--muted);
+      color: rgba(210, 222, 236, 0.65);
     }
   </style>
 </head>

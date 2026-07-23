@@ -17,6 +17,6 @@ not_found_handling = "single-page-application"
 # Prefix match: "203.0.113." allows that whole block
 # Redeploy after every change.
 [vars]
-ALLOWED_IPS = "119.152.233.192"
+ALLOWED_IPS = "119.152.233.192, 202.47.47.187"
 # Optional custom domain (uncomment after adding route in Cloudflare dashboard):
 # routes = [{ pattern = "internal.yourdomain.com/*", zone_name = "yourdomain.com" }]
