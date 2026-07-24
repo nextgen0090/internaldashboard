@@ -710,6 +710,10 @@
       color: #ffa726;
     }
 
+    .kpi-value .kpi-generated {
+      color: #ce93d8;
+    }
+
     .kpi-sub {
       margin-top: 0.45rem;
       font-size: 0.8rem;
@@ -998,6 +1002,17 @@
       background: rgba(255, 167, 38, 0.28);
       border-color: rgba(255, 167, 38, 0.65);
       color: #ffe0b2;
+    }
+
+    .owner-tx-type-btn[data-owner-type="generated"].is-active {
+      background: rgba(171, 71, 188, 0.28);
+      border-color: rgba(171, 71, 188, 0.65);
+      color: #e1bee7;
+    }
+
+    .badge-tx-generated {
+      background: rgba(171, 71, 188, 0.22);
+      color: #e1bee7;
     }
 
     #maintenanceTableWrap tr.maint-row-selected {
@@ -1736,6 +1751,7 @@
                 <button type="button" class="secondary owner-tx-type-btn is-active" data-owner-type="all">All</button>
                 <button type="button" class="secondary owner-tx-type-btn" data-owner-type="recharge">Recharge</button>
                 <button type="button" class="secondary owner-tx-type-btn" data-owner-type="redeem">Redeem</button>
+                <button type="button" class="secondary owner-tx-type-btn" data-owner-type="generated">Generated coin</button>
               </div>
             </div>
             <div class="inline-field">
@@ -1931,6 +1947,7 @@
         totalRedeemed: 98210.25,
         ownerTotalRecharged: 210500.00,
         ownerTotalRedeemed: 155300.75,
+        ownerTotalGenerated: 50000.00,
         totalUsers: 1842,
         totalGameUsers: {
           count: 2,
@@ -2136,7 +2153,7 @@
       if (value == null || value === '') return '—';
       if (fieldKey === 'rtp' || fieldKey === 'targetRtp') return fmtRtp(value);
       if (fieldKey === 'totalBet' || fieldKey === 'totalWin' || fieldKey === 'totalRecharged' || fieldKey === 'totalRedeemed'
-        || fieldKey === 'ownerTotalRecharged' || fieldKey === 'ownerTotalRedeemed') {
+        || fieldKey === 'ownerTotalRecharged' || fieldKey === 'ownerTotalRedeemed' || fieldKey === 'ownerTotalGenerated') {
         return '$' + fmtMoney(value);
       }
       if (fieldKey === 'totalSpin' || fieldKey === 'feedBackCount') return fmtInt(value);
@@ -2767,6 +2784,7 @@
         { key: 'totalRedeemed', label: 'Total Redeemed' },
         { key: 'ownerTotalRecharged', label: 'Owner Total Recharged' },
         { key: 'ownerTotalRedeemed', label: 'Owner Total Redeemed' },
+        { key: 'ownerTotalGenerated', label: 'Owner Total Generated' },
         { key: 'totalUsers', label: 'Total Users' },
         { key: 'totalGameUsers', label: 'Online Users' },
       ];
@@ -4172,7 +4190,9 @@
         const demo = buildDemoOwnerTransactions();
         let rows = demo;
         if (type === 'recharge') rows = demo.filter((r) => r.type === 'Recharge');
-        if (type === 'redeem') rows = demo.filter((r) => r.type === 'Redeem');
+        else if (type === 'redeem') rows = demo.filter((r) => r.type === 'Redeem');
+        else if (type === 'generated') rows = demo.filter((r) => r.type === 'Generated');
+        else rows = demo.filter((r) => r.type === 'Recharge' || r.type === 'Redeem');
         if (account) {
           const q = account.toLowerCase();
           rows = rows.filter((r) => String(r.account || '').toLowerCase().includes(q));
@@ -4231,6 +4251,10 @@
           type: 'Redeem', id: 'd4', ticket: 'T-1004', actor: 'cashier', account: 'player_beta',
           date: '2026-07-20T12:00:00', amount: 75, before: 200, after: 125, cashier: 'store2', remark: '',
         },
+        {
+          type: 'Generated', id: 'd5', ticket: 'GC-1005', actor: 'owner', account: 'owner',
+          date: '2026-07-19T08:00:00', amount: 5000, before: 0, after: 0, cashier: 'owner', remark: 'Demo coin generate',
+        },
       ];
     }
 
@@ -4274,7 +4298,9 @@
     function renderOwnerTransactionsDrill(frame) {
       syncOwnerTxToolbar(frame);
       renderOwnerTxPager(frame);
-      $('drillTitle').textContent = 'Owner Recharge & Redeem';
+      $('drillTitle').textContent = (frame.txType || 'all') === 'generated'
+        ? 'Owner Generated Coins'
+        : 'Owner Recharge & Redeem';
       const total = Number(frame.totalCount || 0);
       $('drillMeta').textContent = fmtInt(total) + ' record' + (total === 1 ? '' : 's');
 
@@ -4297,7 +4323,12 @@
           label: 'Type',
           render: (r) => {
             const t = String(r.type || '');
-            const cls = t.toLowerCase() === 'redeem' ? 'badge-tx-redeem' : 'badge-tx-recharge';
+            const lower = t.toLowerCase();
+            const cls = lower === 'redeem'
+              ? 'badge-tx-redeem'
+              : lower === 'generated'
+                ? 'badge-tx-generated'
+                : 'badge-tx-recharge';
             return '<span class="badge ' + cls + '">' + escHtml(t || '—') + '</span>';
           },
         },
@@ -4311,13 +4342,27 @@
         {
           label: 'Amount',
           render: (r) => {
-            const isRedeem = String(r.type || '').toLowerCase() === 'redeem';
-            const cls = isRedeem ? 'kpi-redeem-amt' : 'kpi-recharge';
+            const lower = String(r.type || '').toLowerCase();
+            const cls = lower === 'redeem'
+              ? 'kpi-redeem-amt'
+              : lower === 'generated'
+                ? 'cell-game'
+                : 'kpi-recharge';
             return '<span class="' + cls + '">$' + fmtMoney(r.amount) + '</span>';
           },
         },
-        { label: 'Before', render: (r) => '$' + fmtMoney(r.before) },
-        { label: 'After', render: (r) => '$' + fmtMoney(r.after) },
+        {
+          label: 'Before',
+          render: (r) => String(r.type || '').toLowerCase() === 'generated'
+            ? '<span class="cell-empty">—</span>'
+            : ('$' + fmtMoney(r.before)),
+        },
+        {
+          label: 'After',
+          render: (r) => String(r.type || '').toLowerCase() === 'generated'
+            ? '<span class="cell-empty">—</span>'
+            : ('$' + fmtMoney(r.after)),
+        },
         { label: 'Actor', key: 'actor' },
         { label: 'Cashier', key: 'cashier' },
         { label: 'Ticket', key: 'ticket' },
@@ -4543,6 +4588,7 @@
         {
           label: 'Owner Totals',
           value:
+            '<span class="kpi-line kpi-generated">Generated $' + fmtMoney(d.ownerTotalGenerated ?? d.OwnerTotalGenerated) + '</span>' +
             '<span class="kpi-line kpi-recharge">Recharged $' + fmtMoney(d.ownerTotalRecharged ?? d.OwnerTotalRecharged) + '</span>' +
             '<span class="kpi-line kpi-redeem-amt">Redeemed $' + fmtMoney(d.ownerTotalRedeemed ?? d.OwnerTotalRedeemed) + '</span>',
           sub: 'All records (owner stats)',
@@ -4551,7 +4597,6 @@
           valueHtml: true,
           clickable: true,
           kpiKey: 'owner-totals',
-          hint: 'Click to view recharge & redeem records',
         },
         {
           label: 'Total Recharged',
