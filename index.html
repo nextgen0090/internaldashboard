@@ -961,11 +961,38 @@
       display: flex;
       align-items: center;
       gap: 0.45rem;
+      flex-wrap: wrap;
     }
 
     .pager-bar button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
+    }
+
+    .pager-jump {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-left: 0.25rem;
+    }
+
+    .pager-jump label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .pager-jump input {
+      width: 4.2rem;
+      min-height: 2rem;
+      padding: 0.25rem 0.45rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pager-jump button {
+      min-height: 2rem;
+      padding: 0.25rem 0.65rem;
     }
 
     .badge-tx-recharge {
@@ -1401,6 +1428,52 @@
       font-weight: 600;
     }
 
+    .feedback-date-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      line-height: 1.35;
+      min-width: 12rem;
+    }
+
+    .feedback-date-row {
+      display: block;
+    }
+
+    .feedback-tz-label {
+      display: inline-block;
+      min-width: 2.6rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.35rem;
+    }
+
+    .feedback-date-local {
+      color: #90caf9;
+      font-weight: 600;
+    }
+
+    .feedback-date-us {
+      color: inherit;
+    }
+
+    .feedback-tz-clock {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+    }
+
+    .feedback-tz-clock strong {
+      color: #cfd8dc;
+      font-weight: 650;
+    }
+
     .feedback-today-badge {
       display: inline-block;
       font-size: 0.65rem;
@@ -1644,7 +1717,13 @@
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-feedbacks">
           <div class="section-header-row">
-            <h2>User Feedbacks <span class="row-count" id="countFeedbacks"></span> <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span> <span class="feedback-filter-hint" id="feedbackFilterHint"></span></h2>
+            <h2>
+              User Feedbacks
+              <span class="row-count" id="countFeedbacks"></span>
+              <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span>
+              <span class="feedback-filter-hint" id="feedbackFilterHint"></span>
+              <span class="feedback-tz-clock" id="feedbackTzClock" title="Compare server (US Eastern) time with your browser local time"></span>
+            </h2>
             <div class="section-toolbar section-toolbar-inline">
               <div class="inline-field">
                 <label for="feedbackDateFrom">From</label>
@@ -2347,19 +2426,125 @@
     }
 
     function renderFeedbackDateHtml(value) {
-      const d = parseFeedbackDate(value);
+      const d = parseFeedbackInstant(value);
       if (!d) return '<span class="empty">—</span>';
-      const text = fmtFeedbackDateTime(value);
-      if (isTodayDate(d)) {
-        return '<span class="feedback-date-today">' +
-          '<span class="feedback-today-badge">Today</span>' +
-          escHtml(text) +
-          '</span>';
-      }
+
+      const usText = fmtFeedbackDateTimeUs(value);
+      const localText = fmtFeedbackDateTimeLocal(value);
       const age = relativeDateHint(d);
-      return '<span class="feedback-date-other">' + escHtml(text) +
-        (age ? ' <span class="feedback-date-age">(' + escHtml(age) + ')</span>' : '') +
+      const todayBadge = isTodayDate(d)
+        ? '<span class="feedback-today-badge">Today</span>'
+        : '';
+
+      return '<span class="feedback-date-stack' + (isTodayDate(d) ? ' feedback-date-today' : ' feedback-date-other') + '">' +
+        todayBadge +
+        '<span class="feedback-date-row feedback-date-us">' +
+          '<span class="feedback-tz-label">US</span>' + escHtml(usText) +
+        '</span>' +
+        '<span class="feedback-date-row feedback-date-local">' +
+          '<span class="feedback-tz-label">Local</span>' + escHtml(localText) +
+          (age ? ' <span class="feedback-date-age">(' + escHtml(age) + ')</span>' : '') +
+        '</span>' +
         '</span>';
+    }
+
+    const FEEDBACK_US_TZ = 'America/New_York';
+
+    function formatDateTimeInZone(date, timeZone) {
+      if (!date || Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleString(undefined, {
+        timeZone,
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+
+    function formatClockInZone(date, timeZone) {
+      if (!date || Number.isNaN(date.getTime())) return '—';
+      return date.toLocaleString(undefined, {
+        timeZone,
+        weekday: 'short',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+    }
+
+    /**
+     * API feedback timestamps are UTC (often without Z).
+     * Parse as UTC, then convert to US Eastern / local for display.
+     */
+    function parseFeedbackInstant(value) {
+      if (value == null || value === '') return null;
+      const text = String(value).trim();
+      if (!text) return null;
+
+      if (/[zZ]$/.test(text) || /[+-]\d{2}:\d{2}$/.test(text)) {
+        const d = new Date(text);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      const m = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+      if (m) {
+        const d = new Date(Date.UTC(
+          Number(m[1]),
+          Number(m[2]) - 1,
+          Number(m[3]),
+          m[4] != null ? Number(m[4]) : 0,
+          m[5] != null ? Number(m[5]) : 0,
+          m[6] != null ? Number(m[6]) : 0
+        ));
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      return parseFeedbackDate(value);
+    }
+
+    function fmtFeedbackDateTimeUs(value) {
+      const d = parseFeedbackInstant(value);
+      if (!d) return '—';
+      return formatDateTimeInZone(d, FEEDBACK_US_TZ);
+    }
+
+    function fmtFeedbackDateTimeLocal(value) {
+      const d = parseFeedbackInstant(value);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+
+    function updateFeedbackTimezoneClock() {
+      const el = $('feedbackTzClock');
+      if (!el) return;
+      const now = new Date();
+      const usNow = formatClockInZone(now, FEEDBACK_US_TZ);
+      const localNow = now.toLocaleString(undefined, {
+        weekday: 'short',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+      el.textContent = 'Now · US (Eastern): ' + usNow + '  ·  Local (' + localTz + '): ' + localNow;
+    }
+
+    let feedbackTzClockTimer = null;
+    function startFeedbackTimezoneClock() {
+      updateFeedbackTimezoneClock();
+      if (feedbackTzClockTimer) return;
+      feedbackTzClockTimer = window.setInterval(updateFeedbackTimezoneClock, 1000);
     }
 
     function feedbackDatesCell(userRow) {
@@ -2495,6 +2680,7 @@
         day: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
+        hour12: true,
       });
     }
 
@@ -2644,6 +2830,7 @@
 
       if (!smooth || !wrap) {
         apply();
+        startFeedbackTimezoneClock();
         return;
       }
 
@@ -2654,6 +2841,7 @@
         apply();
         wrap.classList.remove('is-updating');
         if (countEl) countEl.classList.remove('is-updating');
+        startFeedbackTimezoneClock();
       }, 160);
     }
 
@@ -4284,15 +4472,65 @@
       const page = Number(frame.page || 1);
       const pageSize = Number(frame.pageSize || 25);
       const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+      frame.totalPages = totalPages;
       const fromRow = total === 0 ? 0 : (page - 1) * pageSize + 1;
       const toRow = Math.min(page * pageSize, total);
       pager.innerHTML =
         '<span>Showing ' + fmtInt(fromRow) + '–' + fmtInt(toRow) + ' of ' + fmtInt(total) + '</span>' +
         '<div class="pager-actions">' +
+        '<button type="button" class="secondary" data-owner-page="first"' + (page <= 1 ? ' disabled' : '') + '>First</button>' +
         '<button type="button" class="secondary" data-owner-page="prev"' + (page <= 1 ? ' disabled' : '') + '>Prev</button>' +
         '<span>Page ' + fmtInt(page) + ' / ' + fmtInt(totalPages) + '</span>' +
         '<button type="button" class="secondary" data-owner-page="next"' + (page >= totalPages ? ' disabled' : '') + '>Next</button>' +
+        '<button type="button" class="secondary" data-owner-page="last"' + (page >= totalPages ? ' disabled' : '') + '>Last</button>' +
+        '<span class="pager-jump">' +
+        '<label for="ownerTxPageJump">Go to</label>' +
+        '<input type="number" id="ownerTxPageJump" min="1" max="' + totalPages + '" value="' + page + '" inputmode="numeric" />' +
+        '<button type="button" class="secondary" data-owner-page="goto">Go</button>' +
+        '</span>' +
         '</div>';
+    }
+
+    function ownerTxTotalPages(frame) {
+      if (!frame) return 1;
+      if (Number.isFinite(Number(frame.totalPages)) && Number(frame.totalPages) > 0) {
+        return Math.max(1, Number(frame.totalPages));
+      }
+      const total = Number(frame.totalCount || 0);
+      const pageSize = Number(frame.pageSize || 25) || 25;
+      return Math.max(1, Math.ceil(total / pageSize) || 1);
+    }
+
+    function jumpOwnerTransactionsPage(targetPage) {
+      const frame = drillStack[drillStack.length - 1];
+      if (!frame || frame.type !== 'owner-transactions' || isDrillLoading) return;
+      const totalPages = ownerTxTotalPages(frame);
+      const parsed = parseInt(String(targetPage ?? '').trim(), 10);
+      const page = Number.isFinite(parsed)
+        ? Math.min(totalPages, Math.max(1, parsed))
+        : 1;
+      if (page === Number(frame.page || 1)) return;
+      loadOwnerTransactionsPage({ page });
+    }
+
+    function handleOwnerTxPagerClick(e) {
+      const btn = e.target.closest('[data-owner-page]');
+      if (!btn || btn.disabled || isDrillLoading) return;
+      const frame = drillStack[drillStack.length - 1];
+      if (!frame || frame.type !== 'owner-transactions') return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const dir = btn.getAttribute('data-owner-page') || '';
+      const page = Number(frame.page || 1);
+      const totalPages = ownerTxTotalPages(frame);
+
+      if (dir === 'first') jumpOwnerTransactionsPage(1);
+      else if (dir === 'prev') jumpOwnerTransactionsPage(page - 1);
+      else if (dir === 'next') jumpOwnerTransactionsPage(page + 1);
+      else if (dir === 'last') jumpOwnerTransactionsPage(totalPages);
+      else if (dir === 'goto') jumpOwnerTransactionsPage($('ownerTxPageJump')?.value);
     }
 
     function renderOwnerTransactionsDrill(frame) {
@@ -4374,10 +4612,12 @@
       const frame = drillStack[drillStack.length - 1];
       if (!frame || frame.type !== 'owner-transactions' || isDrillLoading) return;
 
+      const rawPage = overrides.page ?? frame.page ?? 1;
+      const parsedPage = parseInt(String(rawPage), 10);
       const next = {
         txType: overrides.txType ?? frame.txType ?? 'all',
-        page: overrides.page ?? frame.page ?? 1,
-        pageSize: overrides.pageSize ?? frame.pageSize ?? 25,
+        page: Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1,
+        pageSize: Number(overrides.pageSize ?? frame.pageSize ?? 25) || 25,
         account: overrides.account ?? frame.account ?? '',
         from: overrides.from ?? frame.from ?? '',
         to: overrides.to ?? frame.to ?? '',
@@ -4395,15 +4635,21 @@
           from: next.from,
           to: next.to,
         });
+        const totalCount = Number(data.totalCount || 0);
+        const pageSize = Number(data.pageSize || next.pageSize) || 25;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize) || 1);
+        let page = Number(data.page || next.page) || 1;
+        if (page > totalPages) page = totalPages;
         Object.assign(frame, {
           txType: data.type || next.txType,
-          page: data.page,
-          pageSize: data.pageSize,
+          page,
+          pageSize,
+          totalPages,
           account: next.account,
           from: next.from,
           to: next.to,
           items: data.items,
-          totalCount: data.totalCount,
+          totalCount,
           loading: false,
         });
         renderDrillView();
@@ -5367,14 +5613,8 @@
         selectMaintenanceType(editBtn.dataset.maintEdit);
         return;
       }
-      const ownerPageBtn = e.target.closest('[data-owner-page]');
-      if (ownerPageBtn && !ownerPageBtn.disabled && !isDrillLoading) {
-        const frame = drillStack[drillStack.length - 1];
-        if (frame?.type === 'owner-transactions') {
-          const dir = ownerPageBtn.dataset.ownerPage;
-          const page = Number(frame.page || 1);
-          loadOwnerTransactionsPage({ page: dir === 'next' ? page + 1 : Math.max(1, page - 1) });
-        }
+      if (e.target.closest('#ownerTxPager')) {
+        handleOwnerTxPagerClick(e);
         return;
       }
       const kpi = e.target.closest('[data-kpi]');
@@ -5386,7 +5626,13 @@
       const button = e.target.closest('[data-drill]');
       if (button && !button.disabled && !isDrillLoading) handleDrillClick(button);
     });
+    $('ownerTxPager')?.addEventListener('click', handleOwnerTxPagerClick);
     $('dashboard').addEventListener('keydown', (e) => {
+      if (e.target?.id === 'ownerTxPageJump' && e.key === 'Enter') {
+        e.preventDefault();
+        jumpOwnerTransactionsPage(e.target.value);
+        return;
+      }
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const kpi = e.target.closest('[data-kpi]');
       if (!kpi || isDrillLoading) return;
@@ -5470,6 +5716,7 @@
       clearResponseHistory();
       setDefaultFeedbackDateFilter();
       updateFeedbackFilterHint();
+      startFeedbackTimezoneClock();
       updateDataSourceUi();
       startRefreshClock();
       loadData(false);
