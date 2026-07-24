@@ -412,6 +412,30 @@
 
     .inline-field input[type="search"] {
       min-width: 180px;
+      /* Room for the browser clear (×) so GUID/text does not overlap it */
+      padding-right: 1.85rem;
+    }
+
+    .inline-field input[type="search"]::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 14px;
+      width: 14px;
+      margin-right: 2px;
+      background:
+        linear-gradient(45deg, transparent 42%, #90caf9 42%, #90caf9 58%, transparent 58%),
+        linear-gradient(-45deg, transparent 42%, #90caf9 42%, #90caf9 58%, transparent 58%);
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    #userGameplayUserId,
+    #userGameplaySpinsUserId {
+      min-width: min(360px, 70vw);
+      max-width: 420px;
+      width: 100%;
+      padding-right: 2rem;
+      font-size: 0.85rem;
     }
 
     .section-toolbar-inline .section-toolbar-actions {
@@ -1037,6 +1061,12 @@
       color: #e1bee7;
     }
 
+    .user-gameplay-tab-btn.is-active {
+      border-color: rgba(100, 181, 246, 0.55);
+      background: rgba(100, 181, 246, 0.16);
+      color: #bbdefb;
+    }
+
     .badge-tx-generated {
       background: rgba(171, 71, 188, 0.22);
       color: #e1bee7;
@@ -1165,12 +1195,234 @@
       margin-bottom: 1rem;
     }
 
+    #userGameplaySummary.chart-summary {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.85rem;
+    }
+
+    #userGameplaySummary .chart-stat {
+      padding: 1rem 1.05rem 1.1rem;
+      min-height: 6.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #userGameplaySummary .chart-stat span {
+      font-size: 0.78rem;
+      margin-bottom: 0.45rem;
+    }
+
+    #userGameplaySummary .chart-stat strong {
+      font-size: 1.55rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    #userGameplaySummary .chart-stat.ugp-stat-id strong {
+      font-size: 0.95rem;
+      line-height: 1.35;
+      letter-spacing: 0;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    #userGameplaySummary .ugp-id-actions {
+      margin-top: 0.55rem;
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    #userGameplaySummary .ugp-id-actions button {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.75rem;
+    }
+
     .chart-stat {
       padding: 0.75rem 0.9rem;
       border-radius: 12px;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.035);
     }
+
+    .chart-stat.ugp-stat-user {
+      border-color: rgba(66, 165, 245, 0.35);
+      background: rgba(66, 165, 245, 0.08);
+    }
+    .chart-stat.ugp-stat-user strong { color: #90caf9; }
+
+    .chart-stat.ugp-stat-id {
+      border-color: rgba(171, 71, 188, 0.35);
+      background: rgba(171, 71, 188, 0.08);
+    }
+    .chart-stat.ugp-stat-id strong { color: #ce93d8; }
+
+    .chart-stat.ugp-stat-bet {
+      border-color: rgba(100, 181, 246, 0.35);
+      background: rgba(100, 181, 246, 0.08);
+    }
+    .chart-stat.ugp-stat-bet strong { color: #64b5f6; }
+
+    .chart-stat.ugp-stat-win-up {
+      border-color: rgba(76, 175, 80, 0.4);
+      background: rgba(76, 175, 80, 0.1);
+    }
+    .chart-stat.ugp-stat-win-up strong { color: #81c784; }
+
+    .chart-stat.ugp-stat-win-down {
+      border-color: rgba(244, 67, 54, 0.35);
+      background: rgba(244, 67, 54, 0.08);
+    }
+    .chart-stat.ugp-stat-win-down strong { color: #ef9a9a; }
+
+    .chart-stat.ugp-stat-win-flat {
+      border-color: rgba(139, 155, 176, 0.35);
+      background: rgba(139, 155, 176, 0.08);
+    }
+    .chart-stat.ugp-stat-win-flat strong { color: #b0bec5; }
+
+    .chart-stat.ugp-stat-recharge {
+      border-color: rgba(102, 187, 106, 0.4);
+      background: rgba(102, 187, 106, 0.1);
+    }
+    .chart-stat.ugp-stat-recharge strong { color: #a5d6a7; }
+
+    .chart-stat.ugp-stat-redeem {
+      border-color: rgba(255, 167, 38, 0.4);
+      background: rgba(255, 167, 38, 0.1);
+    }
+    .chart-stat.ugp-stat-redeem strong { color: #ffcc80; }
+
+    .chart-stat.ugp-stat-rtp-high {
+      border-color: rgba(76, 175, 80, 0.45);
+      background: rgba(76, 175, 80, 0.12);
+    }
+    .chart-stat.ugp-stat-rtp-high strong { color: #81c784; }
+
+    .chart-stat.ugp-stat-rtp-mid {
+      border-color: rgba(255, 152, 0, 0.4);
+      background: rgba(255, 152, 0, 0.1);
+    }
+    .chart-stat.ugp-stat-rtp-mid strong { color: #ffb74d; }
+
+    .chart-stat.ugp-stat-rtp-low {
+      border-color: rgba(244, 67, 54, 0.4);
+      background: rgba(244, 67, 54, 0.1);
+    }
+    .chart-stat.ugp-stat-rtp-low strong { color: #ef9a9a; }
+
+    .ugp-val-bet { color: #64b5f6; font-variant-numeric: tabular-nums; }
+    .ugp-val-win-up { color: #81c784; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .ugp-val-win-down { color: #ef9a9a; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .ugp-val-win-flat { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .ugp-val-rtp-high { color: #81c784; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ugp-val-rtp-mid { color: #ffb74d; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ugp-val-rtp-low { color: #ef9a9a; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ugp-val-spins { color: #b3d9ff; font-variant-numeric: tabular-nums; }
+    .ugp-val-free { color: #ce93d8; font-variant-numeric: tabular-nums; }
+    .badge.ugp-free { background: rgba(171, 71, 188, 0.2); color: #e1bee7; }
+    .badge.ugp-paid { background: rgba(66, 165, 245, 0.15); color: #90caf9; }
+
+    .ugp-info-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 0.35rem;
+      vertical-align: middle;
+    }
+
+    .ugp-info-btn {
+      width: 1.35rem;
+      height: 1.35rem;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(100, 181, 246, 0.55);
+      background: rgba(66, 165, 245, 0.15);
+      color: #90caf9;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-style: italic;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1;
+      cursor: help;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ugp-info-btn:hover,
+    .ugp-info-wrap:focus-within .ugp-info-btn {
+      background: rgba(66, 165, 245, 0.28);
+      border-color: rgba(144, 202, 249, 0.8);
+      color: #e3f2fd;
+    }
+
+    .ugp-info-legend {
+      display: none;
+      position: absolute;
+      top: calc(100% + 0.45rem);
+      left: 0;
+      z-index: 40;
+      min-width: 260px;
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      border: 1px solid rgba(100, 181, 246, 0.35);
+      background: rgba(14, 20, 30, 0.97);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      color: var(--text);
+      font-size: 0.8rem;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .ugp-info-wrap:hover .ugp-info-legend,
+    .ugp-info-wrap:focus-within .ugp-info-legend {
+      display: block;
+    }
+
+    .ugp-info-legend h4 {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .ugp-info-legend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.22rem 0;
+    }
+
+    .ugp-info-legend-row span:first-child {
+      color: #cfd8dc;
+    }
+
+    .ugp-swatch {
+      display: inline-block;
+      min-width: 3.6rem;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 0.12rem 0.4rem;
+      border-radius: 999px;
+    }
+
+    .ugp-swatch.bet { color: #64b5f6; background: rgba(100, 181, 246, 0.15); }
+    .ugp-swatch.win-up { color: #81c784; background: rgba(76, 175, 80, 0.15); }
+    .ugp-swatch.win-down { color: #ef9a9a; background: rgba(244, 67, 54, 0.15); }
+    .ugp-swatch.rtp-high { color: #81c784; background: rgba(76, 175, 80, 0.15); }
+    .ugp-swatch.rtp-mid { color: #ffb74d; background: rgba(255, 152, 0, 0.15); }
+    .ugp-swatch.rtp-low { color: #ef9a9a; background: rgba(244, 67, 54, 0.15); }
+    .ugp-swatch.recharge { color: #a5d6a7; background: rgba(102, 187, 106, 0.15); }
+    .ugp-swatch.redeem { color: #ffcc80; background: rgba(255, 167, 38, 0.15); }
+    .ugp-swatch.free { color: #e1bee7; background: rgba(171, 71, 188, 0.2); }
+    .ugp-swatch.paid { color: #90caf9; background: rgba(66, 165, 245, 0.15); }
 
     .chart-stat span {
       display: block;
@@ -1605,6 +1857,7 @@
           <button class="secondary" id="toggleDiffBtn" type="button">Show Diff</button>
           <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
           <button class="secondary" id="maintenanceBtn" type="button" title="Open maintenance settings">Maintenance</button>
+          <button class="secondary" id="userGameplayBtn" type="button" title="Lookup user game play summary">User Game Play</button>
           <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
         </div>
       </div>
@@ -1772,6 +2025,116 @@
       </div>
       </div>
 
+      <section class="card hidden" id="userGameplayCard">
+        <div class="drill-toolbar">
+          <button type="button" class="secondary" id="userGameplayHomeBtn">← Home</button>
+          <h2>
+            User Game Play Summary
+            <span class="row-count" id="countUserGameplay"></span>
+            <span class="ugp-info-wrap">
+              <button type="button" class="ugp-info-btn" aria-label="Color legend" aria-describedby="ugpColorLegend">i</button>
+              <div class="ugp-info-legend" id="ugpColorLegend" role="tooltip">
+                <h4>Color legend</h4>
+                <div class="ugp-info-legend-row"><span>Bet</span><span class="ugp-swatch bet">Blue</span></div>
+                <div class="ugp-info-legend-row"><span>Win &gt; Bet</span><span class="ugp-swatch win-up">Green</span></div>
+                <div class="ugp-info-legend-row"><span>Win &lt; Bet</span><span class="ugp-swatch win-down">Red</span></div>
+                <div class="ugp-info-legend-row"><span>RTP ≥ 100%</span><span class="ugp-swatch rtp-high">Green</span></div>
+                <div class="ugp-info-legend-row"><span>RTP 80–99%</span><span class="ugp-swatch rtp-mid">Orange</span></div>
+                <div class="ugp-info-legend-row"><span>RTP &lt; 80%</span><span class="ugp-swatch rtp-low">Red</span></div>
+                <div class="ugp-info-legend-row"><span>Recharge</span><span class="ugp-swatch recharge">Green</span></div>
+                <div class="ugp-info-legend-row"><span>Redeem</span><span class="ugp-swatch redeem">Orange</span></div>
+                <div class="ugp-info-legend-row"><span>Free / Paid</span><span><span class="ugp-swatch free">Purple</span> / <span class="ugp-swatch paid">Blue</span></span></div>
+              </div>
+            </span>
+          </h2>
+        </div>
+        <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.75rem;">
+          <div class="inline-field">
+            <label>Type</label>
+            <div class="owner-tx-type-btns" role="group" aria-label="User game play type">
+              <button type="button" class="secondary user-gameplay-tab-btn is-active" data-ugp-tab="summary">Summary</button>
+              <button type="button" class="secondary user-gameplay-tab-btn" data-ugp-tab="daily">Daily</button>
+              <button type="button" class="secondary user-gameplay-tab-btn" data-ugp-tab="spins">Spins</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="userGameplaySummaryPanel">
+          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+            <div class="inline-field">
+              <label for="userGameplayName">Username</label>
+              <input type="search" id="userGameplayName" placeholder="e.g. g292siumap" autocomplete="off" />
+            </div>
+            <div class="section-toolbar-actions">
+              <button type="button" id="userGameplayLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplayClearBtn">Clear</button>
+            </div>
+            <div class="inline-field hidden" id="userGameplayTableToolbar">
+              <label for="userGameplaySearch">Search games</label>
+              <input type="search" id="userGameplaySearch" placeholder="Game, RTP, spins…" autocomplete="off" />
+            </div>
+          </div>
+          <p class="diff-meta" id="userGameplayHint">Enter a username to run <code>dbo.GetUserGamePlaySummary</code>.</p>
+          <div class="chart-summary hidden" id="userGameplaySummary"></div>
+          <div class="table-wrap tall smooth-update" id="userGameplayGamesWrap"></div>
+        </div>
+
+        <div id="userGameplayDailyPanel" class="hidden">
+          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+            <div class="inline-field" style="min-width: 280px; flex: 1.4;">
+              <label for="userGameplayUserId">User ID</label>
+              <input type="search" id="userGameplayUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" />
+            </div>
+            <div class="inline-field">
+              <label for="userGameplayDailyFrom">From</label>
+              <input type="date" id="userGameplayDailyFrom" />
+            </div>
+            <div class="inline-field">
+              <label for="userGameplayDailyTo">To</label>
+              <input type="date" id="userGameplayDailyTo" />
+            </div>
+            <div class="section-toolbar-actions">
+              <button type="button" id="userGameplayDailyLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplayDailyClearBtn">Clear</button>
+            </div>
+            <div class="inline-field hidden" id="userGameplayDailySearchWrap">
+              <label for="userGameplayDailySearch">Search</label>
+              <input type="search" id="userGameplayDailySearch" placeholder="Game, date, RTP, spins…" autocomplete="off" />
+            </div>
+          </div>
+          <p class="diff-meta" id="userGameplayDailyHint">Enter a user ID to load daily Bet / Win / RTP from <code>game_spin_logs</code>.</p>
+          <div class="table-wrap tall smooth-update" id="userGameplayDailyWrap"></div>
+        </div>
+
+        <div id="userGameplaySpinsPanel" class="hidden">
+          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+            <div class="inline-field" style="min-width: 280px; flex: 1.4;">
+              <label for="userGameplaySpinsUserId">User ID</label>
+              <input type="search" id="userGameplaySpinsUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" />
+            </div>
+            <div class="inline-field">
+              <label for="userGameplaySpinsFrom">From</label>
+              <input type="date" id="userGameplaySpinsFrom" />
+            </div>
+            <div class="inline-field">
+              <label for="userGameplaySpinsTo">To</label>
+              <input type="date" id="userGameplaySpinsTo" />
+            </div>
+            <div class="section-toolbar-actions">
+              <button type="button" id="userGameplaySpinsLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplaySpinsClearBtn">Clear</button>
+            </div>
+            <div class="inline-field hidden" id="userGameplaySpinsSearchWrap">
+              <label for="userGameplaySpinsSearch">Search</label>
+              <input type="search" id="userGameplaySpinsSearch" placeholder="Game, bet, win, index…" autocomplete="off" />
+            </div>
+          </div>
+          <p class="diff-meta" id="userGameplaySpinsHint">Enter a user ID to load spin rows from <code>game_spin_logs</code> (ordered by created_at).</p>
+          <div class="pager-bar" id="userGameplaySpinsPager"></div>
+          <div class="table-wrap tall smooth-update" id="userGameplaySpinsWrap"></div>
+        </div>
+      </section>
+
       <section class="card hidden" id="maintenanceCard">
         <div class="drill-toolbar">
           <button type="button" class="secondary" id="maintenanceHomeBtn">← Home</button>
@@ -1895,6 +2258,15 @@
     let historyViewIndex = 0;
     let isDiffVisible = false;
     let isMaintenanceVisible = false;
+    let isUserGameplayVisible = false;
+    let userGameplayGamesData = [];
+    let userGameplayLastUserName = '';
+    let userGameplayDailyData = [];
+    let userGameplayDailyMeta = { userId: '', userName: '' };
+    let userGameplaySpinsData = [];
+    let userGameplaySpinsMeta = { userId: '', userName: '', page: 1, pageSize: 50, totalCount: 0 };
+    let userGameplayActiveTab = 'summary';
+    let userGameplaySpinsLoading = false;
     let gamesTargetRtpData = [];
     let rtpByGameData = [];
     let gamesAboveTargetData = [];
@@ -3048,6 +3420,7 @@
       hideSpinChartTooltip();
       isDiffVisible = false;
       isMaintenanceVisible = false;
+      isUserGameplayVisible = false;
       const diffBtn = $('toggleDiffBtn');
       if (diffBtn && !diffBtn.disabled) {
         const changeMatch = diffBtn.textContent.match(/\((\d+)\)/);
@@ -3069,6 +3442,7 @@
       resetSpinChartZoom(0, false);
       hideSpinChartTooltip();
       isDiffVisible = false;
+      isUserGameplayVisible = false;
       isMaintenanceVisible = true;
       show($('jsonCard'), false);
       const jsonBtn = $('toggleJsonBtn');
@@ -3078,18 +3452,39 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function openUserGameplayPage() {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      isDiffVisible = false;
+      isMaintenanceVisible = false;
+      isUserGameplayVisible = true;
+      show($('jsonCard'), false);
+      const jsonBtn = $('toggleJsonBtn');
+      if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      setDashboardViewMode();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setUserGameplayTab(userGameplayActiveTab || 'summary');
+      if (userGameplayActiveTab === 'daily') $('userGameplayUserId')?.focus();
+      else if (userGameplayActiveTab === 'spins') $('userGameplaySpinsUserId')?.focus();
+      else $('userGameplayName')?.focus();
+    }
+
     function setDashboardViewMode() {
       const inDrillMode = drillStack.length > 0;
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
       const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
-      show($('mainDashboard'), !inDiffMode && !inDrillMode && !inMaintenanceMode);
+      const inUserGameplayMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && isUserGameplayVisible;
+      show($('mainDashboard'), !inDiffMode && !inDrillMode && !inMaintenanceMode && !inUserGameplayMode);
       show($('diffCard'), inDiffMode);
       show($('drillDownCard'), inDrillMode);
       show($('maintenanceCard'), inMaintenanceMode);
+      show($('userGameplayCard'), inUserGameplayMode);
       if (!inDrillMode || drillStack[drillStack.length - 1]?.type !== 'owner-transactions') {
         show($('drillOwnerTxToolbar'), false);
       }
-      if (inDiffMode || inDrillMode || inMaintenanceMode) {
+      if (inDiffMode || inDrillMode || inMaintenanceMode || inUserGameplayMode) {
         show($('jsonCard'), false);
         const jsonBtn = $('toggleJsonBtn');
         if (jsonBtn) jsonBtn.textContent = 'Show JSON';
@@ -3101,8 +3496,9 @@
       const inDrillMode = drillStack.length > 0;
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
       const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
+      const inUserGameplayMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && isUserGameplayVisible;
       const jsonVisible = !$('jsonCard')?.classList.contains('hidden');
-      const onHome = !inDrillMode && !inDiffMode && !inMaintenanceMode;
+      const onHome = !inDrillMode && !inDiffMode && !inMaintenanceMode && !inUserGameplayMode;
 
       const setActive = (id, active) => {
         const el = $(id);
@@ -3115,6 +3511,7 @@
       setActive('toggleDiffBtn', inDiffMode);
       setActive('toggleJsonBtn', jsonVisible && onHome);
       setActive('maintenanceBtn', inMaintenanceMode);
+      setActive('userGameplayBtn', inUserGameplayMode);
       setActive('pauseRefreshBtn', isRefreshPaused && !isDemoMode());
     }
 
@@ -3191,7 +3588,7 @@
         '<a href="#' + s.id + '"' + (s.tone ? ' data-tone="' + s.tone + '"' : '') + '>' +
         '<span class="section-nav-icon">' + (s.icon || '📊') + '</span>' +
         '<span class="section-nav-label">' + s.label + '</span>' +
-        '<span class="section-nav-count">' + s.count + '</span>' +
+        '<span class="section-nav-count">' + (s.count == null ? '' : s.count) + '</span>' +
         '</a>'
       ).join('');
     }
@@ -3478,6 +3875,7 @@
       drillStack.push(frame);
       isDiffVisible = false;
       isMaintenanceVisible = false;
+      isUserGameplayVisible = false;
       renderDrillView();
     }
 
@@ -4956,6 +5354,738 @@
       show(el, true);
     }
 
+    /** SP returns RTP already as percent (e.g. 104.05), not a 0–1 ratio. */
+    function fmtSpRtpPct(n) {
+      return Number(n || 0).toFixed(2) + '%';
+    }
+
+    /** RTP percent tone: >=100 high (green), >=80 mid (orange), else low (red). */
+    function ugpRtpToneFromPct(pct) {
+      const n = Number(pct || 0);
+      if (n >= 100) return 'high';
+      if (n >= 80) return 'mid';
+      return 'low';
+    }
+
+    function ugpWinTone(bet, win) {
+      const b = Number(bet || 0);
+      const w = Number(win || 0);
+      if (w > b) return 'up';
+      if (w < b) return 'down';
+      return 'flat';
+    }
+
+    function ugpMoneyCell(amount, kind) {
+      const cls = kind === 'bet' ? 'ugp-val-bet'
+        : kind === 'up' ? 'ugp-val-win-up'
+        : kind === 'down' ? 'ugp-val-win-down'
+        : 'ugp-val-win-flat';
+      return '<span class="' + cls + '">$' + fmtMoney(amount) + '</span>';
+    }
+
+    function ugpRtpPctCell(pct) {
+      const tone = ugpRtpToneFromPct(pct);
+      return '<span class="ugp-val-rtp-' + tone + '">' + fmtSpRtpPct(pct) + '</span>';
+    }
+
+    function ugpRtpRatioCell(ratio) {
+      const pct = Number(ratio || 0) * 100;
+      const tone = ugpRtpToneFromPct(pct);
+      return '<span class="ugp-val-rtp-' + tone + '">' + fmtRtp(ratio) + '</span>';
+    }
+
+    function matchesUserGameplaySearch(row, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+
+      const name = String(row.gameName ?? row.GameName ?? '').toLowerCase();
+      if (name.includes(q)) return true;
+
+      const bet = row.totalBet ?? row.TotalBet ?? 0;
+      const win = row.totalWin ?? row.TotalWin ?? 0;
+      const rtp = Number(row.rtpPercentage ?? row.RtpPercentage ?? 0);
+      const spins = row.totalSpins ?? row.TotalSpins ?? 0;
+      const free = row.totalFreeSpins ?? row.TotalFreeSpins ?? 0;
+
+      const candidates = [
+        String(spins),
+        String(free),
+        fmtMoney(bet),
+        fmtMoney(win),
+        String(bet),
+        String(win),
+        rtp.toFixed(2),
+        String(rtp),
+        rtp.toFixed(2) + '%',
+        Math.round(rtp) + '%',
+        String(Math.round(rtp)),
+      ];
+      return candidates.some((c) => c.toLowerCase().includes(q));
+    }
+
+    function filterUserGameplayGames(rows, searchQuery) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesUserGameplaySearch(r, searchQuery));
+    }
+
+    function clearUserGameplayUi(message) {
+      userGameplayGamesData = [];
+      userGameplayLastUserName = '';
+      const hint = $('userGameplayHint');
+      if (hint) hint.textContent = message || 'Enter a username to run dbo.GetUserGamePlaySummary.';
+      const summary = $('userGameplaySummary');
+      if (summary) {
+        summary.innerHTML = '';
+        show(summary, false);
+      }
+      const toolbar = $('userGameplayTableToolbar');
+      if (toolbar) show(toolbar, false);
+      if ($('userGameplaySearch')) $('userGameplaySearch').value = '';
+      const wrap = $('userGameplayGamesWrap');
+      if (wrap) wrap.innerHTML = '';
+      setRowCount('countUserGameplay', []);
+    }
+
+    function renderUserGameplayGamesTable() {
+      const wrap = $('userGameplayGamesWrap');
+      if (!wrap) return;
+
+      const search = $('userGameplaySearch')?.value || '';
+      const filtered = filterUserGameplayGames(userGameplayGamesData, search);
+      const total = userGameplayGamesData.length;
+
+      if (!total) {
+        wrap.innerHTML = '<p class="diff-meta">No per-game rows.</p>';
+        setRowCount('countUserGameplay', []);
+        return;
+      }
+
+      if (!filtered.length) {
+        wrap.innerHTML = '<p class="diff-meta">No games match "' + escHtml(String(search).trim()) + '".</p>';
+        setRowCount('countUserGameplay', []);
+        const hint = $('userGameplayHint');
+        if (hint && userGameplayLastUserName) {
+          hint.textContent = 'Results for ' + userGameplayLastUserName + ' · 0 of ' + total + ' games';
+        }
+        return;
+      }
+
+      const head = '<tr><th>Game</th><th>Total Bet</th><th>Total Win</th><th>RTP</th><th>Spins</th><th>Free Spins</th></tr>';
+      const body = filtered.map((g) => {
+        const name = g.gameName ?? g.GameName ?? '';
+        const gBet = g.totalBet ?? g.TotalBet ?? 0;
+        const gWin = g.totalWin ?? g.TotalWin ?? 0;
+        const gRtp = g.rtpPercentage ?? g.RtpPercentage ?? 0;
+        const spins = g.totalSpins ?? g.TotalSpins ?? 0;
+        const free = g.totalFreeSpins ?? g.TotalFreeSpins ?? 0;
+        const winTone = ugpWinTone(gBet, gWin);
+        return '<tr>' +
+          '<td>' + escHtml(name) + '</td>' +
+          '<td>' + ugpMoneyCell(gBet, 'bet') + '</td>' +
+          '<td>' + ugpMoneyCell(gWin, winTone) + '</td>' +
+          '<td>' + ugpRtpPctCell(gRtp) + '</td>' +
+          '<td><span class="ugp-val-spins">' + fmtInt(spins) + '</span></td>' +
+          '<td><span class="ugp-val-free">' + fmtInt(free) + '</span></td>' +
+          '</tr>';
+      }).join('');
+      wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+      setRowCount('countUserGameplay', filtered);
+
+      const hint = $('userGameplayHint');
+      if (hint && userGameplayLastUserName) {
+        const q = String(search).trim();
+        hint.textContent = q
+          ? 'Results for ' + userGameplayLastUserName + ' · ' + filtered.length + ' of ' + total + ' games'
+          : 'Results for ' + userGameplayLastUserName + ' · ' + total + ' game' + (total === 1 ? '' : 's');
+      }
+    }
+
+    function renderUserGameplay(data) {
+      const summary = data?.summary || data?.Summary || null;
+      const games = data?.games || data?.Games || [];
+      const hint = $('userGameplayHint');
+      const summaryEl = $('userGameplaySummary');
+      const rootUserId = data?.userId || data?.UserId || summary?.userId || summary?.UserId || '';
+
+      if (!summary && !games.length) {
+        clearUserGameplayUi('No data returned for this username.');
+        return;
+      }
+
+      userGameplayGamesData = games;
+      const userName = summary?.userName || summary?.UserName || games[0]?.userName || games[0]?.UserName || '';
+      userGameplayLastUserName = userName;
+      if (hint) hint.textContent = 'Results for ' + userName + ' · ' + games.length + ' game' + (games.length === 1 ? '' : 's');
+
+      const toolbar = $('userGameplayTableToolbar');
+      if (toolbar) show(toolbar, games.length > 0);
+
+      if (summaryEl && summary) {
+        const bet = summary.totalBet ?? summary.TotalBet ?? 0;
+        const win = summary.totalWin ?? summary.TotalWin ?? 0;
+        const recharge = summary.totalRecharge ?? summary.TotalRecharge ?? 0;
+        const redeem = summary.totalRedeem ?? summary.TotalRedeem ?? 0;
+        const rtp = summary.rtpPercentage ?? summary.RtpPercentage ?? 0;
+        const userId = String(rootUserId || '');
+        const winTone = ugpWinTone(bet, win);
+        const rtpTone = ugpRtpToneFromPct(rtp);
+        summaryEl.innerHTML =
+          '<div class="chart-stat ugp-stat-user"><span>User</span><strong>' + escHtml(userName) + '</strong></div>' +
+          (userId
+            ? '<div class="chart-stat ugp-stat-id"><span>User ID</span><strong>' +
+              escHtml(userId) +
+              '</strong>' +
+              '<div class="ugp-id-actions">' +
+              '<button type="button" class="secondary" data-ugp-use-userid="' + escAttr(userId) + '" data-ugp-goto="daily">Daily</button>' +
+              '<button type="button" class="secondary" data-ugp-use-userid="' + escAttr(userId) + '" data-ugp-goto="spins">Spins</button>' +
+              '</div></div>'
+            : '<div class="chart-stat ugp-stat-id"><span>User ID</span><strong>—</strong></div>') +
+          '<div class="chart-stat ugp-stat-bet"><span>Total Bet</span><strong>$' + fmtMoney(bet) + '</strong></div>' +
+          '<div class="chart-stat ugp-stat-win-' + winTone + '"><span>Total Win</span><strong>$' + fmtMoney(win) + '</strong></div>' +
+          '<div class="chart-stat ugp-stat-recharge"><span>Total Recharge</span><strong>$' + fmtMoney(recharge) + '</strong></div>' +
+          '<div class="chart-stat ugp-stat-redeem"><span>Total Redeem</span><strong>$' + fmtMoney(redeem) + '</strong></div>' +
+          '<div class="chart-stat ugp-stat-rtp-' + rtpTone + '"><span>RTP</span><strong>' + fmtSpRtpPct(rtp) + '</strong></div>';
+        show(summaryEl, true);
+      } else if (summaryEl) {
+        summaryEl.innerHTML = '';
+        show(summaryEl, false);
+      }
+
+      renderUserGameplayGamesTable();
+    }
+
+    async function fetchUserGameplay(userName) {
+      if (isDemoMode()) {
+        return {
+          userId: 'D74DE6FF-ADCB-48F5-B038-352B179D685E',
+          summary: {
+            userId: 'D74DE6FF-ADCB-48F5-B038-352B179D685E',
+            userName: userName,
+            totalBet: 158127.36,
+            totalWin: 164532.40,
+            totalRecharge: 10.00,
+            totalRedeem: 1500.00,
+            rtpPercentage: 104.05,
+          },
+          games: [
+            { gameName: 'Mermaid', totalBet: 107086.20, totalWin: 86324.90, rtpPercentage: 80.61, totalSpins: 12646, totalFreeSpins: 0 },
+            { gameName: 'Day Of Dead', totalBet: 12000, totalWin: 15000, rtpPercentage: 125, totalSpins: 500, totalFreeSpins: 6 },
+          ],
+        };
+      }
+
+      const url = apiOrigin().replace(/\/$/, '') +
+        '/api/dashboard/internal/user-game-play?userName=' + encodeURIComponent(userName);
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+        cache: 'no-store',
+      });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data || json.Data || {};
+    }
+
+    async function lookupUserGameplay() {
+      const input = $('userGameplayName');
+      const userName = (input?.value || '').trim();
+      if (!userName) {
+        clearUserGameplayUi('Enter a username first.');
+        input?.focus();
+        return;
+      }
+
+      const btn = $('userGameplayLookupBtn');
+      if (btn) btn.disabled = true;
+      try {
+        clearUserGameplayUi('Looking up ' + userName + '…');
+        const data = await fetchUserGameplay(userName);
+        renderUserGameplay(data);
+      } catch (err) {
+        clearUserGameplayUi('Lookup failed: ' + (err?.message || String(err)));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function setUserGameplayTab(tab) {
+      const allowed = { summary: true, daily: true, spins: true };
+      userGameplayActiveTab = allowed[tab] ? tab : 'summary';
+      document.querySelectorAll('.user-gameplay-tab-btn').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.dataset.ugpTab === userGameplayActiveTab);
+      });
+      show($('userGameplaySummaryPanel'), userGameplayActiveTab === 'summary');
+      show($('userGameplayDailyPanel'), userGameplayActiveTab === 'daily');
+      show($('userGameplaySpinsPanel'), userGameplayActiveTab === 'spins');
+
+      // Keep User ID in sync across Daily / Spins.
+      const dailyId = ($('userGameplayUserId')?.value || '').trim();
+      const spinsId = ($('userGameplaySpinsUserId')?.value || '').trim();
+      if (userGameplayActiveTab === 'spins' && !spinsId && dailyId && $('userGameplaySpinsUserId')) {
+        $('userGameplaySpinsUserId').value = dailyId;
+      }
+      if (userGameplayActiveTab === 'daily' && !dailyId && spinsId && $('userGameplayUserId')) {
+        $('userGameplayUserId').value = spinsId;
+      }
+
+      if (userGameplayActiveTab === 'summary') {
+        setRowCount('countUserGameplay', filterUserGameplayGames(userGameplayGamesData, $('userGameplaySearch')?.value || ''));
+        $('userGameplayName')?.focus();
+      } else if (userGameplayActiveTab === 'daily') {
+        setRowCount('countUserGameplay', filterUserGameplayDailyRows(userGameplayDailyData, $('userGameplayDailySearch')?.value || ''));
+        $('userGameplayUserId')?.focus();
+      } else {
+        const filtered = filterUserGameplaySpinsRows(userGameplaySpinsData, $('userGameplaySpinsSearch')?.value || '');
+        setRowCount('countUserGameplay', filtered);
+        $('userGameplaySpinsUserId')?.focus();
+      }
+    }
+
+    function matchesUserGameplayDailySearch(row, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+
+      const name = String(row.gameName ?? row.GameName ?? '').toLowerCase();
+      if (name.includes(q)) return true;
+
+      const gameId = String(row.gameId ?? row.GameId ?? '').toLowerCase();
+      if (gameId.includes(q)) return true;
+
+      const date = String(row.date ?? row.Date ?? '').toLowerCase();
+      if (date.includes(q)) return true;
+
+      const bet = row.bet ?? row.Bet ?? 0;
+      const win = row.win ?? row.Win ?? 0;
+      const rtp = Number(row.rtp ?? row.Rtp ?? 0);
+      const rtpPct = rtp * 100;
+      const spins = row.spins ?? row.Spins ?? 0;
+
+      const candidates = [
+        String(spins),
+        fmtMoney(bet),
+        fmtMoney(win),
+        String(bet),
+        String(win),
+        rtp.toFixed(4),
+        String(rtp),
+        rtpPct.toFixed(2),
+        rtpPct.toFixed(2) + '%',
+        Math.round(rtpPct) + '%',
+        String(Math.round(rtpPct)),
+      ];
+      return candidates.some((c) => c.toLowerCase().includes(q));
+    }
+
+    function filterUserGameplayDailyRows(rows, searchQuery) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesUserGameplayDailySearch(r, searchQuery));
+    }
+
+    function clearUserGameplayDailyUi(message) {
+      userGameplayDailyData = [];
+      userGameplayDailyMeta = { userId: '', userName: '' };
+      const hint = $('userGameplayDailyHint');
+      if (hint) hint.textContent = message || 'Enter a user ID to load daily Bet / Win / RTP from game_spin_logs.';
+      const searchWrap = $('userGameplayDailySearchWrap');
+      if (searchWrap) show(searchWrap, false);
+      if ($('userGameplayDailySearch')) $('userGameplayDailySearch').value = '';
+      const wrap = $('userGameplayDailyWrap');
+      if (wrap) wrap.innerHTML = '';
+      if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', []);
+    }
+
+    function renderUserGameplayDailyTable() {
+      const wrap = $('userGameplayDailyWrap');
+      if (!wrap) return;
+
+      const search = $('userGameplayDailySearch')?.value || '';
+      const filtered = filterUserGameplayDailyRows(userGameplayDailyData, search);
+      const total = userGameplayDailyData.length;
+      const label = userGameplayDailyMeta.userName
+        ? userGameplayDailyMeta.userName + ' (' + userGameplayDailyMeta.userId + ')'
+        : userGameplayDailyMeta.userId;
+
+      if (!total) {
+        wrap.innerHTML = '<p class="diff-meta">No daily rows.</p>';
+        if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', []);
+        return;
+      }
+
+      if (!filtered.length) {
+        wrap.innerHTML = '<p class="diff-meta">No rows match "' + escHtml(String(search).trim()) + '".</p>';
+        if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', []);
+        const hint = $('userGameplayDailyHint');
+        if (hint && label) hint.textContent = 'Results for ' + label + ' · 0 of ' + total + ' rows';
+        return;
+      }
+
+      const head = '<tr><th>Date</th><th>Game</th><th>Game ID</th><th>Bet</th><th>Win</th><th>RTP</th><th>Spins</th></tr>';
+      const body = filtered.map((r) => {
+        const date = r.date ?? r.Date ?? '';
+        const name = r.gameName ?? r.GameName ?? '';
+        const gid = r.gameId ?? r.GameId ?? '';
+        const bet = r.bet ?? r.Bet ?? 0;
+        const win = r.win ?? r.Win ?? 0;
+        const rtp = r.rtp ?? r.Rtp ?? 0;
+        const spins = r.spins ?? r.Spins ?? 0;
+        const winTone = ugpWinTone(bet, win);
+        return '<tr>' +
+          '<td>' + escHtml(date) + '</td>' +
+          '<td>' + escHtml(name) + '</td>' +
+          '<td style="font-size:0.78rem;color:var(--muted)">' + escHtml(gid) + '</td>' +
+          '<td>' + ugpMoneyCell(bet, 'bet') + '</td>' +
+          '<td>' + ugpMoneyCell(win, winTone) + '</td>' +
+          '<td>' + ugpRtpRatioCell(rtp) + '</td>' +
+          '<td><span class="ugp-val-spins">' + fmtInt(spins) + '</span></td>' +
+          '</tr>';
+      }).join('');
+      wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+      if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', filtered);
+
+      const hint = $('userGameplayDailyHint');
+      if (hint && label) {
+        const q = String(search).trim();
+        hint.textContent = q
+          ? 'Results for ' + label + ' · ' + filtered.length + ' of ' + total + ' rows'
+          : 'Results for ' + label + ' · ' + total + ' row' + (total === 1 ? '' : 's');
+      }
+    }
+
+    function renderUserGameplayDaily(data) {
+      const rows = data?.rows || data?.Rows || [];
+      const userId = data?.userId || data?.UserId || '';
+      const userName = data?.userName || data?.UserName || '';
+      userGameplayDailyData = rows;
+      userGameplayDailyMeta = { userId: String(userId), userName: String(userName || '') };
+
+      const searchWrap = $('userGameplayDailySearchWrap');
+      if (searchWrap) show(searchWrap, rows.length > 0);
+
+      const hint = $('userGameplayDailyHint');
+      const label = userName ? userName + ' (' + userId + ')' : userId;
+      if (!rows.length) {
+        if (hint) hint.textContent = 'No daily spin data for ' + (label || 'this user') + '.';
+        const wrap = $('userGameplayDailyWrap');
+        if (wrap) wrap.innerHTML = '<p class="diff-meta">No daily rows.</p>';
+        if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', []);
+        return;
+      }
+
+      if (hint) hint.textContent = 'Results for ' + label + ' · ' + rows.length + ' row' + (rows.length === 1 ? '' : 's');
+      renderUserGameplayDailyTable();
+    }
+
+    async function fetchUserGameplayDaily(userId, from, to) {
+      if (isDemoMode()) {
+        return {
+          userId: userId,
+          userName: 'demo_user',
+          rows: [
+            { gameId: '937BFB14-422B-439F-9119-DF8CD7579585', gameName: 'Demo Game', date: '2026-07-21', bet: 2219.8, win: 7069.3, rtp: 3.184656, spins: 120 },
+            { gameId: '937BFB14-422B-439F-9119-DF8CD7579585', gameName: 'Demo Game', date: '2026-07-22', bet: 16943.3, win: 38663.6, rtp: 2.28194, spins: 840 },
+            { gameId: '937BFB14-422B-439F-9119-DF8CD7579585', gameName: 'Demo Game', date: '2026-07-23', bet: 10171.7, win: 15980.9, rtp: 1.571113, spins: 510 },
+          ],
+        };
+      }
+
+      const params = new URLSearchParams();
+      params.set('userId', userId);
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+
+      const url = apiOrigin().replace(/\/$/, '') +
+        '/api/dashboard/internal/user-game-play/daily?' + params.toString();
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+        cache: 'no-store',
+      });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data || json.Data || {};
+    }
+
+    async function lookupUserGameplayDaily() {
+      const input = $('userGameplayUserId');
+      const userId = (input?.value || '').trim();
+      if (!userId) {
+        clearUserGameplayDailyUi('Enter a user ID first.');
+        input?.focus();
+        return;
+      }
+
+      const guidOk = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(userId);
+      if (!guidOk) {
+        clearUserGameplayDailyUi('User ID must be a valid GUID.');
+        input?.focus();
+        return;
+      }
+
+      const from = $('userGameplayDailyFrom')?.value || '';
+      const to = $('userGameplayDailyTo')?.value || '';
+      const btn = $('userGameplayDailyLookupBtn');
+      if (btn) btn.disabled = true;
+      try {
+        clearUserGameplayDailyUi('Looking up ' + userId + '…');
+        const data = await fetchUserGameplayDaily(userId, from, to);
+        renderUserGameplayDaily(data);
+      } catch (err) {
+        clearUserGameplayDailyUi('Lookup failed: ' + (err?.message || String(err)));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function matchesUserGameplaySpinsSearch(row, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return true;
+
+      const name = String(row.gameName ?? row.GameName ?? '').toLowerCase();
+      if (name.includes(q)) return true;
+      const gameId = String(row.gameId ?? row.GameId ?? '').toLowerCase();
+      if (gameId.includes(q)) return true;
+
+      const before = row.balanceBefore ?? row.BalanceBefore ?? 0;
+      const bet = row.betAmount ?? row.BetAmount ?? 0;
+      const win = row.winAmount ?? row.WinAmount ?? 0;
+      const after = row.balanceAfter ?? row.BalanceAfter ?? 0;
+      const idx = row.spinIndex ?? row.SpinIndex ?? 0;
+      const created = String(row.createdAt ?? row.CreatedAt ?? '').toLowerCase();
+      if (created.includes(q)) return true;
+
+      const candidates = [
+        String(idx),
+        fmtMoney(before),
+        fmtMoney(bet),
+        fmtMoney(win),
+        fmtMoney(after),
+        String(before),
+        String(bet),
+        String(win),
+        String(after),
+        (row.isFreeSpin ?? row.IsFreeSpin) ? 'free' : 'paid',
+      ];
+      return candidates.some((c) => c.toLowerCase().includes(q));
+    }
+
+    function filterUserGameplaySpinsRows(rows, searchQuery) {
+      if (!Array.isArray(rows)) return [];
+      return rows.filter((r) => matchesUserGameplaySpinsSearch(r, searchQuery));
+    }
+
+    function clearUserGameplaySpinsUi(message) {
+      userGameplaySpinsData = [];
+      userGameplaySpinsMeta = { userId: '', userName: '', page: 1, pageSize: 50, totalCount: 0 };
+      const hint = $('userGameplaySpinsHint');
+      if (hint) hint.textContent = message || 'Enter a user ID to load spin rows from game_spin_logs (ordered by created_at).';
+      const searchWrap = $('userGameplaySpinsSearchWrap');
+      if (searchWrap) show(searchWrap, false);
+      if ($('userGameplaySpinsSearch')) $('userGameplaySpinsSearch').value = '';
+      const pager = $('userGameplaySpinsPager');
+      if (pager) pager.innerHTML = '';
+      const wrap = $('userGameplaySpinsWrap');
+      if (wrap) wrap.innerHTML = '';
+      if (userGameplayActiveTab === 'spins') setRowCount('countUserGameplay', []);
+    }
+
+    function renderUserGameplaySpinsPager() {
+      const pager = $('userGameplaySpinsPager');
+      if (!pager) return;
+      const total = Number(userGameplaySpinsMeta.totalCount || 0);
+      const page = Number(userGameplaySpinsMeta.page || 1);
+      const pageSize = Number(userGameplaySpinsMeta.pageSize || 50);
+      if (!total && !userGameplaySpinsData.length) {
+        pager.innerHTML = '';
+        return;
+      }
+      const totalPages = Math.max(1, Math.ceil(total / pageSize) || 1);
+      const fromRow = total === 0 ? 0 : (page - 1) * pageSize + 1;
+      const toRow = Math.min(page * pageSize, total);
+      pager.innerHTML =
+        '<span>Showing ' + fmtInt(fromRow) + '–' + fmtInt(toRow) + ' of ' + fmtInt(total) + '</span>' +
+        '<div class="pager-actions">' +
+        '<button type="button" class="secondary" data-ugp-spins-page="first"' + (page <= 1 ? ' disabled' : '') + '>First</button>' +
+        '<button type="button" class="secondary" data-ugp-spins-page="prev"' + (page <= 1 ? ' disabled' : '') + '>Prev</button>' +
+        '<span>Page ' + fmtInt(page) + ' / ' + fmtInt(totalPages) + '</span>' +
+        '<button type="button" class="secondary" data-ugp-spins-page="next"' + (page >= totalPages ? ' disabled' : '') + '>Next</button>' +
+        '<button type="button" class="secondary" data-ugp-spins-page="last"' + (page >= totalPages ? ' disabled' : '') + '>Last</button>' +
+        '</div>';
+    }
+
+    function renderUserGameplaySpinsTable() {
+      const wrap = $('userGameplaySpinsWrap');
+      if (!wrap) return;
+
+      const search = $('userGameplaySpinsSearch')?.value || '';
+      const filtered = filterUserGameplaySpinsRows(userGameplaySpinsData, search);
+      const pageCount = userGameplaySpinsData.length;
+      const label = userGameplaySpinsMeta.userName
+        ? userGameplaySpinsMeta.userName + ' (' + userGameplaySpinsMeta.userId + ')'
+        : userGameplaySpinsMeta.userId;
+
+      if (!pageCount) {
+        wrap.innerHTML = '<p class="diff-meta">No spin rows.</p>';
+        if (userGameplayActiveTab === 'spins') setRowCount('countUserGameplay', []);
+        return;
+      }
+
+      if (!filtered.length) {
+        wrap.innerHTML = '<p class="diff-meta">No spins match "' + escHtml(String(search).trim()) + '" on this page.</p>';
+        if (userGameplayActiveTab === 'spins') setRowCount('countUserGameplay', []);
+        return;
+      }
+
+      const head = '<tr><th>Created</th><th>Game</th><th>Spin #</th><th>Balance Before</th><th>Bet</th><th>Win</th><th>Balance After</th><th>Type</th></tr>';
+      const body = filtered.map((r) => {
+        const created = r.createdAt ?? r.CreatedAt ?? '';
+        const name = r.gameName ?? r.GameName ?? '';
+        const idx = r.spinIndex ?? r.SpinIndex ?? 0;
+        const before = r.balanceBefore ?? r.BalanceBefore ?? 0;
+        const bet = r.betAmount ?? r.BetAmount ?? 0;
+        const win = r.winAmount ?? r.WinAmount ?? 0;
+        const after = r.balanceAfter ?? r.BalanceAfter ?? 0;
+        const free = !!(r.isFreeSpin ?? r.IsFreeSpin);
+        const winTone = Number(win) > 0 ? 'up' : (Number(win) === 0 ? 'flat' : 'down');
+        const afterTone = Number(after) >= Number(before) ? 'up' : 'down';
+        return '<tr>' +
+          '<td>' + escHtml(fmtFeedbackDateTime(created)) + '</td>' +
+          '<td>' + escHtml(name) + '</td>' +
+          '<td><span class="ugp-val-spins">' + fmtInt(idx) + '</span></td>' +
+          '<td><span class="ugp-val-bet">$' + fmtMoney(before) + '</span></td>' +
+          '<td>' + ugpMoneyCell(bet, 'bet') + '</td>' +
+          '<td>' + ugpMoneyCell(win, winTone) + '</td>' +
+          '<td>' + ugpMoneyCell(after, afterTone) + '</td>' +
+          '<td>' + (free
+            ? '<span class="badge ugp-free">Free</span>'
+            : '<span class="badge ugp-paid">Paid</span>') + '</td>' +
+          '</tr>';
+      }).join('');
+      wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
+      if (userGameplayActiveTab === 'spins') setRowCount('countUserGameplay', filtered);
+
+      const hint = $('userGameplaySpinsHint');
+      if (hint && label) {
+        const q = String(search).trim();
+        const total = Number(userGameplaySpinsMeta.totalCount || 0);
+        hint.textContent = q
+          ? 'Results for ' + label + ' · ' + filtered.length + ' of ' + pageCount + ' on this page (total ' + total + ')'
+          : 'Results for ' + label + ' · page ' + userGameplaySpinsMeta.page + ' · ' + total + ' spin' + (total === 1 ? '' : 's');
+      }
+    }
+
+    function renderUserGameplaySpins(data) {
+      const items = data?.items || data?.Items || [];
+      const userId = data?.userId || data?.UserId || '';
+      const userName = data?.userName || data?.UserName || '';
+      userGameplaySpinsData = items;
+      userGameplaySpinsMeta = {
+        userId: String(userId),
+        userName: String(userName || ''),
+        page: Number(data?.page ?? data?.Page ?? 1),
+        pageSize: Number(data?.pageSize ?? data?.PageSize ?? 50),
+        totalCount: Number(data?.totalCount ?? data?.TotalCount ?? items.length),
+      };
+
+      const searchWrap = $('userGameplaySpinsSearchWrap');
+      if (searchWrap) show(searchWrap, items.length > 0 || userGameplaySpinsMeta.totalCount > 0);
+
+      renderUserGameplaySpinsPager();
+      renderUserGameplaySpinsTable();
+    }
+
+    async function fetchUserGameplaySpins(userId, from, to, page, pageSize) {
+      if (isDemoMode()) {
+        const demo = [];
+        for (let i = 1; i <= 12; i++) {
+          demo.push({
+            gameId: '937BFB14-422B-439F-9119-DF8CD7579585',
+            gameName: 'Demo Game',
+            balanceBefore: 1000 + i * 10,
+            betAmount: 1.2,
+            winAmount: i % 3 === 0 ? 5 : 0,
+            balanceAfter: 1000 + i * 10 - 1.2 + (i % 3 === 0 ? 5 : 0),
+            spinIndex: i,
+            createdAt: '2026-07-23T12:' + String(i).padStart(2, '0') + ':00',
+            isFreeSpin: i % 5 === 0,
+          });
+        }
+        return {
+          userId,
+          userName: 'demo_user',
+          page: 1,
+          pageSize: 50,
+          totalCount: demo.length,
+          items: demo,
+        };
+      }
+
+      const params = new URLSearchParams();
+      params.set('userId', userId);
+      params.set('page', String(page || 1));
+      params.set('pageSize', String(pageSize || 50));
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+
+      const url = apiOrigin().replace(/\/$/, '') +
+        '/api/dashboard/internal/user-game-play/spins?' + params.toString();
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+        cache: 'no-store',
+      });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data || json.Data || {};
+    }
+
+    async function lookupUserGameplaySpins(opts = {}) {
+      const input = $('userGameplaySpinsUserId');
+      const userId = (input?.value || '').trim();
+      if (!userId) {
+        clearUserGameplaySpinsUi('Enter a user ID first.');
+        input?.focus();
+        return;
+      }
+
+      const guidOk = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(userId);
+      if (!guidOk) {
+        clearUserGameplaySpinsUi('User ID must be a valid GUID.');
+        input?.focus();
+        return;
+      }
+
+      const from = $('userGameplaySpinsFrom')?.value || '';
+      const to = $('userGameplaySpinsTo')?.value || '';
+      const page = Math.max(1, Number(opts.page || userGameplaySpinsMeta.page || 1));
+      const pageSize = Number(userGameplaySpinsMeta.pageSize || 50);
+      const btn = $('userGameplaySpinsLookupBtn');
+      if (btn) btn.disabled = true;
+      userGameplaySpinsLoading = true;
+      try {
+        if (!opts.silent) clearUserGameplaySpinsUi('Looking up spins for ' + userId + '…');
+        const data = await fetchUserGameplaySpins(userId, from, to, page, pageSize);
+        renderUserGameplaySpins(data);
+      } catch (err) {
+        clearUserGameplaySpinsUi('Lookup failed: ' + (err?.message || String(err)));
+      } finally {
+        userGameplaySpinsLoading = false;
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function handleUserGameplaySpinsPagerClick(e) {
+      const btn = e.target.closest('[data-ugp-spins-page]');
+      if (!btn || btn.disabled || userGameplaySpinsLoading) return;
+      const dir = btn.getAttribute('data-ugp-spins-page') || '';
+      const page = Number(userGameplaySpinsMeta.page || 1);
+      const pageSize = Number(userGameplaySpinsMeta.pageSize || 50);
+      const totalPages = Math.max(1, Math.ceil(Number(userGameplaySpinsMeta.totalCount || 0) / pageSize) || 1);
+      let next = page;
+      if (dir === 'first') next = 1;
+      else if (dir === 'prev') next = Math.max(1, page - 1);
+      else if (dir === 'next') next = Math.min(totalPages, page + 1);
+      else if (dir === 'last') next = totalPages;
+      if (next === page) return;
+      lookupUserGameplaySpins({ page: next, silent: true });
+    }
+
     function parseMaintenanceParts(value) {
       if (value == null || value === '') return { date: '', time: '' };
       const text = String(value).trim();
@@ -5461,6 +6591,12 @@
     $('maintenanceHomeBtn')?.addEventListener('click', () => {
       goHome();
     });
+    $('userGameplayBtn')?.addEventListener('click', () => {
+      openUserGameplayPage();
+    });
+    $('userGameplayHomeBtn')?.addEventListener('click', () => {
+      goHome();
+    });
     $('maintenanceReloadBtn')?.addEventListener('click', () => loadMaintenanceSettings());
     $('maintSaveBtn')?.addEventListener('click', () => saveMaintenanceSetting({ turnOff: false }));
     $('maintType')?.addEventListener('change', () => {
@@ -5601,13 +6737,29 @@
     });
     $('toggleDiffBtn').addEventListener('click', () => {
       isDiffVisible = !isDiffVisible;
-      if (isDiffVisible) isMaintenanceVisible = false;
+      if (isDiffVisible) {
+        isMaintenanceVisible = false;
+        isUserGameplayVisible = false;
+      }
       updateDiffPanel();
       if (isDiffVisible) {
         $('diffCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
     $('dashboard').addEventListener('click', (e) => {
+      const ugpUserBtn = e.target.closest('[data-ugp-use-userid]');
+      if (ugpUserBtn) {
+        const uid = ugpUserBtn.getAttribute('data-ugp-use-userid') || '';
+        const goto = ugpUserBtn.getAttribute('data-ugp-goto') || 'daily';
+        if (uid) {
+          if ($('userGameplayUserId')) $('userGameplayUserId').value = uid;
+          if ($('userGameplaySpinsUserId')) $('userGameplaySpinsUserId').value = uid;
+          setUserGameplayTab(goto === 'spins' ? 'spins' : 'daily');
+          if (goto === 'spins') lookupUserGameplaySpins({ page: 1 });
+          else lookupUserGameplayDaily();
+        }
+        return;
+      }
       const editBtn = e.target.closest('[data-maint-edit]');
       if (editBtn) {
         selectMaintenanceType(editBtn.dataset.maintEdit);
@@ -5708,6 +6860,60 @@
         renderSpinChart(activeChartSpins);
       }
     });
+
+    $('userGameplayLookupBtn')?.addEventListener('click', () => lookupUserGameplay());
+    $('userGameplayClearBtn')?.addEventListener('click', () => {
+      if ($('userGameplayName')) $('userGameplayName').value = '';
+      if ($('userGameplaySearch')) $('userGameplaySearch').value = '';
+      clearUserGameplayUi();
+    });
+    $('userGameplayName')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        lookupUserGameplay();
+      }
+    });
+    $('userGameplaySearch')?.addEventListener('input', () => {
+      renderUserGameplayGamesTable();
+    });
+    document.querySelectorAll('.user-gameplay-tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => setUserGameplayTab(btn.dataset.ugpTab || 'summary'));
+    });
+    $('userGameplayDailyLookupBtn')?.addEventListener('click', () => lookupUserGameplayDaily());
+    $('userGameplayDailyClearBtn')?.addEventListener('click', () => {
+      if ($('userGameplayUserId')) $('userGameplayUserId').value = '';
+      if ($('userGameplayDailyFrom')) $('userGameplayDailyFrom').value = '';
+      if ($('userGameplayDailyTo')) $('userGameplayDailyTo').value = '';
+      if ($('userGameplayDailySearch')) $('userGameplayDailySearch').value = '';
+      clearUserGameplayDailyUi();
+    });
+    $('userGameplayUserId')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        lookupUserGameplayDaily();
+      }
+    });
+    $('userGameplayDailySearch')?.addEventListener('input', () => {
+      renderUserGameplayDailyTable();
+    });
+    $('userGameplaySpinsLookupBtn')?.addEventListener('click', () => lookupUserGameplaySpins({ page: 1 }));
+    $('userGameplaySpinsClearBtn')?.addEventListener('click', () => {
+      if ($('userGameplaySpinsUserId')) $('userGameplaySpinsUserId').value = '';
+      if ($('userGameplaySpinsFrom')) $('userGameplaySpinsFrom').value = '';
+      if ($('userGameplaySpinsTo')) $('userGameplaySpinsTo').value = '';
+      if ($('userGameplaySpinsSearch')) $('userGameplaySpinsSearch').value = '';
+      clearUserGameplaySpinsUi();
+    });
+    $('userGameplaySpinsUserId')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        lookupUserGameplaySpins({ page: 1 });
+      }
+    });
+    $('userGameplaySpinsSearch')?.addEventListener('input', () => {
+      renderUserGameplaySpinsTable();
+    });
+    $('userGameplaySpinsPager')?.addEventListener('click', handleUserGameplaySpinsPagerClick);
 
     function initPage() {
       isDiffVisible = false;
