@@ -814,6 +814,7 @@
       letter-spacing: 0.05em;
       position: sticky;
       top: 0;
+      z-index: 3;
       background: rgba(35, 47, 62, 0.98);
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     }
@@ -1325,6 +1326,143 @@
     .badge.ugp-free { background: rgba(171, 71, 188, 0.2); color: #e1bee7; }
     .badge.ugp-paid { background: rgba(66, 165, 245, 0.15); color: #90caf9; }
 
+    .ugp-spin-json-btn {
+      width: 1.55rem;
+      height: 1.55rem;
+      min-width: 1.55rem;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(100, 181, 246, 0.55);
+      background: rgba(66, 165, 245, 0.15);
+      color: #90caf9;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-style: italic;
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 0;
+      flex-shrink: 0;
+    }
+
+    .ugp-spin-json-btn:hover:not(:disabled) {
+      background: rgba(66, 165, 245, 0.28);
+      border-color: rgba(144, 202, 249, 0.8);
+      color: #e3f2fd;
+    }
+
+    .ugp-spin-json-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    th.ugp-json-col,
+    td.ugp-json-col {
+      width: 4.25rem;
+      min-width: 4.25rem;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    td.ugp-json-col {
+      padding-left: 0.55rem;
+      padding-right: 0.55rem;
+    }
+
+    .ugp-spin-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(4, 8, 14, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .ugp-spin-modal.hidden { display: none; }
+
+    .ugp-spin-modal-card {
+      width: min(960px, 96vw);
+      max-height: min(88vh, 900px);
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      border: 1px solid rgba(100, 181, 246, 0.35);
+      background: rgba(14, 20, 30, 0.98);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+
+    .ugp-spin-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.15rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ugp-spin-modal-head h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .ugp-spin-modal-meta {
+      margin: 0.35rem 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .ugp-spin-modal-actions {
+      display: flex;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    .ugp-spin-modal-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.55rem;
+      padding: 0.85rem 1.15rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ugp-spin-modal-summary .chart-stat {
+      min-height: auto;
+      padding: 0.55rem 0.7rem;
+    }
+
+    .ugp-spin-modal-summary .chart-stat strong {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .ugp-spin-modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 0.85rem 1.15rem 1.15rem;
+    }
+
+    .ugp-spin-modal-body pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #d7e3f4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
     .ugp-info-wrap {
       position: relative;
       display: inline-flex;
@@ -1567,6 +1705,16 @@
       pointer-events: none;
       transform: translate(-50%, calc(-100% - 14px));
       white-space: nowrap;
+    }
+
+    .chart-tooltip.has-json-action {
+      pointer-events: auto;
+      max-width: 260px;
+      white-space: normal;
+    }
+
+    .chart-tooltip .ugp-spin-json-btn {
+      margin-top: 0.35rem;
     }
 
     .chart-tooltip strong {
@@ -2135,6 +2283,25 @@
         </div>
       </section>
 
+      <div class="ugp-spin-modal hidden" id="ugpSpinJsonModal" role="dialog" aria-modal="true" aria-labelledby="ugpSpinJsonTitle">
+        <div class="ugp-spin-modal-card">
+          <div class="ugp-spin-modal-head">
+            <div>
+              <h3 id="ugpSpinJsonTitle">Spin response JSON</h3>
+              <p class="ugp-spin-modal-meta" id="ugpSpinJsonMeta"></p>
+            </div>
+            <div class="ugp-spin-modal-actions">
+              <button type="button" class="secondary" id="ugpSpinJsonCopyBtn">Copy</button>
+              <button type="button" class="secondary" id="ugpSpinJsonCloseBtn">Close</button>
+            </div>
+          </div>
+          <div class="ugp-spin-modal-summary" id="ugpSpinJsonSummary"></div>
+          <div class="ugp-spin-modal-body">
+            <pre class="json-view" id="ugpSpinJsonView">Loading…</pre>
+          </div>
+        </div>
+      </div>
+
       <section class="card hidden" id="maintenanceCard">
         <div class="drill-toolbar">
           <button type="button" class="secondary" id="maintenanceHomeBtn">← Home</button>
@@ -2232,7 +2399,8 @@
                 <button type="button" class="secondary" id="spinPanRightBtn" title="Move right">›</button>
                 <button type="button" class="secondary" id="spinZoomResetBtn" title="Reset zoom">Reset</button>
                 <button type="button" id="spinDownloadReportBtn" title="Download a simple session report">⬇ Report</button>
-                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag or scroller to pan</span>
+                <button type="button" class="secondary" id="spinViewJsonBtn" title="Open response JSON for the hovered / selected spin" disabled>i JSON</button>
+                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag or scroller to pan · click spin for JSON</span>
               </div>
             </div>
             <canvas id="spinChart" aria-label="Session spin bet and win chart"></canvas>
@@ -2289,6 +2457,7 @@
     let chartViewStart = 0;
     let chartViewEnd = 0;
     let chartPanState = null;
+    let chartSuppressClick = false;
     let chartSmoothRaf = null;
     let chartSmoothTargetStart = null;
     let chartScrollDragging = false;
@@ -4000,6 +4169,7 @@
       ).join('');
       activeChartSpins = spins;
       resetSpinChartZoom(spins.length, false);
+      syncSpinViewJsonButton();
       window.requestAnimationFrame(() => renderSpinChart(spins));
     }
 
@@ -4634,19 +4804,28 @@
       const spin = meta.spins[index];
       const pointX = meta.xAt(index);
       const pointY = Math.min(meta.yAt(spin.betAmount), meta.yAt(spin.winAmount));
+      const hasJson = !!(spin.hasResponseJson ?? spin.HasResponseJson);
+      const spinId = spin.id ?? spin.Id ?? '';
 
       if (hoveredSpinIndex !== index) {
         hoveredSpinIndex = index;
         renderSpinChart(meta.spins, index);
+        syncSpinViewJsonButton();
       }
 
+      tooltip.classList.toggle('has-json-action', hasJson);
       tooltip.innerHTML =
-        '<strong>Spin ' + escHtml(spin.spinIndex) + '</strong>' +
+        '<strong>Spin ' + escHtml(spin.spinIndex ?? spin.SpinIndex ?? (index + 1)) + '</strong>' +
         '<div class="chart-tooltip-row"><span>Type</span><b>' + (isSpinFree(spin) ? 'Free spin' : 'Paid spin') + '</b></div>' +
-        '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount)) + '</b></div>' +
-        '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount)) + '</b></div>' +
-        '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter)) + '</b></div>' +
-        '<div class="chart-tooltip-row"><span>Time</span><b>' + escHtml(fmtFeedbackDateTime(spin.createdAt)) + '</b></div>';
+        '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount ?? spin.BetAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount ?? spin.WinAmount)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter ?? spin.BalanceAfter)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Time</span><b>' + escHtml(fmtFeedbackDateTime(spin.createdAt ?? spin.CreatedAt)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>JSON</span><b>' + (hasJson ? 'Available' : 'None') + '</b></div>' +
+        (hasJson
+          ? '<button type="button" class="ugp-spin-json-btn" data-chart-spin-json="' + escAttr(spinId) +
+            '" title="Open spin response JSON" aria-label="Open spin JSON">i</button>'
+          : '');
 
       const tipW = tooltip.offsetWidth || 190;
       const tipH = tooltip.offsetHeight || 110;
@@ -4661,13 +4840,117 @@
       show(tooltip, true);
     }
 
+    function syncSpinViewJsonButton() {
+      const btn = $('spinViewJsonBtn');
+      if (!btn) return;
+      const spin = hoveredSpinIndex >= 0 ? activeChartSpins[hoveredSpinIndex] : null;
+      const hasJson = !!(spin && (spin.hasResponseJson ?? spin.HasResponseJson));
+      btn.disabled = !hasJson;
+      btn.title = hasJson
+        ? 'Open response JSON for spin ' + (spin.spinIndex ?? spin.SpinIndex ?? (hoveredSpinIndex + 1))
+        : 'Hover a spin that has response_json, then click';
+    }
+
+    function getChartSpinGameName() {
+      const frame = drillStack[drillStack.length - 1];
+      return frame?.gameName || frame?.GameName || frame?.title || '';
+    }
+
+    async function openChartSpinJson(spin) {
+      if (!spin) return;
+      const id = String(spin.id ?? spin.Id ?? '');
+      const hasJson = !!(spin.hasResponseJson ?? spin.HasResponseJson);
+      const meta = {
+        id,
+        gameName: getChartSpinGameName() || 'Spin',
+        spinIndex: spin.spinIndex ?? spin.SpinIndex ?? '',
+        createdAt: spin.createdAt ?? spin.CreatedAt ?? '',
+        requestId: spin.requestId ?? spin.RequestId ?? '',
+        betAmount: spin.betAmount ?? spin.BetAmount ?? 0,
+        winAmount: spin.winAmount ?? spin.WinAmount ?? 0,
+      };
+
+      if (!id || !hasJson) {
+        showUgpSpinJsonModal(meta, null);
+        return;
+      }
+
+      if (isDemoMode()) {
+        showUgpSpinJsonModal(meta, spin._demoJson || {
+          Success: true,
+          SpinIndex: meta.spinIndex,
+          TotalWin: meta.winAmount,
+          IsFreeSpin: isSpinFree(spin),
+          rngCategory: Number(meta.winAmount) > 0 ? 'Win' : 'NoWin',
+        });
+        return;
+      }
+
+      const view = $('ugpSpinJsonView');
+      const modal = $('ugpSpinJsonModal');
+      if (view) view.textContent = 'Loading…';
+      if (modal) show(modal, true);
+      if ($('ugpSpinJsonTitle')) $('ugpSpinJsonTitle').textContent = 'Spin response JSON';
+      if ($('ugpSpinJsonMeta')) $('ugpSpinJsonMeta').textContent = 'Loading ' + id + '…';
+      if ($('ugpSpinJsonSummary')) $('ugpSpinJsonSummary').innerHTML = '';
+
+      try {
+        const url = apiOrigin().replace(/\/$/, '') +
+          '/api/dashboard/internal/user-game-play/spins/' + encodeURIComponent(id) + '/json';
+        const res = await fetch(url, {
+          headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+          cache: 'no-store',
+        });
+        const text = await res.text();
+        const json = parseSummaryResponse(res, text);
+        const data = json.data || json.Data || {};
+        showUgpSpinJsonModal({
+          id: data.id ?? data.Id ?? id,
+          gameName: data.gameName ?? data.GameName ?? meta.gameName,
+          spinIndex: data.spinIndex ?? data.SpinIndex ?? meta.spinIndex,
+          createdAt: data.createdAt ?? data.CreatedAt ?? meta.createdAt,
+          requestId: data.requestId ?? data.RequestId ?? meta.requestId,
+          betAmount: data.betAmount ?? data.BetAmount ?? meta.betAmount,
+          winAmount: data.winAmount ?? data.WinAmount ?? meta.winAmount,
+        }, data.responseJson ?? data.ResponseJson ?? null);
+      } catch (err) {
+        if (view) view.textContent = 'Failed to load JSON: ' + (err?.message || String(err));
+      }
+    }
+
+    function openHoveredChartSpinJson() {
+      if (hoveredSpinIndex < 0 || hoveredSpinIndex >= activeChartSpins.length) return;
+      openChartSpinJson(activeChartSpins[hoveredSpinIndex]);
+    }
+
+    function onSpinChartClick(e) {
+      if (chartPanState || chartSuppressClick) {
+        chartSuppressClick = false;
+        return;
+      }
+      const canvas = $('spinChart');
+      const meta = canvas?._chartMeta;
+      if (!canvas || !meta?.spins?.length) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const index = spinIndexFromPointer(meta, x);
+      if (index < 0) return;
+      hoveredSpinIndex = index;
+      syncSpinViewJsonButton();
+      openChartSpinJson(meta.spins[index]);
+    }
+
     function hideSpinChartTooltip() {
       const tooltip = $('spinChartTooltip');
-      if (tooltip) show(tooltip, false);
+      if (tooltip) {
+        show(tooltip, false);
+        tooltip.classList.remove('has-json-action');
+      }
       if (hoveredSpinIndex !== -1) {
         hoveredSpinIndex = -1;
         if (activeChartSpins.length) renderSpinChart(activeChartSpins, -1);
       }
+      syncSpinViewJsonButton();
     }
 
     function onSpinChartWheel(e) {
@@ -4695,6 +4978,7 @@
       const visible = chartWindowSize();
       if (visible >= meta.spins.length) return;
       stopChartSmoothPan(true);
+      chartSuppressClick = false;
       chartPanState = {
         startX: e.clientX,
         originStart: chartViewStart,
@@ -4712,6 +4996,7 @@
         return;
       }
       const deltaPx = e.clientX - chartPanState.startX;
+      if (Math.abs(deltaPx) > 4) chartSuppressClick = true;
       const deltaSpins = -deltaPx / chartPanState.slotW;
       const n = activeChartSpins.length;
       const windowSize = chartPanState.originEnd - chartPanState.originStart + 1;
@@ -5933,22 +6218,26 @@
         return;
       }
 
-      const head = '<tr><th>Created</th><th>Game</th><th>Spin #</th><th>Balance Before</th><th>Bet</th><th>Win</th><th>Balance After</th><th>Type</th></tr>';
-      const body = filtered.map((r) => {
+      const head = '<tr><th>Created</th><th>Game</th><th>Spin #</th><th>Balance Before</th><th>Bet</th><th>Win</th><th>Balance After</th><th>Type</th><th class="ugp-json-col">JSON</th></tr>';
+      const body = filtered.map((r, idx) => {
         const created = r.createdAt ?? r.CreatedAt ?? '';
         const name = r.gameName ?? r.GameName ?? '';
-        const idx = r.spinIndex ?? r.SpinIndex ?? 0;
+        const spinIdx = r.spinIndex ?? r.SpinIndex ?? 0;
         const before = r.balanceBefore ?? r.BalanceBefore ?? 0;
         const bet = r.betAmount ?? r.BetAmount ?? 0;
         const win = r.winAmount ?? r.WinAmount ?? 0;
         const after = r.balanceAfter ?? r.BalanceAfter ?? 0;
         const free = !!(r.isFreeSpin ?? r.IsFreeSpin);
+        const hasJson = !!(r.hasResponseJson ?? r.HasResponseJson);
+        const id = r.id ?? r.Id ?? '';
         const winTone = Number(win) > 0 ? 'up' : (Number(win) === 0 ? 'flat' : 'down');
         const afterTone = Number(after) >= Number(before) ? 'up' : 'down';
+        // Keep a stable index into userGameplaySpinsData for demo fallback.
+        const sourceIndex = userGameplaySpinsData.indexOf(r);
         return '<tr>' +
           '<td>' + escHtml(fmtFeedbackDateTime(created)) + '</td>' +
           '<td>' + escHtml(name) + '</td>' +
-          '<td><span class="ugp-val-spins">' + fmtInt(idx) + '</span></td>' +
+          '<td><span class="ugp-val-spins">' + fmtInt(spinIdx) + '</span></td>' +
           '<td><span class="ugp-val-bet">$' + fmtMoney(before) + '</span></td>' +
           '<td>' + ugpMoneyCell(bet, 'bet') + '</td>' +
           '<td>' + ugpMoneyCell(win, winTone) + '</td>' +
@@ -5956,6 +6245,13 @@
           '<td>' + (free
             ? '<span class="badge ugp-free">Free</span>'
             : '<span class="badge ugp-paid">Paid</span>') + '</td>' +
+          '<td class="ugp-json-col">' +
+          '<button type="button" class="ugp-spin-json-btn" data-ugp-spin-json="' + escAttr(id) +
+          '" data-ugp-spin-idx="' + escAttr(String(sourceIndex >= 0 ? sourceIndex : idx)) + '"' +
+          (hasJson ? '' : ' disabled') +
+          ' title="' + (hasJson ? 'Open spin response JSON' : 'No response_json for this spin') +
+          '" aria-label="Open spin JSON">i</button>' +
+          '</td>' +
           '</tr>';
       }).join('');
       wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
@@ -5996,8 +6292,10 @@
         const demo = [];
         for (let i = 1; i <= 12; i++) {
           demo.push({
+            id: '00000000-0000-4000-8000-' + String(i).padStart(12, '0'),
             gameId: '937BFB14-422B-439F-9119-DF8CD7579585',
             gameName: 'Demo Game',
+            requestId: 'req-demo-' + i,
             balanceBefore: 1000 + i * 10,
             betAmount: 1.2,
             winAmount: i % 3 === 0 ? 5 : 0,
@@ -6005,6 +6303,18 @@
             spinIndex: i,
             createdAt: '2026-07-23T12:' + String(i).padStart(2, '0') + ':00',
             isFreeSpin: i % 5 === 0,
+            hasResponseJson: i % 2 === 0,
+            _demoJson: i % 2 === 0 ? {
+              Success: true,
+              RequestId: 'req-demo-' + i,
+              SpinId: 'spin-demo-' + i,
+              TotalWin: i % 3 === 0 ? 5 : 0,
+              IsFreeSpin: i % 5 === 0,
+              rngCategory: i % 3 === 0 ? 'Win' : 'NoWin',
+              Reels: [[{ Id: 'BlueSeven' }], [{ Id: 'Empty' }], [{ Id: 'TripleSevenRedHot' }]],
+              PaylineWins: [],
+              NewBalance: 1000 + i * 10,
+            } : null,
           });
         }
         return {
@@ -6084,6 +6394,145 @@
       else if (dir === 'last') next = totalPages;
       if (next === page) return;
       lookupUserGameplaySpins({ page: next, silent: true });
+    }
+
+    let ugpSpinJsonRawText = '';
+
+    function closeUgpSpinJsonModal() {
+      const modal = $('ugpSpinJsonModal');
+      if (modal) show(modal, false);
+      ugpSpinJsonRawText = '';
+    }
+
+    function prettySpinJson(raw) {
+      if (raw == null || raw === '') return '';
+      if (typeof raw === 'object') {
+        try { return JSON.stringify(raw, null, 2); } catch { return String(raw); }
+      }
+      const text = String(raw);
+      try {
+        return JSON.stringify(JSON.parse(text), null, 2);
+      } catch {
+        return text;
+      }
+    }
+
+    function parseSpinJsonObject(raw) {
+      if (raw == null || raw === '') return null;
+      if (typeof raw === 'object') return raw;
+      try { return JSON.parse(String(raw)); } catch { return null; }
+    }
+
+    function renderUgpSpinJsonSummary(meta, parsed) {
+      const el = $('ugpSpinJsonSummary');
+      if (!el) return;
+      const totalWin = parsed?.TotalWin ?? parsed?.totalWin;
+      const rng = parsed?.rngCategory ?? parsed?.RngCategory ?? '—';
+      const free = parsed?.IsFreeSpin ?? parsed?.isFreeSpin;
+      const reels = parsed?.Reels ?? parsed?.reels;
+      const reelCount = Array.isArray(reels) ? reels.length : '—';
+      const paylines = parsed?.PaylineWins ?? parsed?.paylineWins;
+      const payCount = Array.isArray(paylines) ? paylines.length : 0;
+      el.innerHTML =
+        '<div class="chart-stat ugp-stat-bet"><span>Bet</span><strong>$' + fmtMoney(meta.betAmount) + '</strong></div>' +
+        '<div class="chart-stat ugp-stat-win-' + (Number(meta.winAmount) > 0 ? 'up' : 'flat') + '"><span>Win</span><strong>$' +
+          fmtMoney(meta.winAmount ?? totalWin) + '</strong></div>' +
+        '<div class="chart-stat ugp-stat-user"><span>RNG</span><strong style="font-size:0.9rem">' + escHtml(String(rng)) + '</strong></div>' +
+        '<div class="chart-stat ugp-stat-id"><span>Reels</span><strong>' + escHtml(String(reelCount)) + '</strong></div>' +
+        '<div class="chart-stat"><span>Paylines</span><strong>' + fmtInt(payCount) + '</strong></div>' +
+        '<div class="chart-stat"><span>Type</span><strong>' + (free ? 'Free' : 'Paid') + '</strong></div>';
+    }
+
+    function showUgpSpinJsonModal(meta, rawJson) {
+      const modal = $('ugpSpinJsonModal');
+      const view = $('ugpSpinJsonView');
+      const title = $('ugpSpinJsonTitle');
+      const metaEl = $('ugpSpinJsonMeta');
+      if (!modal || !view) return;
+
+      const pretty = prettySpinJson(rawJson);
+      ugpSpinJsonRawText = pretty || String(rawJson || '');
+      if (title) title.textContent = (meta.gameName || 'Spin') + ' · #' + (meta.spinIndex ?? '—');
+      if (metaEl) {
+        metaEl.textContent = [
+          meta.createdAt ? fmtFeedbackDateTime(meta.createdAt) : '',
+          meta.requestId ? 'Request ' + meta.requestId : '',
+          meta.id ? 'Log ' + meta.id : '',
+        ].filter(Boolean).join(' · ');
+      }
+      renderUgpSpinJsonSummary(meta, parseSpinJsonObject(rawJson));
+      view.textContent = ugpSpinJsonRawText || 'No response_json for this spin.';
+      show(modal, true);
+    }
+
+    async function openUgpSpinJson(spinLogId, sourceIndex) {
+      const row = userGameplaySpinsData[Number(sourceIndex)] || null;
+      const meta = {
+        id: spinLogId || (row?.id ?? row?.Id ?? ''),
+        gameName: row?.gameName ?? row?.GameName ?? '',
+        spinIndex: row?.spinIndex ?? row?.SpinIndex ?? '',
+        createdAt: row?.createdAt ?? row?.CreatedAt ?? '',
+        requestId: row?.requestId ?? row?.RequestId ?? '',
+        betAmount: row?.betAmount ?? row?.BetAmount ?? 0,
+        winAmount: row?.winAmount ?? row?.WinAmount ?? 0,
+      };
+
+      if (isDemoMode()) {
+        showUgpSpinJsonModal(meta, row?._demoJson || null);
+        return;
+      }
+
+      if (!spinLogId) {
+        showUgpSpinJsonModal(meta, null);
+        return;
+      }
+
+      const view = $('ugpSpinJsonView');
+      const modal = $('ugpSpinJsonModal');
+      if (view) view.textContent = 'Loading…';
+      if (modal) show(modal, true);
+      if ($('ugpSpinJsonTitle')) $('ugpSpinJsonTitle').textContent = 'Spin response JSON';
+      if ($('ugpSpinJsonMeta')) $('ugpSpinJsonMeta').textContent = 'Loading ' + spinLogId + '…';
+      if ($('ugpSpinJsonSummary')) $('ugpSpinJsonSummary').innerHTML = '';
+
+      try {
+        const url = apiOrigin().replace(/\/$/, '') +
+          '/api/dashboard/internal/user-game-play/spins/' + encodeURIComponent(spinLogId) + '/json';
+        const res = await fetch(url, {
+          headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' },
+          cache: 'no-store',
+        });
+        const text = await res.text();
+        const json = parseSummaryResponse(res, text);
+        const data = json.data || json.Data || {};
+        showUgpSpinJsonModal({
+          id: data.id ?? data.Id ?? spinLogId,
+          gameName: data.gameName ?? data.GameName ?? meta.gameName,
+          spinIndex: data.spinIndex ?? data.SpinIndex ?? meta.spinIndex,
+          createdAt: data.createdAt ?? data.CreatedAt ?? meta.createdAt,
+          requestId: data.requestId ?? data.RequestId ?? meta.requestId,
+          betAmount: data.betAmount ?? data.BetAmount ?? meta.betAmount,
+          winAmount: data.winAmount ?? data.WinAmount ?? meta.winAmount,
+        }, data.responseJson ?? data.ResponseJson ?? null);
+      } catch (err) {
+        if (view) view.textContent = 'Failed to load JSON: ' + (err?.message || String(err));
+      }
+    }
+
+    async function copyUgpSpinJson() {
+      const text = ugpSpinJsonRawText || $('ugpSpinJsonView')?.textContent || '';
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = $('ugpSpinJsonCopyBtn');
+        if (btn) {
+          const prev = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(() => { btn.textContent = prev || 'Copy'; }, 1200);
+        }
+      } catch {
+        // ignore
+      }
     }
 
     function parseMaintenanceParts(value) {
@@ -6840,6 +7289,7 @@
     $('spinZoomOutBtn').addEventListener('click', () => zoomSpinChart(1.45, 0.5));
     $('spinZoomResetBtn').addEventListener('click', () => resetSpinChartZoom());
     $('spinDownloadReportBtn').addEventListener('click', () => downloadSessionSpinReport());
+    $('spinViewJsonBtn')?.addEventListener('click', () => openHoveredChartSpinJson());
     $('spinPanLeftBtn').addEventListener('click', () => panSpinChart(-1));
     $('spinPanRightBtn').addEventListener('click', () => panSpinChart(1));
     $('spinChartScroller').addEventListener('input', onSpinChartScrollerInput);
@@ -6848,9 +7298,26 @@
     $('spinChartScroller').addEventListener('touchend', onSpinChartScrollerEnd);
     $('spinChart').addEventListener('mousemove', onSpinChartPointerMove);
     $('spinChart').addEventListener('mousedown', onSpinChartPointerDown);
+    $('spinChart').addEventListener('click', onSpinChartClick);
     $('spinChart').addEventListener('mouseleave', () => {
       onSpinChartPointerUp();
+      // Keep tooltip if moving onto it (JSON button).
+      const tip = $('spinChartTooltip');
+      if (tip && !tip.classList.contains('hidden') && tip.matches(':hover')) return;
       hideSpinChartTooltip();
+    });
+    $('spinChartTooltip')?.addEventListener('mouseleave', () => {
+      hideSpinChartTooltip();
+    });
+    $('spinChartTooltip')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-chart-spin-json]');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const id = btn.getAttribute('data-chart-spin-json') || '';
+      const spin = activeChartSpins.find((s) => String(s.id ?? s.Id ?? '') === id)
+        || (hoveredSpinIndex >= 0 ? activeChartSpins[hoveredSpinIndex] : null);
+      if (spin) openChartSpinJson(spin);
     });
     window.addEventListener('mouseup', onSpinChartPointerUp);
     $('spinChart').addEventListener('wheel', onSpinChartWheel, { passive: false });
@@ -6914,6 +7381,22 @@
       renderUserGameplaySpinsTable();
     });
     $('userGameplaySpinsPager')?.addEventListener('click', handleUserGameplaySpinsPagerClick);
+    $('userGameplaySpinsWrap')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-ugp-spin-json]');
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      openUgpSpinJson(btn.getAttribute('data-ugp-spin-json') || '', btn.getAttribute('data-ugp-spin-idx') || '0');
+    });
+    $('ugpSpinJsonCloseBtn')?.addEventListener('click', () => closeUgpSpinJsonModal());
+    $('ugpSpinJsonCopyBtn')?.addEventListener('click', () => copyUgpSpinJson());
+    $('ugpSpinJsonModal')?.addEventListener('click', (e) => {
+      if (e.target === $('ugpSpinJsonModal')) closeUgpSpinJsonModal();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !$('ugpSpinJsonModal')?.classList.contains('hidden')) {
+        closeUgpSpinJsonModal();
+      }
+    });
 
     function initPage() {
       isDiffVisible = false;
