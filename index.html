@@ -1322,6 +1322,39 @@
     .ugp-val-rtp-mid { color: #ffb74d; font-weight: 700; font-variant-numeric: tabular-nums; }
     .ugp-val-rtp-low { color: #ef9a9a; font-weight: 700; font-variant-numeric: tabular-nums; }
     .ugp-val-spins { color: #b3d9ff; font-variant-numeric: tabular-nums; }
+    button.ugp-daily-spins-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin: 0;
+      padding: 0.2rem 0.45rem;
+      border: 1px solid rgba(100, 181, 246, 0.45);
+      border-radius: 6px;
+      background: rgba(66, 165, 245, 0.12);
+      color: #b3d9ff;
+      font: inherit;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button.ugp-daily-spins-link:hover:not(:disabled) {
+      background: rgba(66, 165, 245, 0.22);
+      border-color: rgba(100, 181, 246, 0.75);
+      color: #e3f2fd;
+    }
+    button.ugp-daily-spins-link:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    button.ugp-daily-spins-link svg {
+      width: 0.85rem;
+      height: 0.85rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
     .ugp-val-free { color: #ce93d8; font-variant-numeric: tabular-nums; }
     .badge.ugp-free { background: rgba(171, 71, 188, 0.2); color: #e1bee7; }
     .badge.ugp-paid { background: rgba(66, 165, 245, 0.15); color: #90caf9; }
@@ -2267,6 +2300,10 @@
             <div class="inline-field">
               <label for="userGameplaySpinsTo">To</label>
               <input type="date" id="userGameplaySpinsTo" />
+            </div>
+            <div class="inline-field" style="min-width: 220px; flex: 1.1;">
+              <label for="userGameplaySpinsGameId">Game ID</label>
+              <input type="search" id="userGameplaySpinsGameId" placeholder="Optional game filter" autocomplete="off" />
             </div>
             <div class="section-toolbar-actions">
               <button type="button" id="userGameplaySpinsLookupBtn">Lookup</button>
@@ -6013,6 +6050,17 @@
         const rtp = r.rtp ?? r.Rtp ?? 0;
         const spins = r.spins ?? r.Spins ?? 0;
         const winTone = ugpWinTone(bet, win);
+        const canOpen = !!userGameplayDailyMeta.userId && !!gid && !!date && Number(spins) > 0;
+        const spinsCell = canOpen
+          ? ('<button type="button" class="ugp-daily-spins-link" data-ugp-daily-spins="1"' +
+            ' data-game-id="' + escAttr(gid) + '"' +
+            ' data-date="' + escAttr(date) + '"' +
+            ' data-game-name="' + escAttr(name) + '"' +
+            ' title="' + escAttr('Open all spins for ' + name + ' on ' + date) + '"' +
+            ' aria-label="' + escAttr('Open ' + fmtInt(spins) + ' spins') + '">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>' +
+            '<span class="ugp-val-spins">' + fmtInt(spins) + '</span></button>')
+          : ('<span class="ugp-val-spins">' + fmtInt(spins) + '</span>');
         return '<tr>' +
           '<td>' + escHtml(date) + '</td>' +
           '<td>' + escHtml(name) + '</td>' +
@@ -6020,7 +6068,7 @@
           '<td>' + ugpMoneyCell(bet, 'bet') + '</td>' +
           '<td>' + ugpMoneyCell(win, winTone) + '</td>' +
           '<td>' + ugpRtpRatioCell(rtp) + '</td>' +
-          '<td><span class="ugp-val-spins">' + fmtInt(spins) + '</span></td>' +
+          '<td>' + spinsCell + '</td>' +
           '</tr>';
       }).join('');
       wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
@@ -6287,13 +6335,13 @@
       renderUserGameplaySpinsTable();
     }
 
-    async function fetchUserGameplaySpins(userId, from, to, page, pageSize) {
+    async function fetchUserGameplaySpins(userId, from, to, page, pageSize, gameId) {
       if (isDemoMode()) {
         const demo = [];
         for (let i = 1; i <= 12; i++) {
           demo.push({
             id: '00000000-0000-4000-8000-' + String(i).padStart(12, '0'),
-            gameId: '937BFB14-422B-439F-9119-DF8CD7579585',
+            gameId: gameId || '937BFB14-422B-439F-9119-DF8CD7579585',
             gameName: 'Demo Game',
             requestId: 'req-demo-' + i,
             balanceBefore: 1000 + i * 10,
@@ -6301,7 +6349,7 @@
             winAmount: i % 3 === 0 ? 5 : 0,
             balanceAfter: 1000 + i * 10 - 1.2 + (i % 3 === 0 ? 5 : 0),
             spinIndex: i,
-            createdAt: '2026-07-23T12:' + String(i).padStart(2, '0') + ':00',
+            createdAt: (from || '2026-07-23') + 'T12:' + String(i).padStart(2, '0') + ':00',
             isFreeSpin: i % 5 === 0,
             hasResponseJson: i % 2 === 0,
             _demoJson: i % 2 === 0 ? {
@@ -6333,6 +6381,7 @@
       params.set('pageSize', String(pageSize || 50));
       if (from) params.set('from', from);
       if (to) params.set('to', to);
+      if (gameId) params.set('gameId', gameId);
 
       const url = apiOrigin().replace(/\/$/, '') +
         '/api/dashboard/internal/user-game-play/spins?' + params.toString();
@@ -6361,23 +6410,60 @@
         return;
       }
 
-      const from = $('userGameplaySpinsFrom')?.value || '';
-      const to = $('userGameplaySpinsTo')?.value || '';
+      const from = opts.from != null ? opts.from : ($('userGameplaySpinsFrom')?.value || '');
+      const to = opts.to != null ? opts.to : ($('userGameplaySpinsTo')?.value || '');
+      const gameId = opts.gameId != null ? opts.gameId : (($('userGameplaySpinsGameId')?.value || '').trim());
       const page = Math.max(1, Number(opts.page || userGameplaySpinsMeta.page || 1));
       const pageSize = Number(userGameplaySpinsMeta.pageSize || 50);
       const btn = $('userGameplaySpinsLookupBtn');
       if (btn) btn.disabled = true;
       userGameplaySpinsLoading = true;
       try {
-        if (!opts.silent) clearUserGameplaySpinsUi('Looking up spins for ' + userId + '…');
-        const data = await fetchUserGameplaySpins(userId, from, to, page, pageSize);
+        if (!opts.silent) {
+          const label = gameId ? (userId + ' · game ' + gameId) : userId;
+          clearUserGameplaySpinsUi('Looking up spins for ' + label + '…');
+        }
+        const data = await fetchUserGameplaySpins(userId, from, to, page, pageSize, gameId);
         renderUserGameplaySpins(data);
+        if (opts.gameName || from || gameId) {
+          const hint = $('userGameplaySpinsHint');
+          if (hint) {
+            const bits = [];
+            if (opts.gameName) bits.push(opts.gameName);
+            else if (gameId) bits.push('game ' + gameId);
+            if (from && to && from === to) bits.push(from);
+            else if (from || to) bits.push((from || '…') + ' → ' + (to || '…'));
+            if (bits.length) {
+              hint.textContent = (hint.textContent || 'Results') + ' · filter: ' + bits.join(' · ');
+            }
+          }
+        }
       } catch (err) {
         clearUserGameplaySpinsUi('Lookup failed: ' + (err?.message || String(err)));
       } finally {
         userGameplaySpinsLoading = false;
         if (btn) btn.disabled = false;
       }
+    }
+
+    function openDailyRowSpins(gameId, date, gameName) {
+      const userId = (userGameplayDailyMeta.userId || $('userGameplayUserId')?.value || '').trim();
+      if (!userId || !gameId || !date) return;
+
+      if ($('userGameplaySpinsUserId')) $('userGameplaySpinsUserId').value = userId;
+      if ($('userGameplaySpinsFrom')) $('userGameplaySpinsFrom').value = date;
+      if ($('userGameplaySpinsTo')) $('userGameplaySpinsTo').value = date;
+      if ($('userGameplaySpinsGameId')) $('userGameplaySpinsGameId').value = gameId;
+      if ($('userGameplaySpinsSearch')) $('userGameplaySpinsSearch').value = '';
+
+      setUserGameplayTab('spins');
+      lookupUserGameplaySpins({
+        page: 1,
+        from: date,
+        to: date,
+        gameId: gameId,
+        gameName: gameName || '',
+      });
     }
 
     function handleUserGameplaySpinsPagerClick(e) {
@@ -7363,11 +7449,22 @@
     $('userGameplayDailySearch')?.addEventListener('input', () => {
       renderUserGameplayDailyTable();
     });
+    $('userGameplayDailyWrap')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-ugp-daily-spins]');
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      openDailyRowSpins(
+        btn.getAttribute('data-game-id') || '',
+        btn.getAttribute('data-date') || '',
+        btn.getAttribute('data-game-name') || ''
+      );
+    });
     $('userGameplaySpinsLookupBtn')?.addEventListener('click', () => lookupUserGameplaySpins({ page: 1 }));
     $('userGameplaySpinsClearBtn')?.addEventListener('click', () => {
       if ($('userGameplaySpinsUserId')) $('userGameplaySpinsUserId').value = '';
       if ($('userGameplaySpinsFrom')) $('userGameplaySpinsFrom').value = '';
       if ($('userGameplaySpinsTo')) $('userGameplaySpinsTo').value = '';
+      if ($('userGameplaySpinsGameId')) $('userGameplaySpinsGameId').value = '';
       if ($('userGameplaySpinsSearch')) $('userGameplaySpinsSearch').value = '';
       clearUserGameplaySpinsUi();
     });
