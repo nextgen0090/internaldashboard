@@ -67,18 +67,40 @@
     }
 
     header {
-      margin-bottom: 1.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      margin: 0 -1.5rem 1.75rem;
+      padding: 1.25rem 1.5rem 0.65rem;
+      background: var(--bg);
+      box-shadow: 0 12px 24px var(--bg);
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0.4rem;
+      width: 100vw;
+      transform: translateX(-50%);
+      background: var(--bg);
+      pointer-events: none;
     }
 
     .header-panel {
+      position: relative;
+      z-index: 1;
       padding: 1.35rem 1.5rem;
       border-radius: 18px;
       border: 1px solid var(--border-strong);
       background:
-        linear-gradient(135deg, rgba(66, 165, 245, 0.1), rgba(22, 30, 42, 0.92) 45%),
-        var(--card);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(12px);
+        linear-gradient(135deg, rgba(66, 165, 245, 0.14), #121820 42%),
+        #121820;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     .brand-row {
@@ -430,12 +452,15 @@
     }
 
     #userGameplayUserId,
-    #userGameplaySpinsUserId {
+    #userGameplaySpinsUserId,
+    #userGameplaySpinsGameId {
       min-width: min(360px, 70vw);
       max-width: 420px;
       width: 100%;
       padding-right: 2rem;
       font-size: 0.85rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: 0.01em;
     }
 
     .section-toolbar-inline .section-toolbar-actions {
@@ -963,6 +988,41 @@
       flex: 1;
     }
 
+    #userGameplayCard .drill-toolbar {
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      gap: 1rem;
+    }
+
+    #userGameplayCard .drill-toolbar h2 {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    #userGameplayCard .ugp-status-line {
+      flex: 0 1 420px;
+      max-width: min(420px, 38vw);
+      margin: 0.15rem 0 0;
+      padding: 0;
+      text-align: right;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: var(--muted);
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 1100px) {
+      #userGameplayCard .drill-toolbar {
+        flex-wrap: wrap;
+      }
+      #userGameplayCard .ugp-status-line {
+        flex: 1 1 100%;
+        max-width: none;
+        text-align: left;
+      }
+    }
+
     #drillOwnerTxToolbar {
       margin-bottom: 0.75rem;
     }
@@ -1063,9 +1123,43 @@
     }
 
     .user-gameplay-tab-btn.is-active {
-      border-color: rgba(100, 181, 246, 0.55);
-      background: rgba(100, 181, 246, 0.16);
-      color: #bbdefb;
+      border-color: rgba(100, 181, 246, 0.75);
+      background: rgba(66, 165, 245, 0.28);
+      color: #e3f2fd;
+      box-shadow: inset 0 0 0 1px rgba(100, 181, 246, 0.25);
+    }
+
+    body.mode-ugp #userGameplayCard .ugp-sticky-chrome {
+      top: var(--app-header-sticky-height, 0px);
+    }
+
+    #userGameplayCard {
+      overflow: visible;
+    }
+
+    #userGameplayCard .ugp-sticky-chrome {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin: -1.25rem -1.5rem 0.85rem;
+      padding: 1rem 1.5rem 1rem;
+      background: #121820;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    #userGameplayCard .ugp-sticky-chrome .drill-toolbar {
+      margin-bottom: 0;
+    }
+
+    #userGameplayCard .ugp-sticky-chrome .ugp-tab-row,
+    #userGameplayCard .ugp-sticky-chrome .section-toolbar-inline {
+      margin-bottom: 0;
+      flex-wrap: wrap;
+      row-gap: 0.65rem;
     }
 
     .badge-tx-generated {
@@ -2207,6 +2301,7 @@
       </div>
 
       <section class="card hidden" id="userGameplayCard">
+        <div class="ugp-sticky-chrome">
         <div class="drill-toolbar">
           <button type="button" class="secondary" id="userGameplayHomeBtn">← Home</button>
           <h2>
@@ -2227,9 +2322,11 @@
                 <div class="ugp-info-legend-row"><span>Free / Paid</span><span><span class="ugp-swatch free">Purple</span> / <span class="ugp-swatch paid">Blue</span></span></div>
               </div>
             </span>
+            <span class="feedback-tz-clock" id="ugpTzClock" title="Compare server (US Eastern) time with your browser local time"></span>
           </h2>
+          <p class="diff-meta ugp-status-line" id="userGameplayStatus">Enter a username to run dbo.GetUserGamePlaySummary.</p>
         </div>
-        <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.75rem;">
+        <div class="section-toolbar section-toolbar-inline ugp-tab-row">
           <div class="inline-field">
             <label>Type</label>
             <div class="owner-tx-type-btns" role="group" aria-label="User game play type">
@@ -2240,8 +2337,7 @@
           </div>
         </div>
 
-        <div id="userGameplaySummaryPanel">
-          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+        <div id="userGameplaySummaryToolbar" class="section-toolbar section-toolbar-inline">
             <div class="inline-field">
               <label for="userGameplayName">Username</label>
               <input type="search" id="userGameplayName" placeholder="e.g. g292siumap" autocomplete="off" />
@@ -2254,14 +2350,9 @@
               <label for="userGameplaySearch">Search games</label>
               <input type="search" id="userGameplaySearch" placeholder="Game, RTP, spins…" autocomplete="off" />
             </div>
-          </div>
-          <p class="diff-meta" id="userGameplayHint">Enter a username to run <code>dbo.GetUserGamePlaySummary</code>.</p>
-          <div class="chart-summary hidden" id="userGameplaySummary"></div>
-          <div class="table-wrap tall smooth-update" id="userGameplayGamesWrap"></div>
         </div>
 
-        <div id="userGameplayDailyPanel" class="hidden">
-          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+        <div id="userGameplayDailyToolbar" class="section-toolbar section-toolbar-inline hidden">
             <div class="inline-field" style="min-width: 280px; flex: 1.4;">
               <label for="userGameplayUserId">User ID</label>
               <input type="search" id="userGameplayUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" />
@@ -2282,13 +2373,9 @@
               <label for="userGameplayDailySearch">Search</label>
               <input type="search" id="userGameplayDailySearch" placeholder="Game, date, RTP, spins…" autocomplete="off" />
             </div>
-          </div>
-          <p class="diff-meta" id="userGameplayDailyHint">Enter a user ID to load daily Bet / Win / RTP from <code>game_spin_logs</code>.</p>
-          <div class="table-wrap tall smooth-update" id="userGameplayDailyWrap"></div>
         </div>
 
-        <div id="userGameplaySpinsPanel" class="hidden">
-          <div class="section-toolbar section-toolbar-inline" style="margin-bottom: 0.85rem;">
+        <div id="userGameplaySpinsToolbar" class="section-toolbar section-toolbar-inline hidden">
             <div class="inline-field" style="min-width: 280px; flex: 1.4;">
               <label for="userGameplaySpinsUserId">User ID</label>
               <input type="search" id="userGameplaySpinsUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" />
@@ -2301,9 +2388,9 @@
               <label for="userGameplaySpinsTo">To</label>
               <input type="date" id="userGameplaySpinsTo" />
             </div>
-            <div class="inline-field" style="min-width: 220px; flex: 1.1;">
+            <div class="inline-field" style="min-width: 360px; flex: 1.2;">
               <label for="userGameplaySpinsGameId">Game ID</label>
-              <input type="search" id="userGameplaySpinsGameId" placeholder="Optional game filter" autocomplete="off" />
+              <input type="search" id="userGameplaySpinsGameId" placeholder="Optional game GUID filter" autocomplete="off" spellcheck="false" />
             </div>
             <div class="section-toolbar-actions">
               <button type="button" id="userGameplaySpinsLookupBtn">Lookup</button>
@@ -2313,8 +2400,19 @@
               <label for="userGameplaySpinsSearch">Search</label>
               <input type="search" id="userGameplaySpinsSearch" placeholder="Game, bet, win, index…" autocomplete="off" />
             </div>
-          </div>
-          <p class="diff-meta" id="userGameplaySpinsHint">Enter a user ID to load spin rows from <code>game_spin_logs</code> (ordered by created_at).</p>
+        </div>
+        </div>
+
+        <div id="userGameplaySummaryPanel">
+          <div class="chart-summary hidden" id="userGameplaySummary"></div>
+          <div class="table-wrap tall smooth-update" id="userGameplayGamesWrap"></div>
+        </div>
+
+        <div id="userGameplayDailyPanel" class="hidden">
+          <div class="table-wrap tall smooth-update" id="userGameplayDailyWrap"></div>
+        </div>
+
+        <div id="userGameplaySpinsPanel" class="hidden">
           <div class="pager-bar" id="userGameplaySpinsPager"></div>
           <div class="table-wrap tall smooth-update" id="userGameplaySpinsWrap"></div>
         </div>
@@ -3103,8 +3201,6 @@
     }
 
     function updateFeedbackTimezoneClock() {
-      const el = $('feedbackTzClock');
-      if (!el) return;
       const now = new Date();
       const usNow = formatClockInZone(now, FEEDBACK_US_TZ);
       const localNow = now.toLocaleString(undefined, {
@@ -3115,7 +3211,11 @@
         hour12: true,
       });
       const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
-      el.textContent = 'Now · US (Eastern): ' + usNow + '  ·  Local (' + localTz + '): ' + localNow;
+      const text = 'Now · US (Eastern): ' + usNow + '  ·  Local (' + localTz + '): ' + localNow;
+      const feedbackEl = $('feedbackTzClock');
+      if (feedbackEl) feedbackEl.textContent = text;
+      const ugpEl = $('ugpTzClock');
+      if (ugpEl) ugpEl.textContent = text;
     }
 
     let feedbackTzClockTimer = null;
@@ -3677,6 +3777,12 @@
       else $('userGameplayName')?.focus();
     }
 
+    function syncStickyHeaderOffset() {
+      const headerEl = document.querySelector('.wrap > header');
+      const height = headerEl ? Math.ceil(headerEl.getBoundingClientRect().height) : 0;
+      document.documentElement.style.setProperty('--app-header-sticky-height', height + 'px');
+    }
+
     function setDashboardViewMode() {
       const inDrillMode = drillStack.length > 0;
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
@@ -3687,6 +3793,7 @@
       show($('drillDownCard'), inDrillMode);
       show($('maintenanceCard'), inMaintenanceMode);
       show($('userGameplayCard'), inUserGameplayMode);
+      document.body.classList.toggle('mode-ugp', inUserGameplayMode);
       if (!inDrillMode || drillStack[drillStack.length - 1]?.type !== 'owner-transactions') {
         show($('drillOwnerTxToolbar'), false);
       }
@@ -3696,6 +3803,7 @@
         if (jsonBtn) jsonBtn.textContent = 'Show JSON';
       }
       updateControlsHighlight();
+      requestAnimationFrame(syncStickyHeaderOffset);
     }
 
     function updateControlsHighlight() {
@@ -4857,7 +4965,8 @@
         '<div class="chart-tooltip-row"><span>Bet</span><b>$' + escHtml(fmtMoney(spin.betAmount ?? spin.BetAmount)) + '</b></div>' +
         '<div class="chart-tooltip-row"><span>Win</span><b>$' + escHtml(fmtMoney(spin.winAmount ?? spin.WinAmount)) + '</b></div>' +
         '<div class="chart-tooltip-row"><span>Balance</span><b>$' + escHtml(fmtMoney(spin.balanceAfter ?? spin.BalanceAfter)) + '</b></div>' +
-        '<div class="chart-tooltip-row"><span>Time</span><b>' + escHtml(fmtFeedbackDateTime(spin.createdAt ?? spin.CreatedAt)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Time (US)</span><b>' + escHtml(fmtFeedbackDateTimeUs(spin.createdAt ?? spin.CreatedAt)) + '</b></div>' +
+        '<div class="chart-tooltip-row"><span>Time (Local)</span><b>' + escHtml(fmtFeedbackDateTimeLocal(spin.createdAt ?? spin.CreatedAt)) + '</b></div>' +
         '<div class="chart-tooltip-row"><span>JSON</span><b>' + (hasJson ? 'Available' : 'None') + '</b></div>' +
         (hasJson
           ? '<button type="button" class="ugp-spin-json-btn" data-chart-spin-json="' + escAttr(spinId) +
@@ -5753,7 +5862,7 @@
     function clearUserGameplayUi(message) {
       userGameplayGamesData = [];
       userGameplayLastUserName = '';
-      const hint = $('userGameplayHint');
+      const hint = $('userGameplayStatus');
       if (hint) hint.textContent = message || 'Enter a username to run dbo.GetUserGamePlaySummary.';
       const summary = $('userGameplaySummary');
       if (summary) {
@@ -5785,7 +5894,7 @@
       if (!filtered.length) {
         wrap.innerHTML = '<p class="diff-meta">No games match "' + escHtml(String(search).trim()) + '".</p>';
         setRowCount('countUserGameplay', []);
-        const hint = $('userGameplayHint');
+        const hint = $('userGameplayStatus');
         if (hint && userGameplayLastUserName) {
           hint.textContent = 'Results for ' + userGameplayLastUserName + ' · 0 of ' + total + ' games';
         }
@@ -5813,7 +5922,7 @@
       wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
       setRowCount('countUserGameplay', filtered);
 
-      const hint = $('userGameplayHint');
+      const hint = $('userGameplayStatus');
       if (hint && userGameplayLastUserName) {
         const q = String(search).trim();
         hint.textContent = q
@@ -5825,7 +5934,7 @@
     function renderUserGameplay(data) {
       const summary = data?.summary || data?.Summary || null;
       const games = data?.games || data?.Games || [];
-      const hint = $('userGameplayHint');
+      const hint = $('userGameplayStatus');
       const summaryEl = $('userGameplaySummary');
       const rootUserId = data?.userId || data?.UserId || summary?.userId || summary?.UserId || '';
 
@@ -5935,6 +6044,9 @@
       document.querySelectorAll('.user-gameplay-tab-btn').forEach((btn) => {
         btn.classList.toggle('is-active', btn.dataset.ugpTab === userGameplayActiveTab);
       });
+      show($('userGameplaySummaryToolbar'), userGameplayActiveTab === 'summary');
+      show($('userGameplayDailyToolbar'), userGameplayActiveTab === 'daily');
+      show($('userGameplaySpinsToolbar'), userGameplayActiveTab === 'spins');
       show($('userGameplaySummaryPanel'), userGameplayActiveTab === 'summary');
       show($('userGameplayDailyPanel'), userGameplayActiveTab === 'daily');
       show($('userGameplaySpinsPanel'), userGameplayActiveTab === 'spins');
@@ -5950,14 +6062,29 @@
       }
 
       if (userGameplayActiveTab === 'summary') {
-        setRowCount('countUserGameplay', filterUserGameplayGames(userGameplayGamesData, $('userGameplaySearch')?.value || ''));
+        if (userGameplayGamesData.length) renderUserGameplayGamesTable();
+        else {
+          const st = $('userGameplayStatus');
+          if (st) st.textContent = 'Enter a username to run dbo.GetUserGamePlaySummary.';
+          setRowCount('countUserGameplay', []);
+        }
         $('userGameplayName')?.focus();
       } else if (userGameplayActiveTab === 'daily') {
-        setRowCount('countUserGameplay', filterUserGameplayDailyRows(userGameplayDailyData, $('userGameplayDailySearch')?.value || ''));
+        if (userGameplayDailyData.length) renderUserGameplayDailyTable();
+        else {
+          const st = $('userGameplayStatus');
+          if (st) st.textContent = 'Enter a user ID to load daily Bet / Win / RTP from game_spin_logs.';
+          setRowCount('countUserGameplay', []);
+        }
         $('userGameplayUserId')?.focus();
       } else {
-        const filtered = filterUserGameplaySpinsRows(userGameplaySpinsData, $('userGameplaySpinsSearch')?.value || '');
-        setRowCount('countUserGameplay', filtered);
+        if (userGameplaySpinsData.length || Number(userGameplaySpinsMeta.totalCount || 0) > 0) {
+          renderUserGameplaySpinsTable();
+        } else {
+          const st = $('userGameplayStatus');
+          if (st) st.textContent = 'Enter a user ID to load spin rows from game_spin_logs.';
+          setRowCount('countUserGameplay', []);
+        }
         $('userGameplaySpinsUserId')?.focus();
       }
     }
@@ -6005,7 +6132,7 @@
     function clearUserGameplayDailyUi(message) {
       userGameplayDailyData = [];
       userGameplayDailyMeta = { userId: '', userName: '' };
-      const hint = $('userGameplayDailyHint');
+      const hint = $('userGameplayStatus');
       if (hint) hint.textContent = message || 'Enter a user ID to load daily Bet / Win / RTP from game_spin_logs.';
       const searchWrap = $('userGameplayDailySearchWrap');
       if (searchWrap) show(searchWrap, false);
@@ -6035,7 +6162,7 @@
       if (!filtered.length) {
         wrap.innerHTML = '<p class="diff-meta">No rows match "' + escHtml(String(search).trim()) + '".</p>';
         if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', []);
-        const hint = $('userGameplayDailyHint');
+        const hint = $('userGameplayStatus');
         if (hint && label) hint.textContent = 'Results for ' + label + ' · 0 of ' + total + ' rows';
         return;
       }
@@ -6074,7 +6201,7 @@
       wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
       if (userGameplayActiveTab === 'daily') setRowCount('countUserGameplay', filtered);
 
-      const hint = $('userGameplayDailyHint');
+      const hint = $('userGameplayStatus');
       if (hint && label) {
         const q = String(search).trim();
         hint.textContent = q
@@ -6093,7 +6220,7 @@
       const searchWrap = $('userGameplayDailySearchWrap');
       if (searchWrap) show(searchWrap, rows.length > 0);
 
-      const hint = $('userGameplayDailyHint');
+      const hint = $('userGameplayStatus');
       const label = userName ? userName + ' (' + userId + ')' : userId;
       if (!rows.length) {
         if (hint) hint.textContent = 'No daily spin data for ' + (label || 'this user') + '.';
@@ -6207,7 +6334,7 @@
     function clearUserGameplaySpinsUi(message) {
       userGameplaySpinsData = [];
       userGameplaySpinsMeta = { userId: '', userName: '', page: 1, pageSize: 50, totalCount: 0 };
-      const hint = $('userGameplaySpinsHint');
+      const hint = $('userGameplayStatus');
       if (hint) hint.textContent = message || 'Enter a user ID to load spin rows from game_spin_logs (ordered by created_at).';
       const searchWrap = $('userGameplaySpinsSearchWrap');
       if (searchWrap) show(searchWrap, false);
@@ -6283,7 +6410,7 @@
         // Keep a stable index into userGameplaySpinsData for demo fallback.
         const sourceIndex = userGameplaySpinsData.indexOf(r);
         return '<tr>' +
-          '<td>' + escHtml(fmtFeedbackDateTime(created)) + '</td>' +
+          '<td>' + renderFeedbackDateHtml(created) + '</td>' +
           '<td>' + escHtml(name) + '</td>' +
           '<td><span class="ugp-val-spins">' + fmtInt(spinIdx) + '</span></td>' +
           '<td><span class="ugp-val-bet">$' + fmtMoney(before) + '</span></td>' +
@@ -6305,7 +6432,7 @@
       wrap.innerHTML = '<table><thead>' + head + '</thead><tbody>' + body + '</tbody></table>';
       if (userGameplayActiveTab === 'spins') setRowCount('countUserGameplay', filtered);
 
-      const hint = $('userGameplaySpinsHint');
+      const hint = $('userGameplayStatus');
       if (hint && label) {
         const q = String(search).trim();
         const total = Number(userGameplaySpinsMeta.totalCount || 0);
@@ -6426,7 +6553,7 @@
         const data = await fetchUserGameplaySpins(userId, from, to, page, pageSize, gameId);
         renderUserGameplaySpins(data);
         if (opts.gameName || from || gameId) {
-          const hint = $('userGameplaySpinsHint');
+          const hint = $('userGameplayStatus');
           if (hint) {
             const bits = [];
             if (opts.gameName) bits.push(opts.gameName);
@@ -6541,7 +6668,9 @@
       if (title) title.textContent = (meta.gameName || 'Spin') + ' · #' + (meta.spinIndex ?? '—');
       if (metaEl) {
         metaEl.textContent = [
-          meta.createdAt ? fmtFeedbackDateTime(meta.createdAt) : '',
+          meta.createdAt
+            ? ('US: ' + fmtFeedbackDateTimeUs(meta.createdAt) + ' · Local: ' + fmtFeedbackDateTimeLocal(meta.createdAt))
+            : '',
           meta.requestId ? 'Request ' + meta.requestId : '',
           meta.id ? 'Log ' + meta.id : '',
         ].filter(Boolean).join(' · ');
@@ -7408,11 +7537,17 @@
     window.addEventListener('mouseup', onSpinChartPointerUp);
     $('spinChart').addEventListener('wheel', onSpinChartWheel, { passive: false });
     window.addEventListener('resize', () => {
+      syncStickyHeaderOffset();
       if (drillStack[drillStack.length - 1]?.type === 'spins') {
         hideSpinChartTooltip();
         renderSpinChart(activeChartSpins);
       }
     });
+    syncStickyHeaderOffset();
+    const stickyHeaderEl = document.querySelector('.wrap > header');
+    if (stickyHeaderEl && typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => syncStickyHeaderOffset()).observe(stickyHeaderEl);
+    }
 
     $('userGameplayLookupBtn')?.addEventListener('click', () => lookupUserGameplay());
     $('userGameplayClearBtn')?.addEventListener('click', () => {
@@ -7473,6 +7608,14 @@
         e.preventDefault();
         lookupUserGameplaySpins({ page: 1 });
       }
+    });
+    ['userGameplaySpinsFrom', 'userGameplaySpinsTo', 'userGameplaySpinsGameId'].forEach((id) => {
+      $(id)?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          lookupUserGameplaySpins({ page: 1 });
+        }
+      });
     });
     $('userGameplaySpinsSearch')?.addEventListener('input', () => {
       renderUserGameplaySpinsTable();
