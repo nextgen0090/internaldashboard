@@ -1271,6 +1271,91 @@
       color: var(--muted);
     }
 
+    .maint-duration-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.45rem;
+      margin-top: 0.65rem;
+    }
+
+    .maint-duration-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.15rem;
+    }
+
+    .maint-duration-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .maint-duration-btn {
+      min-width: 2.75rem;
+      min-height: 1.85rem;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .maint-duration-btn.is-active {
+      background: rgba(66, 165, 245, 0.28);
+      border-color: rgba(66, 165, 245, 0.65);
+      color: #e3f2fd;
+      box-shadow: none;
+    }
+
+    .maint-confirm-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(4, 8, 14, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .maint-confirm-modal.hidden { display: none; }
+
+    .maint-confirm-card {
+      width: min(420px, 94vw);
+      border-radius: 14px;
+      border: 1px solid rgba(100, 181, 246, 0.35);
+      background: rgba(14, 20, 30, 0.98);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      padding: 1.15rem 1.25rem 1.2rem;
+    }
+
+    .maint-confirm-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .maint-confirm-card p {
+      margin: 0.55rem 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .maint-confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.55rem;
+      margin-top: 1.15rem;
+    }
+
+    .maint-confirm-actions button {
+      min-width: 5.5rem;
+    }
+
     @media (max-width: 900px) {
       .maint-field-type,
       .maint-field-time {
@@ -2141,6 +2226,17 @@
 
     <div class="toast hidden" id="loadToast"></div>
 
+    <div class="maint-confirm-modal hidden" id="maintConfirmModal" role="dialog" aria-modal="true" aria-labelledby="maintConfirmTitle">
+      <div class="maint-confirm-card">
+        <h3 id="maintConfirmTitle">Confirm Save</h3>
+        <p id="maintConfirmMessage">Save maintenance settings?</p>
+        <div class="maint-confirm-actions">
+          <button type="button" class="secondary" id="maintConfirmNoBtn">No</button>
+          <button type="button" id="maintConfirmYesBtn">Yes</button>
+        </div>
+      </div>
+    </div>
+
     <div class="error hidden" id="fetchError"></div>
 
     <section id="dashboard" class="hidden">
@@ -2475,6 +2571,18 @@
             <div class="maint-actions">
               <button type="button" id="maintSaveBtn">Save</button>
               <button type="button" class="secondary" id="maintClearBtn">Turn Off</button>
+            </div>
+          </div>
+          <div class="maint-duration-row">
+            <span class="maint-duration-label">Duration</span>
+            <div class="maint-duration-btns" role="group" aria-label="Maintenance duration presets">
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="1">1h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="2">2h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="4">4h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="6">6h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="12">12h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="24">24h</button>
+              <button type="button" class="secondary maint-duration-btn" data-maint-hours="48">48h</button>
             </div>
           </div>
           <p class="maint-hint" id="maintHint">Select a row, set times (24h), then Save — or Turn Off.</p>
@@ -5407,6 +5515,12 @@
             : '<span class="cell-empty">—</span>',
         },
         {
+          label: 'Before',
+          render: (r) => String(r.type || '').toLowerCase() === 'generated'
+            ? '<span class="cell-empty">—</span>'
+            : ('$' + fmtMoney(r.before)),
+        },
+        {
           label: 'Amount',
           render: (r) => {
             const lower = String(r.type || '').toLowerCase();
@@ -5417,12 +5531,6 @@
                 : 'kpi-recharge';
             return '<span class="' + cls + '">$' + fmtMoney(r.amount) + '</span>';
           },
-        },
-        {
-          label: 'Before',
-          render: (r) => String(r.type || '').toLowerCase() === 'generated'
-            ? '<span class="cell-empty">—</span>'
-            : ('$' + fmtMoney(r.before)),
         },
         {
           label: 'After',
@@ -6792,22 +6900,58 @@
     function clearMaintenanceDateTime(prefix) {
       if ($(prefix + 'Date')) $(prefix + 'Date').value = '';
       if ($(prefix + 'Time')) $(prefix + 'Time').value = '';
+      clearMaintDurationSelection();
     }
 
-    function setMaintenanceFieldToNow(prefix) {
-      const now = new Date();
+    function writeMaintenanceDateTime(prefix, date) {
       const pad = (n) => String(n).padStart(2, '0');
       if ($(prefix + 'Date')) {
         $(prefix + 'Date').value =
-          now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+          date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
       }
       if ($(prefix + 'Time')) {
-        $(prefix + 'Time').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
+        $(prefix + 'Time').value = pad(date.getHours()) + ':' + pad(date.getMinutes());
       }
+    }
+
+    function clearMaintDurationSelection() {
+      document.querySelectorAll('.maint-duration-btn.is-active').forEach((btn) => {
+        btn.classList.remove('is-active');
+      });
+    }
+
+    function setMaintenanceDuration(hours) {
+      const hrs = Number(hours);
+      if (!Number.isFinite(hrs) || hrs <= 0) return;
+      const start = new Date();
+      const end = new Date(start.getTime() + hrs * 60 * 60 * 1000);
+      writeMaintenanceDateTime('maintStart', start);
+      writeMaintenanceDateTime('maintEnd', end);
+      selectedMaintenanceType = String($('maintType')?.value || 'Backend');
+      document.querySelectorAll('.maint-duration-btn').forEach((btn) => {
+        btn.classList.toggle('is-active', Number(btn.getAttribute('data-maint-hours')) === hrs);
+      });
+      renderMaintenanceTable();
+      if ($('maintHint')) {
+        const type = $('maintType')?.value || 'Backend';
+        const pad = (n) => String(n).padStart(2, '0');
+        $('maintHint').textContent =
+          'Editing ' + type + ' · ' + hrs + 'h window · ' +
+          pad(start.getHours()) + ':' + pad(start.getMinutes()) +
+          ' → ' +
+          pad(end.getHours()) + ':' + pad(end.getMinutes());
+      }
+    }
+
+    function setMaintenanceFieldToNow(prefix) {
+      writeMaintenanceDateTime(prefix, new Date());
+      clearMaintDurationSelection();
       selectedMaintenanceType = String($('maintType')?.value || 'Backend');
       renderMaintenanceTable();
       if ($('maintHint')) {
         const type = $('maintType')?.value || 'Backend';
+        const pad = (n) => String(n).padStart(2, '0');
+        const now = new Date();
         $('maintHint').textContent =
           'Editing ' + type + ' · ' + (prefix === 'maintStart' ? 'start' : 'end') +
           ' set to ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' (24h)';
@@ -6823,6 +6967,7 @@
       if (!highlightOnly) {
         setMaintenanceDateTime('maintStart', row.startTime ?? row.StartTime);
         setMaintenanceDateTime('maintEnd', row.endTime ?? row.EndTime);
+        clearMaintDurationSelection();
       }
       if ($('maintHint')) {
         $('maintHint').textContent = enabled
@@ -6926,6 +7071,41 @@
       }
     }
 
+    function closeMaintConfirmModal() {
+      const modal = $('maintConfirmModal');
+      if (modal) show(modal, false);
+    }
+
+    function openMaintConfirmModal() {
+      const type = $('maintType')?.value || 'Backend';
+      const startValue = getMaintenanceDateTime('maintStart');
+      const endValue = getMaintenanceDateTime('maintEnd');
+
+      if (!startValue) {
+        setError('Start date and 24h time (HH:mm) are required when enabling maintenance.');
+        return;
+      }
+      if (($('maintStartTime')?.value || '').trim() && !normalizeTime24h($('maintStartTime').value)) {
+        setError('Start time must be 24-hour HH:mm (e.g. 21:05).');
+        return;
+      }
+      if (($('maintEndTime')?.value || '').trim() && !normalizeTime24h($('maintEndTime').value)) {
+        setError('End time must be 24-hour HH:mm (e.g. 21:05).');
+        return;
+      }
+
+      setError('');
+      const msg = $('maintConfirmMessage');
+      if (msg) {
+        const startText = startValue || '—';
+        const endText = endValue || 'no end';
+        msg.textContent =
+          'Turn ON maintenance for ' + type + ' from ' + startText + ' to ' + endText + '?';
+      }
+      const modal = $('maintConfirmModal');
+      if (modal) show(modal, true);
+    }
+
     async function saveMaintenanceSetting({ turnOff = false } = {}) {
       const type = $('maintType')?.value || 'Backend';
       selectedMaintenanceType = String(type);
@@ -6966,6 +7146,8 @@
           };
         });
         renderMaintenanceTable();
+        clearMaintenanceDateTime('maintStart');
+        clearMaintenanceDateTime('maintEnd');
         showLoadToast('Demo maintenance saved for ' + type);
         return;
       }
@@ -7000,6 +7182,8 @@
         }
         showLoadToast((isOn ? 'Maintenance ON' : 'Maintenance OFF') + ' · ' + type);
         await loadMaintenanceSettings();
+        clearMaintenanceDateTime('maintStart');
+        clearMaintenanceDateTime('maintEnd');
       } catch (err) {
         setError(err.message || 'Failed to save maintenance setting');
       } finally {
@@ -7262,12 +7446,23 @@
       goHome();
     });
     $('maintenanceReloadBtn')?.addEventListener('click', () => loadMaintenanceSettings());
-    $('maintSaveBtn')?.addEventListener('click', () => saveMaintenanceSetting({ turnOff: false }));
+    $('maintSaveBtn')?.addEventListener('click', () => openMaintConfirmModal());
+    $('maintConfirmYesBtn')?.addEventListener('click', () => {
+      closeMaintConfirmModal();
+      saveMaintenanceSetting({ turnOff: false });
+    });
+    $('maintConfirmNoBtn')?.addEventListener('click', () => closeMaintConfirmModal());
+    $('maintConfirmModal')?.addEventListener('click', (e) => {
+      if (e.target === $('maintConfirmModal')) closeMaintConfirmModal();
+    });
     $('maintType')?.addEventListener('change', () => {
       selectMaintenanceType($('maintType').value);
     });
     $('maintStartNowBtn')?.addEventListener('click', () => setMaintenanceFieldToNow('maintStart'));
     $('maintEndNowBtn')?.addEventListener('click', () => setMaintenanceFieldToNow('maintEnd'));
+    document.querySelectorAll('.maint-duration-btn').forEach((btn) => {
+      btn.addEventListener('click', () => setMaintenanceDuration(btn.getAttribute('data-maint-hours')));
+    });
     $('maintStartTime')?.addEventListener('blur', () => {
       const normalized = normalizeTime24h($('maintStartTime').value);
       if (normalized) $('maintStartTime').value = normalized;
@@ -7633,7 +7828,12 @@
       if (e.target === $('ugpSpinJsonModal')) closeUgpSpinJsonModal();
     });
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !$('ugpSpinJsonModal')?.classList.contains('hidden')) {
+      if (e.key !== 'Escape') return;
+      if (!$('maintConfirmModal')?.classList.contains('hidden')) {
+        closeMaintConfirmModal();
+        return;
+      }
+      if (!$('ugpSpinJsonModal')?.classList.contains('hidden')) {
         closeUgpSpinJsonModal();
       }
     });
