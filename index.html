@@ -5362,23 +5362,23 @@
       return [
         {
           type: 'Recharge', id: 'd1', ticket: 'T-1001', actor: 'cashier', account: 'player_alpha',
-          date: '2026-07-23T10:00:00', amount: 100, before: 50, after: 150, cashier: 'store1', remark: 'Demo top-up',
+          date: '2026-07-23T10:00:00', amount: 100, before: 50, after: 150, currentCoin: 110, cashier: 'store1', remark: 'Demo top-up',
         },
         {
           type: 'Redeem', id: 'd2', ticket: 'T-1002', actor: 'cashier', account: 'player_alpha',
-          date: '2026-07-22T16:30:00', amount: 40, before: 150, after: 110, cashier: 'store1', remark: 'Demo cashout',
+          date: '2026-07-22T16:30:00', amount: 40, before: 150, after: 110, currentCoin: 110, cashier: 'store1', remark: 'Demo cashout',
         },
         {
           type: 'Recharge', id: 'd3', ticket: 'T-1003', actor: 'player', account: 'player_beta',
-          date: '2026-07-21T09:15:00', amount: 200, before: 0, after: 200, cashier: 'owner', remark: '',
+          date: '2026-07-21T09:15:00', amount: 200, before: 0, after: 200, currentCoin: 125, cashier: 'owner', remark: '',
         },
         {
           type: 'Redeem', id: 'd4', ticket: 'T-1004', actor: 'cashier', account: 'player_beta',
-          date: '2026-07-20T12:00:00', amount: 75, before: 200, after: 125, cashier: 'store2', remark: '',
+          date: '2026-07-20T12:00:00', amount: 75, before: 200, after: 125, currentCoin: 125, cashier: 'store2', remark: '',
         },
         {
           type: 'Generated', id: 'd5', ticket: 'GC-1005', actor: 'owner', account: 'owner',
-          date: '2026-07-19T08:00:00', amount: 5000, before: 0, after: 0, cashier: 'owner', remark: 'Demo coin generate',
+          date: '2026-07-19T08:00:00', amount: 5000, before: 0, after: 0, currentCoin: 50000, cashier: 'owner', remark: 'Demo coin generate',
         },
       ];
     }
@@ -5489,6 +5489,7 @@
         amount: r.amount ?? r.Amount ?? 0,
         before: r.before ?? r.Before ?? 0,
         after: r.after ?? r.After ?? 0,
+        currentCoin: r.currentCoin ?? r.CurrentCoin ?? null,
         cashier: r.cashier ?? r.Cashier ?? '',
         remark: r.remark ?? r.Remark ?? '',
       }));
@@ -5537,6 +5538,12 @@
           render: (r) => String(r.type || '').toLowerCase() === 'generated'
             ? '<span class="cell-empty">—</span>'
             : ('$' + fmtMoney(r.after)),
+        },
+        {
+          label: 'Current coin',
+          render: (r) => (r.currentCoin == null || r.currentCoin === '')
+            ? '<span class="cell-empty">—</span>'
+            : ('$' + fmtMoney(r.currentCoin)),
         },
         { label: 'Actor', key: 'actor' },
         { label: 'Cashier', key: 'cashier' },
