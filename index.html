@@ -230,8 +230,14 @@
       transition: opacity 0.28s ease;
     }
 
-    .row-count.is-updating {
-      opacity: 0.45;
+    .row-count.notlive-count {
+      color: #f0b27a;
+      border-color: rgba(243, 156, 18, 0.35);
+    }
+
+    .row-count.live-count {
+      color: #7dcea0;
+      border-color: rgba(46, 204, 113, 0.35);
     }
 
     .section-nav {
@@ -393,6 +399,10 @@
 
     .section-header-row h2 {
       margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem;
     }
 
     .section-header-row h2::before {
@@ -868,6 +878,8 @@
     }
 
     #targetRtpFilter,
+    #targetGameTitleFilter,
+    #targetGameLiveFilter,
     #feedbackStarFilter,
     #rtpByGameTargetFilter,
     #gamesAboveTargetFilter,
@@ -877,6 +889,8 @@
     }
 
     #targetRtpFilter:focus,
+    #targetGameTitleFilter:focus,
+    #targetGameLiveFilter:focus,
     #feedbackStarFilter:focus,
     #rtpByGameTargetFilter:focus,
     #gamesAboveTargetFilter:focus,
@@ -2142,6 +2156,368 @@
       color: #b3d9ff;
     }
 
+    .server-log-view {
+      margin: 0;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0a0e12;
+      overflow: auto;
+      max-height: min(72vh, 820px);
+      min-height: 420px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      line-height: 1.45;
+      color: #c8d6e5;
+    }
+
+    .server-log-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #c8d6e5;
+    }
+
+    .server-log-line-new {
+      color: #66bb6a;
+      animation: server-log-fade-new 5s ease-out forwards;
+    }
+
+    @keyframes server-log-fade-new {
+      0% { color: #66bb6a; }
+      15% { color: #81c784; }
+      100% { color: #c8d6e5; }
+    }
+
+    .server-log-meta {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .server-log-live.is-on {
+      box-shadow: 0 0 0 1px rgba(46, 204, 113, 0.35);
+    }
+
+    .server-logs-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.35rem;
+    }
+
+    .server-logs-filter-row > label {
+      margin: 0;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .server-log-file-control {
+      position: relative;
+      display: inline-flex;
+      align-items: stretch;
+      max-width: 100%;
+    }
+
+    .server-log-file-control select {
+      min-width: 220px;
+      max-width: min(100%, 360px);
+      width: auto;
+      padding: 0.55rem 0.65rem;
+    }
+
+    .server-log-file-control.has-games-arrow select {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right-color: transparent;
+    }
+
+    .server-log-games-arrow {
+      flex-shrink: 0;
+      width: 2.25rem;
+      min-width: 2.25rem;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      line-height: 1;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      margin-left: -1px;
+    }
+
+    .server-log-games-arrow.hidden {
+      display: none;
+    }
+
+    .server-log-games-arrow.is-open,
+    .server-log-games-arrow.is-active {
+      border-color: rgba(66, 165, 245, 0.65);
+      background: rgba(66, 165, 245, 0.18);
+      color: #e3f2fd;
+    }
+
+    .server-log-games-flyout {
+      position: fixed;
+      min-width: 18rem;
+      max-width: min(480px, 92vw);
+      max-height: min(420px, 55vh);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 20, 25, 0.98);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+      z-index: 60;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-4px);
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    }
+
+    .server-log-games-flyout.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .server-log-games-flyout-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.65rem;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .server-log-games-flyout-title {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .server-log-games-flyout-search {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 12rem;
+      margin-left: auto;
+      padding: 0.35rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(15, 20, 25, 0.65);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.76rem;
+    }
+
+    .server-log-games-flyout-search:focus {
+      outline: none;
+      border-color: rgba(66, 165, 245, 0.65);
+      box-shadow: 0 0 0 1px rgba(66, 165, 245, 0.25);
+    }
+
+    .server-log-games-flyout-search::-webkit-search-cancel-button {
+      cursor: pointer;
+    }
+
+    .server-log-games-flyout-empty-row td {
+      padding: 0.85rem 0.6rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .server-log-games-flyout-table-wrap {
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .server-log-games-flyout-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .server-log-games-flyout-table col.col-game {
+      width: 38%;
+    }
+
+    .server-log-games-flyout-table col.col-title {
+      width: 20%;
+    }
+
+    .server-log-games-flyout-table col.col-live {
+      width: 18%;
+    }
+
+    .server-log-games-flyout-table col.col-rtp {
+      width: 24%;
+    }
+
+    .server-log-games-flyout-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0.45rem 0.6rem;
+      text-align: left;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(12, 16, 20, 0.98);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .server-log-games-flyout-table td {
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+      overflow: hidden;
+    }
+
+    .server-log-games-flyout-table td.col-game,
+    .server-log-games-flyout-table td.col-rtp {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .server-log-games-flyout-table td.col-title,
+    .server-log-games-flyout-table td.col-live {
+      white-space: nowrap;
+    }
+
+    .server-log-games-name {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .server-log-games-flyout-table .badge {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+
+    .server-log-games-flyout-table tr.server-log-games-row {
+      cursor: pointer;
+    }
+
+    .server-log-games-flyout-table tr.server-log-games-row:hover {
+      background: rgba(66, 165, 245, 0.14);
+    }
+
+    .server-log-games-flyout-table tr.server-log-games-row.is-active {
+      background: rgba(66, 165, 245, 0.28);
+    }
+
+    .server-log-games-flyout-table tr.server-log-games-row.is-muted {
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .server-log-games-flyout-table tr.server-log-games-row.is-muted:hover {
+      background: transparent;
+    }
+
+    .server-log-games-flyout-empty {
+      margin: 0;
+      padding: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .server-log-games-flyout-item {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .server-log-games-flyout-item:hover,
+    .server-log-games-flyout-item.is-active {
+      background: rgba(66, 165, 245, 0.28);
+      color: #e3f2fd;
+    }
+
+    body.mode-server-logs .section-toolbar-inline,
+    body.mode-server-logs .server-logs-chrome,
+    body.mode-server-logs #serverLogsCard .inline-field {
+      overflow: visible;
+    }
+
+    body.mode-server-logs {
+      overflow: hidden;
+    }
+
+    body.mode-server-logs .wrap {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: 1rem;
+    }
+
+    body.mode-server-logs header {
+      flex-shrink: 0;
+    }
+
+    body.mode-server-logs #fetchError {
+      flex-shrink: 0;
+    }
+
+    body.mode-server-logs #dashboard {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.mode-server-logs #serverLogsCard {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    body.mode-server-logs #serverLogsCard .server-logs-chrome {
+      flex-shrink: 0;
+    }
+
+    body.mode-server-logs .server-log-view {
+      flex: 1;
+      min-height: 0;
+      max-height: none;
+      margin-top: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
     .diff-meta {
       margin: 0 0 1rem;
       font-size: 0.85rem;
@@ -2218,6 +2594,7 @@
           <button class="secondary" id="toggleJsonBtn" type="button">Show JSON</button>
           <button class="secondary" id="maintenanceBtn" type="button" title="Open maintenance settings">Maintenance</button>
           <button class="secondary" id="userGameplayBtn" type="button" title="Lookup user game play summary">User Game Play</button>
+          <button class="secondary" id="serverLogsBtn" type="button" title="View live server log files">Server Logs</button>
           <a class="btn-link secondary" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer">Health Monitor</a>
         </div>
       </div>
@@ -2378,7 +2755,7 @@
         </section>
         <section class="card" style="grid-column: 1 / -1;" id="sec-target-rtp">
           <div class="section-header-row">
-            <h2>Game Target RTP <span class="row-count" id="countTargetRtp"></span></h2>
+            <h2>Game Target RTP <span class="row-count" id="countTargetRtp"></span><span class="row-count live-count" id="countTargetRtpLive"></span><span class="row-count notlive-count" id="countTargetRtpNotLive"></span></h2>
             <div class="section-toolbar section-toolbar-inline">
               <div class="inline-field">
                 <label for="targetRtpFilter">Filter by Target RTP</label>
@@ -2387,6 +2764,18 @@
                   <option value="60">60%</option>
                   <option value="70">70%</option>
                   <option value="80">80%</option>
+                </select>
+              </div>
+              <div class="inline-field">
+                <label for="targetGameTitleFilter">Filter by Title</label>
+                <select id="targetGameTitleFilter">
+                  <option value="all">All</option>
+                </select>
+              </div>
+              <div class="inline-field">
+                <label for="targetGameLiveFilter">Filter by Live</label>
+                <select id="targetGameLiveFilter">
+                  <option value="all">All</option>
                 </select>
               </div>
             </div>
@@ -2589,6 +2978,32 @@
         </div>
       </section>
 
+      <section class="card hidden" id="serverLogsCard">
+        <div class="server-logs-chrome">
+        <div class="drill-toolbar">
+          <button type="button" class="secondary" id="serverLogsHomeBtn">← Home</button>
+          <h2>Server Live Logs</h2>
+          <div class="section-toolbar-actions">
+            <button type="button" class="secondary server-log-live is-on" id="serverLogsLiveBtn" title="Poll for new log lines every 2 seconds">Live: ON</button>
+            <button type="button" class="secondary" id="serverLogsRefreshBtn">Refresh</button>
+            <button type="button" class="secondary" id="serverLogsClearBtn">Clear</button>
+          </div>
+        </div>
+        <div class="section-toolbar section-toolbar-inline server-logs-filter-row">
+          <label for="serverLogsFile">Show logs for</label>
+          <div class="server-log-file-control" id="serverLogsFileControl">
+            <select id="serverLogsFile">
+              <option value="">Loading…</option>
+            </select>
+            <button type="button" class="secondary server-log-games-arrow hidden" id="serverLogsGamesArrow" title="Browse game logs" aria-haspopup="menu" aria-expanded="false" aria-controls="serverLogsGamesFlyout">›</button>
+            <div class="server-log-games-flyout hidden" id="serverLogsGamesFlyout" role="menu" aria-label="Game logs"></div>
+          </div>
+        </div>
+        <p class="server-log-meta" id="serverLogsMeta">Live server output — pick a game or General.</p>
+        </div>
+        <div class="server-log-view" id="serverLogsView">Loading…</div>
+      </section>
+
       <section class="card hidden" id="drillDownCard">
         <div class="drill-toolbar">
           <button type="button" class="secondary" id="drillBackBtn">← Back</button>
@@ -2670,6 +3085,24 @@
     let isDiffVisible = false;
     let isMaintenanceVisible = false;
     let isUserGameplayVisible = false;
+    let isServerLogsVisible = false;
+    let serverLogsOffset = 0;
+    let serverLogsPollTimer = null;
+    let serverLogsLive = true;
+    let serverLogsLoading = false;
+    let serverLogsRawFiles = [];
+    let serverLogsActiveFile = '';
+    let serverLogsFilterGameName = '';
+    let serverLogsGamesFlyoutOpen = false;
+    let serverLogsGamesSearch = '';
+    const SERVER_LOG_GAMES_SLUG = 'games';
+    const SERVER_LOG_SYSTEM_SLUGS = new Set([
+      'general',
+      'internaldashboardcontroller',
+      'internaldashboard',
+      'dashboardcontroller',
+      'program',
+    ]);
     let userGameplayGamesData = [];
     let userGameplayLastUserName = '';
     let userGameplayDailyData = [];
@@ -2905,10 +3338,10 @@
           { username: 'high_roller_99', totalBet: 120000, totalWin: 125400, totalSpin: 890, rtp: 1.045 },
         ],
         gamesTargetRtp: [
-          { gameName: 'Lucky Slots', targetRtp: 0.92 },
-          { gameName: 'Dragon Spin', targetRtp: 0.93 },
-          { gameName: 'Vault Poker', targetRtp: 0.90 },
-          { gameName: 'Mega Wheel', targetRtp: 0.88 },
+          { gameName: 'Lucky Slots', title: '', targetRtp: 0.92 },
+          { gameName: 'Dragon Spin', title: 'hot', targetRtp: 0.93 },
+          { gameName: 'Vault Poker', title: 'new', targetRtp: 0.90 },
+          { gameName: 'Mega Wheel', title: 'coming soon', targetRtp: 0.88 },
         ],
         userFeedbacks: [
           {
@@ -3835,6 +4268,8 @@
       isDiffVisible = false;
       isMaintenanceVisible = false;
       isUserGameplayVisible = false;
+      isServerLogsVisible = false;
+      stopServerLogsPolling();
       const diffBtn = $('toggleDiffBtn');
       if (diffBtn && !diffBtn.disabled) {
         const changeMatch = diffBtn.textContent.match(/\((\d+)\)/);
@@ -3857,6 +4292,8 @@
       hideSpinChartTooltip();
       isDiffVisible = false;
       isUserGameplayVisible = false;
+      isServerLogsVisible = false;
+      stopServerLogsPolling();
       isMaintenanceVisible = true;
       show($('jsonCard'), false);
       const jsonBtn = $('toggleJsonBtn');
@@ -3866,6 +4303,635 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function openServerLogsPage() {
+      drillStack = [];
+      activeChartSpins = [];
+      resetSpinChartZoom(0, false);
+      hideSpinChartTooltip();
+      isDiffVisible = false;
+      isMaintenanceVisible = false;
+      isUserGameplayVisible = false;
+      isServerLogsVisible = true;
+      show($('jsonCard'), false);
+      const jsonBtn = $('toggleJsonBtn');
+      if (jsonBtn) jsonBtn.textContent = 'Show JSON';
+      setDashboardViewMode();
+      loadServerLogsPage(true);
+    }
+
+    function stopServerLogsPolling() {
+      if (serverLogsPollTimer) {
+        clearInterval(serverLogsPollTimer);
+        serverLogsPollTimer = null;
+      }
+    }
+
+    function syncServerLogsLiveButton() {
+      const btn = $('serverLogsLiveBtn');
+      if (!btn) return;
+      btn.textContent = serverLogsLive ? 'Live: ON' : 'Live: OFF';
+      btn.classList.toggle('is-on', serverLogsLive);
+    }
+
+    function isServerLogsNearTop() {
+      const el = $('serverLogsView');
+      if (!el) return true;
+      return el.scrollTop < 48;
+    }
+
+    function reverseLogLines(chunk) {
+      if (!chunk) return '';
+      const endsWithNewline = chunk.endsWith('\n');
+      const lines = chunk.split('\n');
+      if (lines.length && lines[lines.length - 1] === '') lines.pop();
+      const reversed = lines.slice().reverse().join('\n');
+      return reversed ? reversed + (endsWithNewline ? '\n' : '') : '';
+    }
+
+    function splitReversedLogLines(chunk) {
+      const text = reverseLogLines(chunk);
+      if (!text) return [];
+      const lines = text.split('\n');
+      if (lines.length && lines[lines.length - 1] === '') lines.pop();
+      return lines;
+    }
+
+    function createServerLogLine(lineText, highlightNew) {
+      const el = document.createElement('div');
+      el.className = 'server-log-line' + (highlightNew ? ' server-log-line-new' : '');
+      el.textContent = lineText;
+      return el;
+    }
+
+    function setServerLogLines(view, chunk, highlightNew) {
+      if (!view) return;
+      view.innerHTML = '';
+      const lines = splitReversedLogLines(chunk);
+      for (const line of lines) {
+        view.appendChild(createServerLogLine(line, highlightNew));
+      }
+      view.scrollTop = 0;
+    }
+
+    function prependServerLogChunk(view, chunk) {
+      if (!view || !chunk) return;
+      const lines = splitReversedLogLines(chunk);
+      if (!lines.length) return;
+      const nearTop = isServerLogsNearTop();
+      const prevHeight = view.scrollHeight;
+      const prevTop = view.scrollTop;
+      const frag = document.createDocumentFragment();
+      for (const line of lines) {
+        frag.appendChild(createServerLogLine(line, true));
+      }
+      view.insertBefore(frag, view.firstChild);
+      if (nearTop) {
+        view.scrollTop = 0;
+      } else {
+        view.scrollTop = prevTop + (view.scrollHeight - prevHeight);
+      }
+    }
+
+    async function fetchServerLogFiles() {
+      if (isDemoMode()) {
+        const day = new Date().toISOString().slice(0, 10);
+        return [
+          { fileName: 'general-' + day + '.log', sizeBytes: 4096, lastModifiedUtc: new Date().toISOString() },
+          { fileName: 'vegas7-' + day + '.log', sizeBytes: 8192, lastModifiedUtc: new Date().toISOString() },
+          { fileName: 'cashmachine-' + day + '.log', sizeBytes: 6144, lastModifiedUtc: new Date().toISOString() },
+          { fileName: 'internaldashboardcontroller-' + day + '.log', sizeBytes: 2048, lastModifiedUtc: new Date().toISOString() },
+        ];
+      }
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/server-logs/files';
+      const res = await fetch(url, { headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }, cache: 'no-store' });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      return json.data?.files || json.data?.Files || [];
+    }
+
+    async function fetchServerLogTail({ file = '', offset = 0 } = {}) {
+      if (isDemoMode()) {
+        const stamp = new Date().toISOString().replace('T', ' ').slice(0, 23);
+        const chunk = '[' + stamp + '] [Information] [Demo] Sample server log line\n';
+        return { fileName: file || 'general-demo.log', nextOffset: offset + chunk.length, chunk, reset: false };
+      }
+      const params = new URLSearchParams();
+      if (file) params.set('file', file);
+      params.set('offset', String(offset || 0));
+      const url = apiOrigin().replace(/\/$/, '') + '/api/dashboard/internal/server-logs/tail?' + params.toString();
+      const res = await fetch(url, { headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }, cache: 'no-store' });
+      const text = await res.text();
+      const json = parseSummaryResponse(res, text);
+      const data = json.data || {};
+      return {
+        fileName: data.fileName ?? data.FileName ?? file,
+        nextOffset: Number(data.nextOffset ?? data.NextOffset ?? 0),
+        chunk: data.chunk ?? data.Chunk ?? '',
+        reset: !!(data.reset ?? data.Reset),
+      };
+    }
+
+    function formatServerLogLabel(fileName) {
+      const base = String(fileName || '').replace(/\.log$/i, '');
+      const match = base.match(/^(.+?)-(\d{4}-\d{2}-\d{2})$/i);
+      const slug = (match ? match[1] : base).toLowerCase();
+      const known = {
+        general: 'General',
+        internaldashboardcontroller: 'Internal Dashboard',
+        internaldashboard: 'Internal Dashboard',
+        dashboardcontroller: 'Dashboard',
+        program: 'Server startup',
+      };
+      if (known[slug]) return known[slug];
+      return slug
+        .replace(/controller$/i, '')
+        .replace(/([a-z])(\d)/g, '$1 $2')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .split(/[\s_-]+/)
+        .filter(Boolean)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ') || 'Logs';
+    }
+
+    function pickLatestServerLogFiles(files) {
+      const bySlug = new Map();
+      for (const f of files) {
+        const name = f.fileName ?? f.FileName ?? '';
+        if (!name) continue;
+        const match = name.match(/^(.+?)-(\d{4}-\d{2}-\d{2})\.log$/i);
+        const slug = match ? match[1].toLowerCase() : name.toLowerCase();
+        const mod = new Date(f.lastModifiedUtc ?? f.LastModifiedUtc ?? 0).getTime();
+        const prev = bySlug.get(slug);
+        if (!prev || mod > prev._mod) {
+          bySlug.set(slug, { ...f, _slug: slug, _mod: mod });
+        }
+      }
+      return Array.from(bySlug.values()).sort((a, b) => {
+        if (a._slug === 'general') return -1;
+        if (b._slug === 'general') return 1;
+        return formatServerLogLabel(a.fileName ?? a.FileName).localeCompare(formatServerLogLabel(b.fileName ?? b.FileName));
+      });
+    }
+
+    function lookupGameNameFromDashboard(slug) {
+      const norm = String(slug || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!norm || !currentDashboardData) return null;
+      const pools = [
+        ...(currentDashboardData.rtpByGame || []),
+        ...(currentDashboardData.gamesTargetRtp || []),
+        ...(currentDashboardData.gamesAboveTargetRtp || []),
+      ];
+      for (const g of pools) {
+        const name = g.gameName ?? g.GameName ?? '';
+        const nameNorm = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!nameNorm) continue;
+        if (nameNorm === norm || nameNorm.includes(norm) || norm.includes(nameNorm)) return name;
+      }
+      return null;
+    }
+
+    function getServerLogEntryLabel(entry) {
+      const dashName = lookupGameNameFromDashboard(entry._slug);
+      if (dashName) return dashName;
+      return formatServerLogLabel(entry.fileName ?? entry.FileName);
+    }
+
+    function isServerLogGameEntry(entry) {
+      return !!lookupGameNameFromDashboard(entry._slug);
+    }
+
+    function isServerLogGamesMenuEntry(entry) {
+      return entry._slug === SERVER_LOG_GAMES_SLUG;
+    }
+
+    function getServerLogsGameEntries(all, mainList) {
+      const source = all || dedupeServerLogEntriesByLabel(pickLatestServerLogFiles(serverLogsRawFiles));
+      const explicit = source.filter((f) => isServerLogGameEntry(f));
+      if (explicit.length) return dedupeServerLogEntriesByLabel(explicit);
+      const main = mainList || source.filter((f) => !isServerLogGameEntry(f));
+      const mainSlugs = new Set(main.map((f) => f._slug));
+      return dedupeServerLogEntriesByLabel(source.filter((f) => !mainSlugs.has(f._slug)));
+    }
+
+    function getServerLogGamesOptionFile() {
+      const entry = pickLatestServerLogFiles(serverLogsRawFiles).find((f) => isServerLogGamesMenuEntry(f));
+      return entry?.fileName ?? entry?.FileName ?? '';
+    }
+
+    function isServerLogGamesSelected() {
+      const entry = findServerLogEntry($('serverLogsFile')?.value || '');
+      return !!entry && isServerLogGamesMenuEntry(entry);
+    }
+
+    function getActiveServerLogFile() {
+      if (serverLogsActiveFile) return serverLogsActiveFile;
+      if (serverLogsFilterGameName) {
+        const gamesFile = getServerLogGamesOptionFile();
+        if (gamesFile) return gamesFile;
+      }
+      return $('serverLogsFile')?.value || '';
+    }
+
+    function getLiveGamesFromDashboard() {
+      return (gamesTargetRtpData || [])
+        .filter(isGameLive)
+        .slice()
+        .sort((a, b) => String(a.gameName || '').localeCompare(String(b.gameName || '')));
+    }
+
+    function gameNameToLogSlug(gameName) {
+      return String(gameName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function findLogEntryForGameName(gameName) {
+      if (!gameName) return null;
+      const files = pickLatestServerLogFiles(serverLogsRawFiles);
+      for (const f of files) {
+        const matched = lookupGameNameFromDashboard(f._slug);
+        if (matched && matched.toLowerCase() === String(gameName).toLowerCase()) return f;
+      }
+      const norm = gameNameToLogSlug(gameName);
+      if (!norm) return null;
+      return files.find((f) => {
+        const slugNorm = f._slug.replace(/[^a-z0-9]/g, '');
+        return slugNorm === norm || slugNorm.includes(norm) || norm.includes(slugNorm);
+      }) || null;
+    }
+
+    function filterServerLogChunkByGame(chunk, gameName) {
+      if (!chunk || !gameName) return chunk;
+      const needle = String(gameName).toLowerCase();
+      const lines = chunk.split('\n').filter((line) => line.toLowerCase().includes(needle));
+      return lines.join('\n');
+    }
+
+    function getServerLogsActiveGameLabel() {
+      if (serverLogsFilterGameName) return serverLogsFilterGameName;
+      if (serverLogsActiveFile) {
+        const entry = findServerLogEntry(serverLogsActiveFile);
+        if (entry) return getServerLogEntryLabel(entry);
+      }
+      return '';
+    }
+
+    function positionServerLogsGamesFlyout() {
+      const flyout = $('serverLogsGamesFlyout');
+      const anchor = $('serverLogsGamesArrow') || $('serverLogsFile');
+      if (!flyout || !anchor || flyout.classList.contains('hidden')) return;
+      const rect = anchor.getBoundingClientRect();
+      const gap = 6;
+      const flyoutWidth = Math.min(480, window.innerWidth * 0.92);
+      let left = rect.right + gap;
+      if (left + flyoutWidth > window.innerWidth - 8) {
+        left = Math.max(8, rect.left - flyoutWidth - gap);
+      }
+      const maxHeight = Math.min(420, window.innerHeight - rect.top - 12);
+      flyout.style.left = left + 'px';
+      flyout.style.top = rect.top + 'px';
+      flyout.style.maxHeight = Math.max(160, maxHeight) + 'px';
+    }
+
+    function closeServerLogsGamesFlyout() {
+      serverLogsGamesFlyoutOpen = false;
+      const arrow = $('serverLogsGamesArrow');
+      const flyout = $('serverLogsGamesFlyout');
+      if (arrow) {
+        arrow.classList.remove('is-open');
+        arrow.setAttribute('aria-expanded', 'false');
+      }
+      if (flyout) {
+        flyout.classList.remove('is-open');
+        flyout.classList.add('hidden');
+      }
+    }
+
+    function openServerLogsGamesFlyout() {
+      const flyout = $('serverLogsGamesFlyout');
+      const arrow = $('serverLogsGamesArrow');
+      if (!flyout || (!isServerLogGamesSelected() && !serverLogsActiveFile && !serverLogsFilterGameName)) return;
+      serverLogsGamesFlyoutOpen = true;
+      if (arrow) {
+        arrow.classList.add('is-open');
+        arrow.setAttribute('aria-expanded', 'true');
+      }
+      flyout.classList.remove('hidden');
+      positionServerLogsGamesFlyout();
+      requestAnimationFrame(() => {
+        flyout.classList.add('is-open');
+        $('serverLogsGamesSearch')?.focus();
+      });
+    }
+
+    function toggleServerLogsGamesFlyout() {
+      if (serverLogsGamesFlyoutOpen) closeServerLogsGamesFlyout();
+      else openServerLogsGamesFlyout();
+    }
+
+    function filterLiveGamesForFlyout(games) {
+      const q = serverLogsGamesSearch.trim().toLowerCase();
+      if (!q) return games;
+      return games.filter((game) => {
+        const name = String(game.gameName || '').toLowerCase();
+        const title = formatGameTitleLabel(getGameTitle(game)).toLowerCase();
+        const rtp = fmtRtp(game.targetRtp).toLowerCase();
+        return name.includes(q) || title.includes(q) || rtp.includes(q);
+      });
+    }
+
+    function renderServerLogsGameFlyoutRow(game) {
+      const logEntry = findLogEntryForGameName(game.gameName);
+      const fileName = logEntry?.fileName ?? logEntry?.FileName ?? '';
+      const active = serverLogsFilterGameName === game.gameName
+        || (fileName && fileName === serverLogsActiveFile && !serverLogsFilterGameName);
+      return (
+        '<tr class="server-log-games-row' + (active ? ' is-active' : '') + '" data-game-name="' + escHtml(game.gameName) + '"' +
+        (fileName ? ' data-log-file="' + escHtml(fileName) + '"' : '') +
+        ' role="menuitem" tabindex="0">' +
+        '<td class="col-game" title="' + escAttr(game.gameName) + '"><span class="server-log-games-name">' + escHtml(game.gameName) + '</span></td>' +
+        '<td class="col-title">' + renderGameTitleBadge(getGameTitle(game)) + '</td>' +
+        '<td class="col-live">' + renderGameLiveBadge(game) + '</td>' +
+        '<td class="col-rtp">' + escHtml(fmtRtp(game.targetRtp)) + '</td>' +
+        '</tr>'
+      );
+    }
+
+    function renderServerLogsGamesFlyout() {
+      const flyout = $('serverLogsGamesFlyout');
+      if (!flyout) return;
+
+      const searchInput = $('serverLogsGamesSearch');
+      const hadSearchFocus = document.activeElement === searchInput;
+      if (searchInput) serverLogsGamesSearch = searchInput.value;
+
+      const liveGames = getLiveGamesFromDashboard();
+      if (liveGames.length) {
+        const filtered = filterLiveGamesForFlyout(liveGames);
+        const countLabel = serverLogsGamesSearch.trim()
+          ? fmtInt(filtered.length) + ' / ' + fmtInt(liveGames.length)
+          : fmtInt(liveGames.length);
+        const rows = filtered.length
+          ? filtered.map((game) => renderServerLogsGameFlyoutRow(game)).join('')
+          : '<tr class="server-log-games-flyout-empty-row"><td colspan="4">No matching games</td></tr>';
+        flyout.innerHTML =
+          '<div class="server-log-games-flyout-head">' +
+          '<span class="server-log-games-flyout-title">Live games (' + countLabel + ')</span>' +
+          '<input type="search" class="server-log-games-flyout-search" id="serverLogsGamesSearch" placeholder="Search games" autocomplete="off" value="' + escAttr(serverLogsGamesSearch) + '" />' +
+          '</div>' +
+          '<div class="server-log-games-flyout-table-wrap">' +
+          '<table class="server-log-games-flyout-table">' +
+          '<colgroup><col class="col-game"><col class="col-title"><col class="col-live"><col class="col-rtp"></colgroup>' +
+          '<thead><tr>' +
+          '<th>Game</th><th>Title</th><th>Live</th><th>Target RTP</th>' +
+          '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+        if (hadSearchFocus) {
+          const nextSearch = $('serverLogsGamesSearch');
+          if (nextSearch) {
+            nextSearch.focus();
+            const len = nextSearch.value.length;
+            nextSearch.setSelectionRange(len, len);
+          }
+        }
+      } else {
+        const logGames = getServerLogsGameEntries();
+        if (logGames.length) {
+          flyout.innerHTML =
+            '<div class="server-log-games-flyout-head">Game logs</div>' +
+            '<div class="server-log-games-flyout-table-wrap">' +
+            logGames.map((g) => {
+              const name = g.fileName ?? g.FileName ?? '';
+              const label = getServerLogEntryLabel(g);
+              const active = name === serverLogsActiveFile ? ' is-active' : '';
+              return '<button type="button" class="server-log-games-flyout-item' + active + '" role="menuitem" data-log-file="' + escHtml(name) + '">' + escHtml(label) + '</button>';
+            }).join('') +
+            '</div>';
+        } else {
+          flyout.innerHTML = '<p class="server-log-games-flyout-empty">Load dashboard data to see live games.</p>';
+        }
+      }
+      syncServerLogsGamesArrow();
+      if (serverLogsGamesFlyoutOpen) positionServerLogsGamesFlyout();
+    }
+
+    function syncServerLogsGamesArrow() {
+      const arrow = $('serverLogsGamesArrow');
+      const control = $('serverLogsFileControl');
+      if (!arrow) return;
+      const show = !!(serverLogsActiveFile || serverLogsFilterGameName || isServerLogGamesSelected());
+      if (control) control.classList.toggle('has-games-arrow', show);
+      if (!show) {
+        arrow.classList.add('hidden');
+        arrow.classList.remove('is-open', 'is-active');
+        arrow.setAttribute('aria-expanded', 'false');
+        closeServerLogsGamesFlyout();
+        return;
+      }
+      arrow.classList.remove('hidden');
+      arrow.classList.toggle('is-active', true);
+    }
+
+    function selectServerLogGame(gameName) {
+      if (!gameName) return;
+      const logEntry = findLogEntryForGameName(gameName);
+      const dedicatedFile = logEntry?.fileName ?? logEntry?.FileName ?? '';
+      if (dedicatedFile) {
+        serverLogsActiveFile = dedicatedFile;
+        serverLogsFilterGameName = '';
+      } else {
+        serverLogsActiveFile = '';
+        serverLogsFilterGameName = gameName;
+      }
+      const select = $('serverLogsFile');
+      const gamesFile = getServerLogGamesOptionFile();
+      if (select && gamesFile) select.value = gamesFile;
+      closeServerLogsGamesFlyout();
+      syncServerLogsGamesArrow();
+      serverLogsOffset = 0;
+      pollServerLogs({ reset: true });
+    }
+
+    function findServerLogEntry(fileName) {
+      if (!fileName) return null;
+      return pickLatestServerLogFiles(serverLogsRawFiles).find(
+        (f) => (f.fileName ?? f.FileName) === fileName
+      ) || null;
+    }
+
+    function dedupeServerLogEntriesByLabel(entries) {
+      const byLabel = new Map();
+      for (const e of entries) {
+        const key = getServerLogEntryLabel(e).toLowerCase();
+        const prev = byLabel.get(key);
+        if (!prev || e._mod > prev._mod) byLabel.set(key, e);
+      }
+      return Array.from(byLabel.values()).sort((a, b) => {
+        if (a._slug === 'general') return -1;
+        if (b._slug === 'general') return 1;
+        return getServerLogEntryLabel(a).localeCompare(getServerLogEntryLabel(b));
+      });
+    }
+
+    function renderServerLogsFileOptions(files, selectedFile) {
+      const select = $('serverLogsFile');
+      if (!select) return;
+
+      serverLogsRawFiles = Array.isArray(files) ? files : serverLogsRawFiles;
+      const all = dedupeServerLogEntriesByLabel(pickLatestServerLogFiles(serverLogsRawFiles));
+      const list = all.filter((f) => !isServerLogGameEntry(f));
+
+      if (!list.length) {
+        select.innerHTML = '<option value="">No logs yet</option>';
+        renderServerLogsGamesFlyout();
+        return;
+      }
+
+      select.innerHTML = list.map((f) => {
+        const name = f.fileName ?? f.FileName ?? '';
+        let label = getServerLogEntryLabel(f);
+        if (isServerLogGamesMenuEntry(f)) label += ' ›';
+        return '<option value="' + escHtml(name) + '">' + escHtml(label) + '</option>';
+      }).join('');
+
+      const names = list.map((f) => f.fileName ?? f.FileName ?? '');
+      const selectedEntry = findServerLogEntry(selectedFile || serverLogsActiveFile);
+      let wanted = selectedFile && names.includes(selectedFile) ? selectedFile : '';
+      if (!wanted && (serverLogsFilterGameName || (selectedEntry && isServerLogGameEntry(selectedEntry)))) {
+        const gamesFile = getServerLogGamesOptionFile();
+        wanted = gamesFile && names.includes(gamesFile) ? gamesFile : (select.value && names.includes(select.value) ? select.value : '');
+      }
+      if (!wanted) {
+        const general = list.find((f) => f._slug === 'general');
+        wanted = general?.fileName ?? general?.FileName ?? names[0] ?? '';
+      }
+      if (wanted && !serverLogsActiveFile) select.value = wanted;
+
+      renderServerLogsGamesFlyout();
+      syncServerLogsGamesArrow();
+    }
+
+    function renderServerLogsControls(files, selectedFile) {
+      renderServerLogsFileOptions(files, selectedFile);
+    }
+
+    function selectServerLogFile(fileName) {
+      if (!fileName) return;
+      const entry = findServerLogEntry(fileName);
+      serverLogsActiveFile = entry && isServerLogGameEntry(entry) ? fileName : '';
+      serverLogsFilterGameName = '';
+      const select = $('serverLogsFile');
+      if (select && !serverLogsActiveFile) select.value = fileName;
+      renderServerLogsControls(serverLogsRawFiles, fileName);
+      serverLogsOffset = 0;
+      pollServerLogs({ reset: true });
+    }
+
+    async function pollServerLogs({ reset = false } = {}) {
+      if (!isServerLogsVisible || serverLogsLoading) return;
+      const select = $('serverLogsFile');
+      const view = $('serverLogsView');
+      const meta = $('serverLogsMeta');
+      if (!select || !view) return;
+
+      const file = getActiveServerLogFile();
+      if (!file && !isDemoMode()) {
+        if (meta) meta.textContent = 'No log file selected.';
+        return;
+      }
+
+      serverLogsLoading = true;
+      try {
+        const data = await fetchServerLogTail({ file, offset: reset ? 0 : serverLogsOffset });
+        if (reset || data.reset) {
+          view.innerHTML = '';
+          serverLogsOffset = 0;
+        }
+        if (data.chunk) {
+          let chunk = data.chunk;
+          if (serverLogsFilterGameName) {
+            chunk = filterServerLogChunkByGame(chunk, serverLogsFilterGameName);
+          }
+          if (reset || data.reset) {
+            if (chunk) {
+              setServerLogLines(view, chunk, false);
+            } else if (serverLogsFilterGameName) {
+              view.innerHTML = '';
+              view.appendChild(createServerLogLine('(no log lines for ' + serverLogsFilterGameName + ' yet)', false));
+              view.scrollTop = 0;
+            }
+          } else if (chunk) {
+            prependServerLogChunk(view, chunk);
+          }
+          serverLogsOffset = Number(data.nextOffset || 0);
+        } else if (reset) {
+          view.innerHTML = '';
+          const emptyMsg = serverLogsFilterGameName
+            ? '(no log lines for ' + serverLogsFilterGameName + ' yet)'
+            : '(empty log file)';
+          view.appendChild(createServerLogLine(emptyMsg, false));
+          view.scrollTop = 0;
+          serverLogsOffset = Number(data.nextOffset || 0);
+        }
+        if (meta) {
+          const gameLabel = getServerLogsActiveGameLabel();
+          if (gameLabel) {
+            meta.textContent = 'Watching ' + gameLabel + (serverLogsFilterGameName ? ' · games log' : '') +
+              (serverLogsLive ? ' · newest first · live' : ' · newest first · paused');
+          } else {
+            const entry = findServerLogEntry(data.fileName || file || '');
+            const label = entry ? getServerLogEntryLabel(entry) : formatServerLogLabel(data.fileName || file || '');
+            meta.textContent = 'Watching ' + label + (serverLogsLive ? ' · newest first · live' : ' · newest first · paused');
+          }
+        }
+      } catch (err) {
+        if (meta) meta.textContent = err.message || 'Failed to load server logs';
+      } finally {
+        serverLogsLoading = false;
+      }
+    }
+
+    async function clearServerLogsView() {
+      const view = $('serverLogsView');
+      const meta = $('serverLogsMeta');
+      const file = getActiveServerLogFile();
+      if (view) view.innerHTML = '';
+      if (!file && !isDemoMode()) {
+        if (meta) meta.textContent = 'Cleared · no file selected';
+        return;
+      }
+      try {
+        const data = await fetchServerLogTail({ file, offset: serverLogsOffset });
+        serverLogsOffset = Number(data.nextOffset ?? serverLogsOffset ?? 0);
+        const entry = findServerLogEntry(data.fileName || file || '');
+        const label = entry ? getServerLogEntryLabel(entry) : formatServerLogLabel(data.fileName || file || '');
+        if (meta) {
+          meta.textContent = 'Cleared · waiting for new ' + label + (serverLogsLive ? ' · live' : ' · paused');
+        }
+      } catch (err) {
+        if (meta) meta.textContent = err.message || 'Failed to clear logs view';
+      }
+    }
+
+    async function loadServerLogsPage(resetView = true) {
+      const view = $('serverLogsView');
+      const meta = $('serverLogsMeta');
+      if (view && resetView) view.textContent = 'Loading…';
+      if (meta) meta.textContent = 'Loading log files…';
+      stopServerLogsPolling();
+      try {
+        const files = await fetchServerLogFiles();
+        const previous = getActiveServerLogFile();
+        renderServerLogsControls(files, previous);
+        serverLogsOffset = 0;
+        await pollServerLogs({ reset: true });
+        if (serverLogsLive) {
+          serverLogsPollTimer = setInterval(() => pollServerLogs({ reset: false }), 2000);
+        }
+      } catch (err) {
+        if (view) view.innerHTML = '';
+        if (meta) meta.textContent = err.message || 'Failed to load server logs';
+      }
+      syncServerLogsLiveButton();
+    }
+
     function openUserGameplayPage() {
       drillStack = [];
       activeChartSpins = [];
@@ -3873,6 +4939,8 @@
       hideSpinChartTooltip();
       isDiffVisible = false;
       isMaintenanceVisible = false;
+      isServerLogsVisible = false;
+      stopServerLogsPolling();
       isUserGameplayVisible = true;
       show($('jsonCard'), false);
       const jsonBtn = $('toggleJsonBtn');
@@ -3896,16 +4964,25 @@
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
       const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
       const inUserGameplayMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && isUserGameplayVisible;
-      show($('mainDashboard'), !inDiffMode && !inDrillMode && !inMaintenanceMode && !inUserGameplayMode);
+      const inServerLogsMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && !inUserGameplayMode && isServerLogsVisible;
+      show($('mainDashboard'), !inDiffMode && !inDrillMode && !inMaintenanceMode && !inUserGameplayMode && !inServerLogsMode);
       show($('diffCard'), inDiffMode);
       show($('drillDownCard'), inDrillMode);
       show($('maintenanceCard'), inMaintenanceMode);
       show($('userGameplayCard'), inUserGameplayMode);
+      show($('serverLogsCard'), inServerLogsMode);
+      if (!inServerLogsMode) stopServerLogsPolling();
       document.body.classList.toggle('mode-ugp', inUserGameplayMode);
+      document.body.classList.toggle('mode-server-logs', inServerLogsMode);
+      if (inServerLogsMode) {
+        document.documentElement.style.overflow = 'hidden';
+      } else {
+        document.documentElement.style.overflow = '';
+      }
       if (!inDrillMode || drillStack[drillStack.length - 1]?.type !== 'owner-transactions') {
         show($('drillOwnerTxToolbar'), false);
       }
-      if (inDiffMode || inDrillMode || inMaintenanceMode || inUserGameplayMode) {
+      if (inDiffMode || inDrillMode || inMaintenanceMode || inUserGameplayMode || inServerLogsMode) {
         show($('jsonCard'), false);
         const jsonBtn = $('toggleJsonBtn');
         if (jsonBtn) jsonBtn.textContent = 'Show JSON';
@@ -3919,8 +4996,9 @@
       const inDiffMode = !inDrillMode && isDiffVisible && !isDemoMode() && responseHistory.length >= 2;
       const inMaintenanceMode = !inDrillMode && !inDiffMode && isMaintenanceVisible;
       const inUserGameplayMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && isUserGameplayVisible;
+      const inServerLogsMode = !inDrillMode && !inDiffMode && !inMaintenanceMode && !inUserGameplayMode && isServerLogsVisible;
       const jsonVisible = !$('jsonCard')?.classList.contains('hidden');
-      const onHome = !inDrillMode && !inDiffMode && !inMaintenanceMode && !inUserGameplayMode;
+      const onHome = !inDrillMode && !inDiffMode && !inMaintenanceMode && !inUserGameplayMode && !inServerLogsMode;
 
       const setActive = (id, active) => {
         const el = $(id);
@@ -3934,6 +5012,7 @@
       setActive('toggleJsonBtn', jsonVisible && onHome);
       setActive('maintenanceBtn', inMaintenanceMode);
       setActive('userGameplayBtn', inUserGameplayMode);
+      setActive('serverLogsBtn', inServerLogsMode);
       setActive('pauseRefreshBtn', isRefreshPaused && !isDemoMode());
     }
 
@@ -3998,6 +5077,24 @@
       if (!el) return;
       const n = Array.isArray(rows) ? rows.length : 0;
       el.textContent = n + ' row' + (n === 1 ? '' : 's');
+    }
+
+    function countGameLiveStatus(rows) {
+      let live = 0;
+      let notLive = 0;
+      for (const row of rows || []) {
+        if (isGameLive(row)) live++;
+        else notLive++;
+      }
+      return { live, notLive };
+    }
+
+    function setTargetRtpLiveCounts(rows) {
+      const { live, notLive } = countGameLiveStatus(rows);
+      const liveEl = $('countTargetRtpLive');
+      const notLiveEl = $('countTargetRtpNotLive');
+      if (liveEl) liveEl.textContent = fmtInt(live) + ' live';
+      if (notLiveEl) notLiveEl.textContent = fmtInt(notLive) + ' not live';
     }
 
     function updateSectionNavCount(sectionId, count) {
@@ -4069,8 +5166,128 @@
     }
 
     function filterGamesTargetRtp(rows) {
-      const filter = $('targetRtpFilter')?.value || 'all';
-      return filterByTargetRtp(rows, filter);
+      const rtpFilter = $('targetRtpFilter')?.value || 'all';
+      const titleFilter = $('targetGameTitleFilter')?.value || 'all';
+      const liveFilter = $('targetGameLiveFilter')?.value || 'all';
+      return filterByTargetRtp(rows, rtpFilter)
+        .filter((r) => matchesGameTitleFilter(r, titleFilter))
+        .filter((r) => matchesGameLiveFilter(r, liveFilter));
+    }
+
+    function normalizeGameTargetRtpRow(row) {
+      return {
+        gameId: row.gameId ?? row.GameId ?? '',
+        gameName: row.gameName ?? row.GameName ?? '',
+        title: row.title ?? row.Title ?? '',
+        targetRtp: row.targetRtp ?? row.TargetRtp ?? 0,
+      };
+    }
+
+    function getGameTitle(row) {
+      return row?.title ?? row?.Title ?? '';
+    }
+
+    const GAME_TITLE_FILTER_LABELS = {
+      'none': 'None',
+      'coming soon': 'Coming Soon',
+      'new': 'New',
+      'hot': 'Hot',
+      'trending': 'Trending',
+    };
+
+    function normalizeGameTitle(value) {
+      let t = String(value ?? '').trim().toLowerCase();
+      if (!t || t === 'none' || t === 'null' || t === '-' || t === 'n/a') return 'none';
+      t = t.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+      if (t === 'comingsoon' || t === 'coming-soon' || t === 'coming soon') return 'coming soon';
+      return t;
+    }
+
+    function formatGameTitleLabel(value) {
+      const norm = normalizeGameTitle(value);
+      if (GAME_TITLE_FILTER_LABELS[norm]) return GAME_TITLE_FILTER_LABELS[norm];
+      return norm.split(/\s+/).filter(Boolean).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    function populateGameTitleFilter(rows) {
+      const el = $('targetGameTitleFilter');
+      if (!el) return;
+      const previous = el.value || 'all';
+      const list = Array.isArray(rows) ? rows : [];
+      const counts = new Map();
+      for (const row of list) {
+        const norm = normalizeGameTitle(getGameTitle(row));
+        counts.set(norm, (counts.get(norm) || 0) + 1);
+      }
+
+      const orderedKeys = ['none', 'coming soon', 'new', 'hot', 'trending'];
+      let html = '<option value="all">All (' + fmtInt(list.length) + ')</option>';
+      for (const key of orderedKeys) {
+        const count = counts.get(key) || 0;
+        if (count > 0) {
+          html += '<option value="' + escAttr(key) + '">' + escHtml(GAME_TITLE_FILTER_LABELS[key]) + ' (' + fmtInt(count) + ')</option>';
+        }
+      }
+      for (const [key, count] of counts) {
+        if (orderedKeys.includes(key)) continue;
+        html += '<option value="' + escAttr(key) + '">' + escHtml(formatGameTitleLabel(key)) + ' (' + fmtInt(count) + ')</option>';
+      }
+
+      el.innerHTML = html;
+      const stillValid = Array.from(el.options).some((o) => o.value === previous);
+      el.value = stillValid ? previous : 'all';
+    }
+
+    function matchesGameTitleFilter(row, filter) {
+      if (!filter || filter === 'all') return true;
+      return normalizeGameTitle(getGameTitle(row)) === filter;
+    }
+
+    function matchesGameLiveFilter(row, filter) {
+      if (!filter || filter === 'all') return true;
+      if (filter === 'live') return isGameLive(row);
+      if (filter === 'not-live') return !isGameLive(row);
+      return true;
+    }
+
+    function populateGameLiveFilter(rows) {
+      const el = $('targetGameLiveFilter');
+      if (!el) return;
+      const previous = el.value || 'all';
+      const list = Array.isArray(rows) ? rows : [];
+      const { live, notLive } = countGameLiveStatus(list);
+      let html = '<option value="all">All (' + fmtInt(list.length) + ')</option>';
+      if (live > 0) html += '<option value="live">Live (' + fmtInt(live) + ')</option>';
+      if (notLive > 0) html += '<option value="not-live">Not live (' + fmtInt(notLive) + ')</option>';
+      el.innerHTML = html;
+      const stillValid = Array.from(el.options).some((o) => o.value === previous);
+      el.value = stillValid ? previous : 'all';
+    }
+
+    function renderGameTitleBadge(value) {
+      const label = formatGameTitleLabel(value);
+      const norm = normalizeGameTitle(value);
+      const cls = norm === 'none'
+        ? 'badge muted'
+        : norm === 'hot'
+          ? 'badge warn'
+          : norm === 'new'
+            ? 'badge-tx-recharge'
+            : norm === 'coming soon'
+              ? 'badge muted'
+              : 'badge ok';
+      return '<span class="badge ' + cls + '">' + escHtml(label) + '</span>';
+    }
+
+    function isGameLive(row) {
+      return normalizeGameTitle(getGameTitle(row)) !== 'coming soon';
+    }
+
+    function renderGameLiveBadge(row) {
+      const live = isGameLive(row);
+      return live
+        ? '<span class="badge badge-tx-recharge">Live</span>'
+        : '<span class="badge badge-tx-redeem">Not live</span>';
     }
 
     const smoothUpdateTimers = {};
@@ -4254,14 +5471,27 @@
     }
 
     function renderGamesTargetRtpTable(smooth = false) {
+      const rtpFilter = $('targetRtpFilter')?.value || 'all';
+      const titleFilter = $('targetGameTitleFilter')?.value || 'all';
+      const liveFilter = $('targetGameLiveFilter')?.value || 'all';
       const filtered = filterGamesTargetRtp(gamesTargetRtpData);
       const columns = [
         { label: 'Game', key: 'gameName' },
+        { label: 'Title', render: (r) => renderGameTitleBadge(getGameTitle(r)) },
+        { label: 'Live', render: (r) => renderGameLiveBadge(r) },
         { label: 'Target RTP', render: (r) => fmtRtp(r.targetRtp) },
       ];
+      const emptyMsg = liveFilter !== 'all'
+        ? emptyFilterMessage('live', liveFilter)
+        : titleFilter !== 'all'
+          ? emptyFilterMessage('title', titleFilter)
+          : rtpFilter !== 'all'
+            ? emptyFilterMessage('target', rtpFilter)
+            : 'No data.';
       withSmoothTableUpdate('gamesTargetRtpWrap', 'countTargetRtp', () => {
-        renderTable('gamesTargetRtpWrap', filtered, columns);
+        renderTable('gamesTargetRtpWrap', filtered, columns, emptyMsg);
         setRowCount('countTargetRtp', filtered);
+        setTargetRtpLiveCounts(filtered);
         const navLink = $('sectionNav')?.querySelector('a[href="#sec-target-rtp"]');
         if (navLink) updateSectionNavCount('sec-target-rtp', filtered.length);
       }, smooth);
@@ -4289,6 +5519,10 @@
     function emptyFilterMessage(kind, filterValue) {
       if (!filterValue || filterValue === 'all') return 'No data.';
       if (kind === 'target') return 'No rows with Target RTP ' + filterValue + '%. Try All or another option.';
+      if (kind === 'title') return 'No games with title "' + formatGameTitleLabel(filterValue) + '". Try All or another option.';
+      if (kind === 'live') return filterValue === 'live'
+        ? 'No live games match your filters. Try All or Not live.'
+        : 'No not-live games match your filters. Try All or Live.';
       if (kind === 'minRtp') return 'No rows with RTP ≥ ' + filterValue + '%. Try All or a lower option.';
       return 'No data.';
     }
@@ -5844,17 +7078,20 @@
       gamesAboveTargetData = d.gamesAboveTargetRtp || [];
       rtpByUserData = d.rtpByUser || [];
       usersRtpHighData = d.usersRtpAboveOrEqualOne || [];
-      gamesTargetRtpData = d.gamesTargetRtp || [];
+      gamesTargetRtpData = (d.gamesTargetRtp || d.GamesTargetRtp || []).map(normalizeGameTargetRtpRow);
 
       populateTargetRtpSelect('rtpByGameTargetFilter', rtpByGameData);
       populateTargetRtpSelect('gamesAboveTargetFilter', gamesAboveTargetData);
       populateTargetRtpSelect('targetRtpFilter', gamesTargetRtpData);
+      populateGameTitleFilter(gamesTargetRtpData);
+      populateGameLiveFilter(gamesTargetRtpData);
 
       renderRtpByGameTable();
       renderRtpByUserTable();
       renderGamesAboveTargetTable();
       renderUsersRtpHighTable();
       renderGamesTargetRtpTable();
+      if (isServerLogsVisible) renderServerLogsGamesFlyout();
       userFeedbacksData = feedbacks;
       renderUserFeedbacksTable();
 
@@ -7449,6 +8686,64 @@
     $('userGameplayBtn')?.addEventListener('click', () => {
       openUserGameplayPage();
     });
+    $('serverLogsBtn')?.addEventListener('click', () => {
+      openServerLogsPage();
+    });
+    $('serverLogsHomeBtn')?.addEventListener('click', () => {
+      goHome();
+    });
+    $('serverLogsRefreshBtn')?.addEventListener('click', () => {
+      loadServerLogsPage(true);
+    });
+    $('serverLogsClearBtn')?.addEventListener('click', () => {
+      clearServerLogsView();
+    });
+    $('serverLogsLiveBtn')?.addEventListener('click', () => {
+      serverLogsLive = !serverLogsLive;
+      syncServerLogsLiveButton();
+      stopServerLogsPolling();
+      if (serverLogsLive && isServerLogsVisible) {
+        serverLogsPollTimer = setInterval(() => pollServerLogs({ reset: false }), 2000);
+      }
+    });
+    $('serverLogsFile')?.addEventListener('change', () => {
+      serverLogsActiveFile = '';
+      serverLogsFilterGameName = '';
+      serverLogsOffset = 0;
+      syncServerLogsGamesArrow();
+      if (isServerLogGamesSelected()) openServerLogsGamesFlyout();
+      else closeServerLogsGamesFlyout();
+      pollServerLogs({ reset: true });
+    });
+    $('serverLogsGamesArrow')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleServerLogsGamesFlyout();
+    });
+    $('serverLogsGamesFlyout')?.addEventListener('input', (e) => {
+      if (e.target.id !== 'serverLogsGamesSearch') return;
+      serverLogsGamesSearch = e.target.value;
+      renderServerLogsGamesFlyout();
+    });
+    $('serverLogsGamesFlyout')?.addEventListener('click', (e) => {
+      if (e.target.closest('#serverLogsGamesSearch')) return;
+      const row = e.target.closest('[data-game-name]');
+      if (!row) return;
+      e.preventDefault();
+      selectServerLogGame(row.getAttribute('data-game-name'));
+      renderServerLogsGamesFlyout();
+    });
+    document.addEventListener('click', (e) => {
+      if (!serverLogsGamesFlyoutOpen) return;
+      if (e.target.closest('#serverLogsFileControl')) return;
+      closeServerLogsGamesFlyout();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && serverLogsGamesFlyoutOpen) closeServerLogsGamesFlyout();
+    });
+    window.addEventListener('resize', () => {
+      if (serverLogsGamesFlyoutOpen) positionServerLogsGamesFlyout();
+    });
     $('userGameplayHomeBtn')?.addEventListener('click', () => {
       goHome();
     });
@@ -7506,6 +8801,12 @@
     $('targetRtpFilter').addEventListener('change', () => {
       renderGamesTargetRtpTable(true);
     });
+    $('targetGameTitleFilter').addEventListener('change', () => {
+      renderGamesTargetRtpTable(true);
+    });
+    $('targetGameLiveFilter').addEventListener('change', () => {
+      renderGamesTargetRtpTable(true);
+    });
     $('rtpByGameTargetFilter').addEventListener('change', () => {
       renderRtpByGameTable(true);
     });
@@ -7520,6 +8821,12 @@
       renderGamesAboveTargetTable(true);
     });
     $('targetRtpFilter').addEventListener('input', () => {
+      renderGamesTargetRtpTable(true);
+    });
+    $('targetGameTitleFilter').addEventListener('input', () => {
+      renderGamesTargetRtpTable(true);
+    });
+    $('targetGameLiveFilter').addEventListener('input', () => {
       renderGamesTargetRtpTable(true);
     });
     $('rtpByUserMinFilter').addEventListener('change', () => {
