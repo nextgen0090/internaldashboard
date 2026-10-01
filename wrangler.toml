@@ -15,8 +15,10 @@ not_found_handling = "single-page-application"
 # Comma-separated IPs (spaces ok). All listed IPs can open this Worker.
 # Find each public IP: https://www.cloudflare.com/cdn-cgi/trace  → line "ip="
 # Prefix match: "203.0.113." allows that whole block
+# CIDR match: "203.0.113.0/24" or IPv6 "2400:adc1:1a2:5b00::/64"
+# IPv6 visitors: add their /64 (first 4 groups + "::/64"), not the full address — it rotates.
 # Redeploy after every change.
 [vars]
-ALLOWED_IPS = "119.152.233.192, 202.47.47.187"
+ALLOWED_IPS = "119.152.233.192, 202.47.47.187, 137.59.226.231, 2400:adc1:160:e500::/64"
 # Optional custom domain (uncomment after adding route in Cloudflare dashboard):
 # routes = [{ pattern = "internal.yourdomain.com/*", zone_name = "yourdomain.com" }]

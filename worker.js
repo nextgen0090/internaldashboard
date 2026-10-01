@@ -35,14 +35,72 @@ function parseAllowlist(raw) {
     .filter(Boolean);
 }
 
-/** Exact match, or simple prefix like 203.0.113. (office range). */
+/**
+ * Entry forms: exact IP (v4 or v6), IPv4 prefix like 203.0.113.,
+ * or CIDR like 203.0.113.0/24 or 2400:adc1:1a2:5b00::/64.
+ * IPv6 privacy addresses rotate the last 64 bits, so allow IPv6 users by /64 (or wider).
+ */
 function isIpAllowed(ip, allowed) {
+  const client = parseIp(ip);
   for (const entry of allowed) {
     if (entry === '*') return true;
     if (entry.endsWith('.') && ip.startsWith(entry)) return true;
+    if (entry.includes('/')) {
+      if (client && inCidr(client, entry)) return true;
+      continue;
+    }
     if (entry === ip) return true;
+    const exact = parseIp(entry);
+    if (client && exact && client.bits === exact.bits && client.value === exact.value) return true;
   }
   return false;
+}
+
+function inCidr(client, cidr) {
+  const [base, lenText] = cidr.split('/');
+  const network = parseIp(base);
+  const len = Number(lenText);
+  if (!network || network.bits !== client.bits) return false;
+  if (!Number.isInteger(len) || len < 0 || len > client.bits) return false;
+  const shift = BigInt(client.bits - len);
+  return (client.value >> shift) === (network.value >> shift);
+}
+
+function parseIp(raw) {
+  const ip = String(raw || '').trim().replace(/%.*$/, '');
+  if (ip.includes(':')) {
+    const value = parseIPv6(ip);
+    return value == null ? null : { bits: 128, value };
+  }
+  const value = parseIPv4(ip);
+  return value == null ? null : { bits: 32, value };
+}
+
+function parseIPv4(ip) {
+  const parts = ip.split('.');
+  if (parts.length !== 4) return null;
+  let value = 0n;
+  for (const part of parts) {
+    if (!/^\d{1,3}$/.test(part) || Number(part) > 255) return null;
+    value = (value << 8n) | BigInt(part);
+  }
+  return value;
+}
+
+function parseIPv6(ip) {
+  const halves = ip.split('::');
+  if (halves.length > 2) return null;
+  const head = halves[0] ? halves[0].split(':') : [];
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(':') : [];
+  const missing = 8 - head.length - tail.length;
+  if (halves.length === 1 ? missing !== 0 : missing < 1) return null;
+  const groups = [...head, ...Array(halves.length === 2 ? missing : 0).fill('0'), ...tail];
+  let value = 0n;
+  for (const group of groups) {
+    if (!/^[0-9a-f]{1,4}$/i.test(group)) return null;
+    value = (value << 16n) | BigInt(parseInt(group, 16));
+  }
+  return value;
 }
 
 function escapeHtml(value) {

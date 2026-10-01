@@ -5710,8 +5710,6 @@
           '</tr>';
       }).join('');
 
-      const generatedAt = new Date().toLocaleString();
-
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5735,7 +5733,6 @@
     th { background: #f1f5f9; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; }
     tr.free td:nth-child(2) { color: #b8860b; font-weight: 600; }
     tr.paid td:nth-child(2) { color: #1565c0; font-weight: 600; }
-    .footer { margin-top: 16px; color: #7b8798; font-size: 0.8rem; }
     @media print { body { background: #fff; padding: 0; } .wrap { border: none; } }
   </style>
 </head>
@@ -5744,7 +5741,7 @@
     <h1>Session Spin Report</h1>
     <div class="sub">
       ${escHtml(session?.username || 'Unknown user')} · ${escHtml(session?.gameName || 'Unknown game')}<br/>
-      Started: ${escHtml(fmtFeedbackDateTime(session?.startedAt))} · Generated: ${escHtml(generatedAt)}
+      Started: ${escHtml(fmtFeedbackDateTime(session?.startedAt))}
     </div>
 
     <div class="summary">${escHtml(plainSummary)}</div>
@@ -5775,7 +5772,6 @@
         ${spinRowsHtml || '<tr><td colspan="6">No spins.</td></tr>'}
       </tbody>
     </table>
-    <div class="footer">Game Vault Internal Dashboard · simple session report</div>
   </div>
 </body>
 </html>`;
