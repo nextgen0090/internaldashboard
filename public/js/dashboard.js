@@ -1294,9 +1294,6 @@ function renderDashboard(response) {
     { id: 'sec-daily-rewards', label: 'Daily Rewards' },
   ]);
   syncRewardRecordNavCounts();
-  if (REWARD_RECORD_TABS[activeExplorerTab] && rewardRecordState[activeExplorerTab]?.loaded) {
-    showRewardRecords(activeExplorerTab);
-  }
   // Each table render also updates its tab count.
   renderAllRtpTables();
   setUserFeedbacksData(d.userFeedbacks || []);

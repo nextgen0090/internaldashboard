@@ -705,7 +705,8 @@ const REWARD_RECORD_TABS = {
     clearBtn: 'spinWheelClearBtn',
     fields: { userName: 'spinWheelUserName', userId: 'spinWheelUserId', from: 'spinWheelFrom', to: 'spinWheelTo' },
     subId: 'spinWheelSub',
-    summaryHint: 'One row per user · reward is the total · click a user for every spin',
+    noun: 'spin',
+    summaryHint: 'One row per user · reward is the total · click a user for their spins',
     summaryColumns: SPIN_WHEEL_SUMMARY_COLUMNS,
     columns: SPIN_WHEEL_COLUMNS,
     amountKey: 'reward',
@@ -733,7 +734,8 @@ const REWARD_RECORD_TABS = {
     clearBtn: 'dailyRewardClearBtn',
     fields: { userName: 'dailyRewardUserName', userId: 'dailyRewardUserId', from: 'dailyRewardFrom', to: 'dailyRewardTo' },
     subId: 'dailyRewardSub',
-    summaryHint: 'One row per user · coins are the total · click a user for every claim',
+    noun: 'claim',
+    summaryHint: 'One row per user · coins are the total · click a user for their claims',
     summaryColumns: DAILY_REWARD_SUMMARY_COLUMNS,
     columns: DAILY_REWARD_COLUMNS,
     amountKey: 'coinsAwarded',
@@ -828,21 +830,6 @@ async function fetchRewardRecords(cfg, query) {
   };
 }
 
-/** Every matching log, so a user's total is not limited to the current page. */
-async function fetchAllRewardRecords(cfg, query, token, state) {
-  const first = await fetchRewardRecords(cfg, { ...query, page: 1, pageSize: REWARD_FETCH_PAGE_SIZE });
-  if (state.token !== token) return null;
-  const items = [...(first.items || [])];
-  const total = Number(first.totalCount || items.length);
-  const size = Number(first.pageSize || REWARD_FETCH_PAGE_SIZE) || REWARD_FETCH_PAGE_SIZE;
-  const pages = pageCount(total, size);
-  for (let page = 2; page <= pages && page <= 50; page++) {
-    const next = await fetchRewardRecords(cfg, { ...query, page, pageSize: size });
-    if (state.token !== token) return null;
-    items.push(...(next.items || []));
-  }
-  return items;
-}
 
 /** One row per user: count and sum of the amount, plus the newest log's date (and streak). */
 function groupRewardUsers(cfg, rows) {
@@ -887,14 +874,24 @@ function renderRewardSubtitle(tab) {
   const sub = $(cfg.subId);
   if (!sub) return;
   if (!state.selectedUserId) {
-    setHtml(sub, escHtml(cfg.summaryHint));
+    const loaded = state.items?.length || 0;
+    const total = Number(state.totalCount || 0);
+    const hint = state.loaded && total > loaded
+      ? 'Latest ' + fmtInt(loaded) + ' of ' + fmtInt(total) + ' ' + cfg.noun + 's · click a user to load that player'
+      : cfg.summaryHint;
+    setHtml(sub, escHtml(hint));
     return;
   }
   const group = (state.groups || []).find((g) => String(g.userId || g.userName) === String(state.selectedUserId));
   const name = group?.userName || 'User';
+  const shown = group?.logs.length || 0;
+  const total = Number(group?.totalLogs || shown);
+  const detail = total > shown
+    ? 'latest ' + fmtInt(shown) + ' of ' + fmtInt(total)
+    : countLabel(shown, 'log');
   setHtml(sub,
     '<button type="button" class="link-btn" data-reward-back>← All users</button>' +
-    '<span> · ' + escHtml(name) + ' · ' + escHtml(countLabel(group?.logs.length || 0, 'log')) + '</span>');
+    '<span> · ' + escHtml(name) + ' · ' + escHtml(detail) + '</span>');
 }
 
 function renderRewardPager(tab) {
@@ -927,9 +924,12 @@ function renderRewardRecords(tab) {
   if (state.loaded) {
     const viewingUser = !!state.selectedUserId;
     const shown = rewardVisibleRows(tab).length;
+    const loaded = state.items.length;
+    const total = Number(state.totalCount || loaded);
     setText(cfg.countId, viewingUser
       ? countLabel(shown, 'log')
-      : countLabel(state.groups.length, 'user') + ' · ' + countLabel(state.totalCount, 'log'));
+      : countLabel(state.groups.length, 'user') + ' · ' +
+        (total > loaded ? 'latest ' + fmtInt(loaded) + ' of ' + fmtInt(total) + ' logs' : countLabel(total, 'log')));
     updateSectionNavCount(tab, state.totalCount);
   }
   renderRewardPager(tab);
@@ -953,17 +953,14 @@ function renderRewardRecords(tab) {
   renderTable(cfg.wrapId, pageRows, columns, state.error || cfg.empty);
 }
 
-/** Opening the tab loads that page. A later visit keeps the page and filters and asks again. */
+/** First open loads one page. Coming back to the tab shows what is already loaded. */
 function showRewardRecords(tab) {
   const state = rewardState(tab);
-  if (state.loading) {
+  if (state.loading || state.loaded) {
     renderRewardRecords(tab);
     return;
   }
-  loadRewardRecords(tab, {
-    page: state.loaded ? state.page : 1,
-    query: state.loaded ? state.query : readRewardFilters(REWARD_RECORD_TABS[tab]),
-  });
+  loadRewardRecords(tab, { page: 1, query: readRewardFilters(REWARD_RECORD_TABS[tab]) });
 }
 
 async function loadRewardRecords(tab, { page, query } = {}) {
@@ -998,12 +995,12 @@ async function loadRewardRecords(tab, { page, query } = {}) {
   writeRewardFilters(cfg, nextQuery);
   renderRewardRecords(tab);
   try {
-    const raw = await fetchAllRewardRecords(cfg, nextQuery, token, state);
-    if (raw == null || state.token !== token) return;
-    const items = raw.map(cfg.normalize);
+    const pageData = await fetchRewardRecords(cfg, { ...nextQuery, page: 1, pageSize: REWARD_FETCH_PAGE_SIZE });
+    if (state.token !== token) return;
+    const items = (pageData.items || []).map(cfg.normalize);
     state.items = items;
     state.groups = groupRewardUsers(cfg, items);
-    state.totalCount = items.length;
+    state.totalCount = Number(pageData.totalCount || items.length);
     if (state.selectedUserId && !state.groups.some((g) => String(g.userId || g.userName) === String(state.selectedUserId))) {
       state.selectedUserId = '';
     }
@@ -1024,11 +1021,44 @@ async function loadRewardRecords(tab, { page, query } = {}) {
 }
 
 function openRewardUserLogs(tab, userKey) {
+  const cfg = REWARD_RECORD_TABS[tab];
   const state = rewardState(tab);
-  if (!userKey || state.loading) return;
+  if (!cfg || !userKey || state.loading) return;
+  const group = (state.groups || []).find((g) => String(g.userId || g.userName) === String(userKey));
   state.selectedUserId = String(userKey);
   state.page = 1;
+  // The list page already holds every matching log.
+  if ((state.items?.length || 0) >= Number(state.totalCount || 0)) {
+    renderRewardRecords(tab);
+    return;
+  }
+  const userId = group?.userId && REWARD_USER_ID_RE.test(group.userId) ? group.userId : '';
+  const userName = userId ? '' : (group?.userName || '');
+  if (!userId && !userName) {
+    renderRewardRecords(tab);
+    return;
+  }
+  const token = ++state.token;
+  state.loading = true;
+  state.error = '';
   renderRewardRecords(tab);
+  fetchRewardRecords(cfg, {
+    userId, userName, from: state.query.from || '', to: state.query.to || '', page: 1, pageSize: REWARD_FETCH_PAGE_SIZE,
+  }).then((pageData) => {
+    if (state.token !== token) return;
+    const logs = (pageData.items || []).map(cfg.normalize);
+    if (group) {
+      group.logs = logs;
+      group.totalLogs = Number(pageData.totalCount || logs.length);
+    }
+    state.loading = false;
+    renderRewardRecords(tab);
+  }).catch((err) => {
+    if (state.token !== token) return;
+    state.loading = false;
+    state.error = err?.message || 'Failed to load records.';
+    renderRewardRecords(tab);
+  });
 }
 
 function closeRewardUserLogs(tab) {
