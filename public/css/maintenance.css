@@ -1,0 +1,65 @@
+/* Maintenance page: selected row and the start/end editor. */
+
+#maintenanceTableWrap tr.maint-row-selected td {
+  background: rgba(47, 143, 230, 0.12);
+}
+
+#maintenanceTableWrap tr.maint-row-selected td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.maint-editor {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.maint-editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.maint-field-type { flex: 0 0 9rem; }
+.maint-field-time { flex: 1 1 15rem; min-width: 14rem; }
+
+.maint-datetime {
+  display: grid;
+  grid-template-columns: 1.2fr 0.7fr auto;
+  gap: 0.35rem;
+}
+
+.maint-datetime input[type="text"] {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.maint-actions {
+  display: flex;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
+.maint-duration-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.maint-hint {
+  margin: 0.65rem 0 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .maint-field-type,
+  .maint-field-time { flex: 1 1 100%; }
+  .maint-actions { margin-left: 0; width: 100%; }
+  .maint-actions button { flex: 1; }
+}

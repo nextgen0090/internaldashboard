@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta name="color-scheme" content="dark" />
+  <title>Game Vault 2.0 — Internal Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/user-gameplay.css" />
+  <link rel="stylesheet" href="css/maintenance.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div class="topbar">
+        <div class="brand">
+          <span class="brand-mark">GV</span>
+          <div class="brand-text">
+            <h1>Game Vault 2.0 <span class="title-badge">Internal</span></h1>
+            <p class="subtitle" id="subtitle"></p>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Pages">
+          <button type="button" class="nav-btn" id="homeBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            Overview
+          </button>
+          <button type="button" class="nav-btn" id="userGameplayBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            User Game Play
+          </button>
+          <button type="button" class="nav-btn" id="maintenanceBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>
+            Maintenance
+          </button>
+          <a class="nav-btn" href="https://gamevault222.com/api/devops" target="_blank" rel="noopener noreferrer" data-tip="Opens the API health monitor in a new tab">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+            Health <span aria-hidden="true">↗</span>
+          </a>
+        </nav>
+
+        <div class="status-cluster">
+          <span class="demo-pill hidden" id="demoPill" data-tip="Sample data from demo-data.js — no API calls">Demo data</span>
+          <div class="sync" id="statusPill" data-state="idle" role="status" aria-live="polite">
+            <span class="dot" id="connDot"></span>
+            <span class="sync-text">
+              <strong id="connText">Not loaded</strong>
+              <span id="syncDetail"></span>
+            </span>
+            <button type="button" class="sync-ring" id="refreshTimer" aria-label="Refresh now">
+              <svg viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track" cx="18" cy="18" r="15"/>
+                <circle class="ring-fill" id="refreshBar" cx="18" cy="18" r="15" pathLength="100"/>
+              </svg>
+              <span id="refreshText">20</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="control-group">
+          <label class="field" id="dataSourceField">
+            <span>Source</span>
+            <select id="dataSource">
+              <option value="api">Live API</option>
+              <option value="demo">Demo (local only)</option>
+            </select>
+          </label>
+          <label class="field field-history" id="historyField">
+            <span>Response history</span>
+            <select id="responseHistory" disabled>
+              <option value="0">No history yet</option>
+            </select>
+          </label>
+        </div>
+        <div class="control-group controls-actions">
+          <button type="button" class="sm" id="loadBtn" data-tip="Fetch the full summary now (bypasses the ETag check)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg>
+            Load
+          </button>
+          <button type="button" class="secondary sm" id="pauseRefreshBtn" data-tip="Pause or resume the 20-second auto-refresh">Pause</button>
+          <span class="divider" aria-hidden="true"></span>
+          <button type="button" class="secondary sm" id="toggleDiffBtn">Show Diff</button>
+          <button type="button" class="secondary sm" id="toggleJsonBtn" data-tip="Raw summary response">Show JSON</button>
+          <button type="button" class="secondary sm" id="refreshPageBtn" data-tip="Reload the whole page">Reload page</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="toast hidden" id="loadToast" role="status"></div>
+
+    <div class="modal hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-card modal-sm">
+        <div class="modal-head"><h3 id="confirmTitle">Confirm</h3></div>
+        <div class="modal-body"><p id="confirmMessage"></p></div>
+        <div class="modal-foot">
+          <button type="button" class="secondary" id="confirmNoBtn">Cancel</button>
+          <button type="button" id="confirmYesBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert hidden" id="fetchError" role="alert">
+      <div class="alert-body">
+        <strong>Something went wrong</strong>
+        <pre id="fetchErrorText"></pre>
+      </div>
+      <button type="button" class="icon-btn" id="fetchErrorClose" aria-label="Dismiss error" data-tip="Dismiss">✕</button>
+    </div>
+
+    <section id="dashboard" class="hidden">
+      <section class="card hidden" id="diffCard">
+        <div class="card-head">
+          <h2>Changes vs previous response <span class="row-count" id="diffChangeCount"></span></h2>
+        </div>
+        <p class="card-sub" id="diffMeta"></p>
+        <div id="diffContent"></div>
+      </section>
+
+      <div id="mainDashboard">
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <div class="insights" id="insightsBar" aria-label="Needs attention"></div>
+
+        <div class="analytics-grid">
+          <section class="panel panel-game">
+            <div class="panel-head">
+              <div>
+                <h2>Game performance</h2>
+                <p class="panel-sub">Bet vs win, house hold and RTP against each game's target · click a game for its players</p>
+              </div>
+              <div class="panel-tools">
+                <div class="seg seg-sm" role="group" aria-label="Sort games by" id="gpSort">
+                  <button type="button" class="seg-btn is-active" data-gp-sort="bet">Bet</button>
+                  <button type="button" class="seg-btn" data-gp-sort="win">Win</button>
+                  <button type="button" class="seg-btn" data-gp-sort="hold">Hold</button>
+                  <button type="button" class="seg-btn" data-gp-sort="rtp">RTP</button>
+                  <button type="button" class="seg-btn" data-gp-sort="spins">Spins</button>
+                </div>
+                <select id="gpFilter" class="select-sm" aria-label="Filter games by target RTP">
+                  <option value="all">All games</option>
+                  <option value="above">Above target</option>
+                  <option value="below">At/below target</option>
+                </select>
+              </div>
+            </div>
+            <div id="gamePerfChart"></div>
+          </section>
+
+          <section class="panel panel-cash">
+            <div class="panel-head">
+              <div>
+                <h2>Cash flow</h2>
+                <p class="panel-sub">Summary totals · player cash and owner coin movements are kept separate</p>
+              </div>
+            </div>
+            <div id="cashflowChart"></div>
+          </section>
+
+          <section class="panel panel-players">
+            <div class="panel-head">
+              <div>
+                <h2>Players · bet vs win</h2>
+                <p class="panel-sub">Above the line a player won more than they bet · dot size = spins · click to open sessions</p>
+              </div>
+            </div>
+            <div id="playerScatter"></div>
+          </section>
+
+          <section class="panel panel-online">
+            <div class="panel-head">
+              <div>
+                <h2>Online now</h2>
+                <p class="panel-sub">Players in game, by game</p>
+              </div>
+              <button type="button" class="secondary sm" data-kpi="online-users">View all</button>
+            </div>
+            <div id="onlineChart"></div>
+          </section>
+
+          <section class="panel panel-feedback">
+            <div class="panel-head">
+              <div>
+                <h2>Player sentiment</h2>
+                <p class="panel-sub">Rating distribution of all loaded feedback</p>
+              </div>
+              <button type="button" class="secondary sm" data-tab="sec-feedbacks">Details</button>
+            </div>
+            <div id="feedbackChart"></div>
+          </section>
+        </div>
+
+        <section class="card explorer" id="dataExplorer">
+          <div class="explorer-head">
+            <h2>Data explorer</h2>
+            <nav class="tabs" id="sectionNav" role="tablist" aria-label="Data tables"></nav>
+          </div>
+
+          <section class="explorer-panel" id="sec-rtp-game">
+            <div class="card-head">
+              <h2>RTP by Game <span class="row-count" id="countRtpGame"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Search</span>
+                  <input type="search" id="rtpByGameSearch" placeholder="Game, spins, RTP" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span>Target RTP</span>
+                  <select id="rtpByGameTargetFilter">
+                    <option value="all">All</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Status</span>
+                  <select id="rtpByGameStatusFilter">
+                    <option value="all">All</option>
+                    <option value="above">Above target</option>
+                    <option value="below">At/below target</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap" id="rtpByGameWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-rtp-user">
+            <div class="card-head">
+              <h2>RTP by User <span class="row-count" id="countRtpUser"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Search</span>
+                  <input type="search" id="rtpByUserSearch" placeholder="Username, spins, RTP" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span>Min RTP</span>
+                  <select id="rtpByUserMinFilter">
+                    <option value="all">All</option>
+                    <option value="50">≥ 50%</option>
+                    <option value="100">≥ 100%</option>
+                    <option value="200">≥ 200%</option>
+                    <option value="300">≥ 300%</option>
+                    <option value="500">≥ 500%</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap" id="rtpByUserWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-above-target">
+            <div class="card-head">
+              <h2>Games Above Target RTP <span class="row-count" id="countAboveTarget"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Search</span>
+                  <input type="search" id="gamesAboveTargetSearch" placeholder="Game, spins, RTP" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span>Target RTP</span>
+                  <select id="gamesAboveTargetFilter">
+                    <option value="all">All</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap" id="gamesAboveTargetWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-users-high">
+            <div class="card-head">
+              <h2>Users RTP &ge; 100% <span class="row-count" id="countUsersHigh"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Search</span>
+                  <input type="search" id="usersHighSearch" placeholder="Username, spins, RTP" autocomplete="off" />
+                </label>
+                <label class="field">
+                  <span>Min RTP</span>
+                  <select id="usersHighMinFilter">
+                    <option value="all">All (≥100%)</option>
+                    <option value="100">≥ 100%</option>
+                    <option value="200">≥ 200%</option>
+                    <option value="300">≥ 300%</option>
+                    <option value="500">≥ 500%</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap" id="usersRtpHighWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-feedbacks">
+            <div class="card-head">
+              <h2>
+                User Feedbacks
+                <span class="row-count" id="countFeedbacks"></span>
+                <span class="row-count" id="feedbackFilteredAvgRating">Avg —</span>
+              </h2>
+              <div class="filters">
+                <label class="field">
+                  <span>From</span>
+                  <input type="date" id="feedbackDateFrom" />
+                </label>
+                <label class="field">
+                  <span>To</span>
+                  <input type="date" id="feedbackDateTo" />
+                </label>
+                <label class="field">
+                  <span>Stars</span>
+                  <select id="feedbackStarFilter">
+                    <option value="all">All</option>
+                    <option value="low">≤ 2 ★ (low)</option>
+                    <option value="5">5 ★</option>
+                    <option value="4">4 ★</option>
+                    <option value="3">3 ★</option>
+                    <option value="2">2 ★</option>
+                    <option value="1">1 ★</option>
+                  </select>
+                </label>
+                <div class="filter-actions">
+                  <button type="button" id="feedbackFilterBtn">Filter</button>
+                  <button type="button" class="secondary" id="feedbackClearFilterBtn">Clear</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-sub">
+              <span class="feedback-filter-hint" id="feedbackFilterHint"></span>
+              <span class="tz-clock" id="feedbackTzClock" data-tip="Compare UTC, US Eastern and the dashboard display time zone"></span>
+            </p>
+            <div class="table-wrap tall" id="userFeedbacksWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-target-rtp">
+            <div class="card-head">
+              <h2>
+                Game Target RTP
+                <span class="row-count" id="countTargetRtp"></span>
+                <span class="row-count tone-up" id="countTargetRtpLive"></span>
+                <span class="row-count tone-warn" id="countTargetRtpNotLive"></span>
+              </h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Target RTP</span>
+                  <select id="targetRtpFilter">
+                    <option value="all">All</option>
+                    <option value="60">60%</option>
+                    <option value="70">70%</option>
+                    <option value="80">80%</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Title</span>
+                  <select id="targetGameTitleFilter">
+                    <option value="all">All</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Live</span>
+                  <select id="targetGameLiveFilter">
+                    <option value="all">All</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap tall" id="gamesTargetRtpWrap"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-spin-wheel">
+            <div class="card-head">
+              <h2>Spin Wheel <span class="row-count" id="countSpinWheel"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Username</span>
+                  <input type="search" id="spinWheelUserName" placeholder="Username" autocomplete="off" />
+                </label>
+                <label class="field field-guid">
+                  <span>User ID</span>
+                  <input type="search" id="spinWheelUserId" placeholder="GUID" autocomplete="off" spellcheck="false" />
+                </label>
+                <label class="field">
+                  <span>From</span>
+                  <input type="date" id="spinWheelFrom" />
+                </label>
+                <label class="field">
+                  <span>To</span>
+                  <input type="date" id="spinWheelTo" />
+                </label>
+                <div class="filter-actions">
+                  <button type="button" id="spinWheelFilterBtn">Filter</button>
+                  <button type="button" class="secondary" id="spinWheelClearBtn">Clear</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-sub" id="spinWheelSub">One row per user · reward is the total · click a user for every spin</p>
+            <div class="table-wrap tall" id="spinWheelWrap"></div>
+            <div class="pager-bar" id="spinWheelPager"></div>
+          </section>
+
+          <section class="explorer-panel hidden" id="sec-daily-rewards">
+            <div class="card-head">
+              <h2>Daily Rewards <span class="row-count" id="countDailyRewards"></span></h2>
+              <div class="filters">
+                <label class="field">
+                  <span>Username</span>
+                  <input type="search" id="dailyRewardUserName" placeholder="Username" autocomplete="off" />
+                </label>
+                <label class="field field-guid">
+                  <span>User ID</span>
+                  <input type="search" id="dailyRewardUserId" placeholder="GUID" autocomplete="off" spellcheck="false" />
+                </label>
+                <label class="field">
+                  <span>From</span>
+                  <input type="date" id="dailyRewardFrom" />
+                </label>
+                <label class="field">
+                  <span>To</span>
+                  <input type="date" id="dailyRewardTo" />
+                </label>
+                <div class="filter-actions">
+                  <button type="button" id="dailyRewardFilterBtn">Filter</button>
+                  <button type="button" class="secondary" id="dailyRewardClearBtn">Clear</button>
+                </div>
+              </div>
+            </div>
+            <p class="card-sub" id="dailyRewardSub">One row per user · coins are the total · click a user for every claim</p>
+            <div class="table-wrap tall" id="dailyRewardWrap"></div>
+            <div class="pager-bar" id="dailyRewardPager"></div>
+          </section>
+        </section>
+      </div>
+
+      <section class="card hidden" id="userGameplayCard">
+        <div class="ugp-sticky-chrome">
+          <div class="page-head">
+            <div class="page-title">
+              <nav class="breadcrumb" aria-label="Location">
+                <button type="button" id="userGameplayHomeBtn">Overview</button>
+                <span class="crumb-sep" aria-hidden="true">›</span>
+                <span class="crumb-current" aria-current="page">User Game Play</span>
+              </nav>
+              <h2>
+                User Game Play
+                <span class="row-count" id="countUserGameplay"></span>
+                <span class="info-wrap">
+                  <button type="button" class="icon-btn info-btn" aria-label="Color legend" aria-describedby="ugpColorLegend">i</button>
+                  <div class="info-legend" id="ugpColorLegend" role="tooltip">
+                    <h4>Color legend</h4>
+                    <div class="info-legend-row"><span>Bet</span><span class="badge tone-bet">Blue</span></div>
+                    <div class="info-legend-row"><span>Win &gt; Bet</span><span class="badge tone-up">Green</span></div>
+                    <div class="info-legend-row"><span>Win &lt; Bet</span><span class="badge tone-down">Red</span></div>
+                    <div class="info-legend-row"><span>RTP ≥ 100%</span><span class="badge tone-up">Green</span></div>
+                    <div class="info-legend-row"><span>RTP 80–99%</span><span class="badge tone-warn">Orange</span></div>
+                    <div class="info-legend-row"><span>RTP &lt; 80%</span><span class="badge tone-down">Red</span></div>
+                    <div class="info-legend-row"><span>Recharge</span><span class="badge tone-up">Green</span></div>
+                    <div class="info-legend-row"><span>Redeem</span><span class="badge tone-warn">Orange</span></div>
+                    <div class="info-legend-row"><span>Free / Paid</span><span><span class="badge tone-purple">Purple</span> <span class="badge tone-info">Blue</span></span></div>
+                  </div>
+                </span>
+              </h2>
+              <p class="card-sub ugp-status-line" id="userGameplayStatus">Enter a username to run dbo.GetUserGamePlaySummary.</p>
+            </div>
+            <span class="tz-clock ugp-clock" id="ugpTzClock" data-tip="Compare UTC, US Eastern and the dashboard display time zone"></span>
+          </div>
+
+          <div class="seg" role="group" aria-label="User game play view">
+            <button type="button" class="seg-btn user-gameplay-tab-btn is-active" data-ugp-tab="summary">Summary</button>
+            <button type="button" class="seg-btn user-gameplay-tab-btn" data-ugp-tab="daily">Daily</button>
+            <button type="button" class="seg-btn user-gameplay-tab-btn" data-ugp-tab="spins">Spins</button>
+          </div>
+
+          <div id="userGameplaySummaryToolbar" class="filters">
+            <label class="field">
+              <span>Username</span>
+              <input type="search" id="userGameplayName" placeholder="e.g. g292siumap" autocomplete="off" />
+            </label>
+            <div class="filter-actions">
+              <button type="button" id="userGameplayLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplayClearBtn">Clear</button>
+            </div>
+            <label class="field filter-push hidden" id="userGameplayTableToolbar">
+              <span>Search games</span>
+              <input type="search" id="userGameplaySearch" placeholder="Game, RTP, spins…" autocomplete="off" />
+            </label>
+          </div>
+
+          <div id="userGameplayDailyToolbar" class="filters hidden">
+            <label class="field field-guid">
+              <span>User ID</span>
+              <input type="search" id="userGameplayUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" spellcheck="false" />
+            </label>
+            <label class="field">
+              <span>From</span>
+              <input type="date" id="userGameplayDailyFrom" />
+            </label>
+            <label class="field">
+              <span>To</span>
+              <input type="date" id="userGameplayDailyTo" />
+            </label>
+            <div class="filter-actions">
+              <button type="button" id="userGameplayDailyLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplayDailyClearBtn">Clear</button>
+            </div>
+            <label class="field filter-push hidden" id="userGameplayDailySearchWrap">
+              <span>Search</span>
+              <input type="search" id="userGameplayDailySearch" placeholder="Game, date, RTP, spins…" autocomplete="off" />
+            </label>
+          </div>
+
+          <div id="userGameplaySpinsToolbar" class="filters hidden">
+            <label class="field field-guid">
+              <span>User ID</span>
+              <input type="search" id="userGameplaySpinsUserId" placeholder="e.g. D74DE6FF-ADCB-48F5-B038-352B179D685E" autocomplete="off" spellcheck="false" />
+            </label>
+            <label class="field">
+              <span>From</span>
+              <input type="date" id="userGameplaySpinsFrom" />
+            </label>
+            <label class="field">
+              <span>To</span>
+              <input type="date" id="userGameplaySpinsTo" />
+            </label>
+            <label class="field field-guid">
+              <span>Game ID</span>
+              <input type="search" id="userGameplaySpinsGameId" placeholder="Optional game GUID filter" autocomplete="off" spellcheck="false" />
+            </label>
+            <div class="filter-actions">
+              <button type="button" id="userGameplaySpinsLookupBtn">Lookup</button>
+              <button type="button" class="secondary" id="userGameplaySpinsClearBtn">Clear</button>
+            </div>
+            <label class="field filter-push hidden" id="userGameplaySpinsSearchWrap">
+              <span>Search this page</span>
+              <input type="search" id="userGameplaySpinsSearch" placeholder="Game, bet, win, index…" autocomplete="off" />
+            </label>
+          </div>
+        </div>
+
+        <div id="userGameplaySummaryPanel">
+          <div class="stat-grid stat-grid-lg hidden" id="userGameplaySummary"></div>
+          <div class="chart-card" id="ugpGamesChart"></div>
+          <div class="table-wrap tall" id="userGameplayGamesWrap"></div>
+        </div>
+
+        <div id="userGameplayDailyPanel" class="hidden">
+          <div class="chart-card" id="ugpDailyChart"></div>
+          <div class="table-wrap tall" id="userGameplayDailyWrap"></div>
+        </div>
+
+        <div id="userGameplaySpinsPanel" class="hidden">
+          <div class="chart-card" id="ugpSpinsChart"></div>
+          <div class="pager-bar" id="userGameplaySpinsPager"></div>
+          <div class="table-wrap tall" id="userGameplaySpinsWrap"></div>
+        </div>
+      </section>
+
+      <div class="modal hidden" id="ugpSpinJsonModal" role="dialog" aria-modal="true" aria-labelledby="ugpSpinJsonTitle">
+        <div class="modal-card modal-lg">
+          <div class="modal-head">
+            <div>
+              <h3 id="ugpSpinJsonTitle">Spin response JSON</h3>
+              <p class="modal-meta" id="ugpSpinJsonMeta"></p>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="secondary sm" id="ugpSpinJsonCopyBtn">Copy</button>
+              <button type="button" class="secondary sm" id="ugpSpinJsonCloseBtn">Close</button>
+            </div>
+          </div>
+          <div class="stat-grid stat-grid-sm modal-summary" id="ugpSpinJsonSummary"></div>
+          <div class="modal-body">
+            <pre class="json-view json-wrap" id="ugpSpinJsonView">Loading…</pre>
+          </div>
+        </div>
+      </div>
+
+      <section class="card hidden" id="maintenanceCard">
+        <div class="page-head">
+          <div class="page-title">
+            <nav class="breadcrumb" aria-label="Location">
+              <button type="button" id="maintenanceHomeBtn">Overview</button>
+              <span class="crumb-sep" aria-hidden="true">›</span>
+              <span class="crumb-current" aria-current="page">Maintenance</span>
+            </nav>
+            <h2>Maintenance Settings <span class="row-count" id="countMaintenance"></span></h2>
+            <p class="card-sub">Times are shown and entered in <b class="display-tz-label">PKT</b> (24-hour) and stored as UTC.</p>
+          </div>
+          <button type="button" class="secondary" id="maintenanceReloadBtn">Reload</button>
+        </div>
+        <div class="table-wrap" id="maintenanceTableWrap"></div>
+        <div class="maint-editor">
+          <div class="maint-editor-row">
+            <label class="field maint-field-type">
+              <span>Type</span>
+              <select id="maintType">
+                <option value="Backend">Backend</option>
+                <option value="Dashboard">Dashboard</option>
+                <option value="Games">Games</option>
+              </select>
+            </label>
+            <div class="field maint-field-time">
+              <span>Start · <b class="display-tz-label">PKT</b> (24h)</span>
+              <div class="maint-datetime">
+                <input type="date" id="maintStartDate" aria-label="Start date" />
+                <input type="text" id="maintStartTime" inputmode="numeric" placeholder="HH:mm" maxlength="5" title="24-hour time, e.g. 21:05" aria-label="Start time" />
+                <button type="button" class="secondary" id="maintStartNowBtn" data-tip="Set start to current time">Now</button>
+              </div>
+            </div>
+            <div class="field maint-field-time">
+              <span>End · <b class="display-tz-label">PKT</b> (24h, optional)</span>
+              <div class="maint-datetime">
+                <input type="date" id="maintEndDate" aria-label="End date" />
+                <input type="text" id="maintEndTime" inputmode="numeric" placeholder="HH:mm" maxlength="5" title="24-hour time, e.g. 21:05" aria-label="End time" />
+                <button type="button" class="secondary" id="maintEndNowBtn" data-tip="Set end to current time">Now</button>
+              </div>
+            </div>
+            <div class="maint-actions">
+              <button type="button" id="maintSaveBtn">Turn On / Save</button>
+              <button type="button" class="secondary danger-outline" id="maintClearBtn">Turn Off</button>
+            </div>
+          </div>
+          <div class="maint-duration-row">
+            <span class="field-label">Quick duration from now</span>
+            <div class="seg" role="group" aria-label="Maintenance duration presets">
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="1">1h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="2">2h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="4">4h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="6">6h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="12">12h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="24">24h</button>
+              <button type="button" class="seg-btn maint-duration-btn" data-maint-hours="48">48h</button>
+            </div>
+          </div>
+          <p class="maint-hint" id="maintHint">Select a row, set times, then Turn On / Save — or Turn Off.</p>
+        </div>
+      </section>
+
+      <section class="card hidden" id="drillDownCard">
+        <div class="page-head">
+          <button type="button" class="secondary" id="drillBackBtn" data-tip="Back one level (Esc)">← Back</button>
+          <div class="page-title">
+            <nav class="breadcrumb" id="drillBreadcrumb" aria-label="Drill-down path"></nav>
+            <h2><span id="drillTitle">Session details</span> <span class="row-count" id="drillMeta"></span></h2>
+          </div>
+          <button type="button" class="drill-update-btn hidden" id="drillUpdateBtn" data-tip="Show the latest data">New data · Show</button>
+        </div>
+        <div class="hidden" id="drillOwnerTxToolbar">
+          <div class="filters">
+            <div class="field">
+              <span>Type</span>
+              <div class="seg" role="group" aria-label="Transaction type">
+                <button type="button" class="seg-btn owner-tx-type-btn is-active" data-owner-type="all">All</button>
+                <button type="button" class="seg-btn owner-tx-type-btn" data-owner-type="recharge" data-tone="up">Recharge</button>
+                <button type="button" class="seg-btn owner-tx-type-btn" data-owner-type="redeem" data-tone="warn">Redeem</button>
+                <button type="button" class="seg-btn owner-tx-type-btn" data-owner-type="generated" data-tone="purple">Generated coin</button>
+              </div>
+            </div>
+            <label class="field">
+              <span>Account</span>
+              <input type="search" id="ownerTxAccount" placeholder="Account name" autocomplete="off" />
+            </label>
+            <label class="field">
+              <span>From</span>
+              <input type="date" id="ownerTxFrom" />
+            </label>
+            <label class="field">
+              <span>To</span>
+              <input type="date" id="ownerTxTo" />
+            </label>
+            <div class="filter-actions">
+              <button type="button" id="ownerTxFilterBtn">Filter</button>
+              <button type="button" class="secondary" id="ownerTxClearBtn">Clear</button>
+            </div>
+          </div>
+          <div class="pager-bar" id="ownerTxPager"></div>
+        </div>
+        <div class="table-wrap tall" id="drillTableWrap"></div>
+        <div class="hidden" id="drillChartWrap">
+          <div class="stat-grid" id="chartSummary"></div>
+          <div class="spin-chart-panel">
+            <div class="spin-chart-toolbar">
+              <div class="spin-chart-legend">
+                <span><i class="leg-bet" aria-hidden="true"></i> Bet (paid)</span>
+                <span><i class="leg-free" aria-hidden="true"></i> Free spin</span>
+                <span><i class="leg-win" aria-hidden="true"></i> Win</span>
+              </div>
+              <div class="spin-chart-zoom">
+                <span class="zoom-hint" id="spinZoomHint">Scroll to zoom · drag or scroller to pan · click spin for JSON</span>
+                <div class="btn-group">
+                  <button type="button" class="secondary sm" id="spinPanLeftBtn" data-tip="Move left" aria-label="Move left">‹</button>
+                  <button type="button" class="secondary sm" id="spinZoomOutBtn" data-tip="Zoom out" aria-label="Zoom out">−</button>
+                  <button type="button" class="secondary sm" id="spinZoomInBtn" data-tip="Zoom in" aria-label="Zoom in">+</button>
+                  <button type="button" class="secondary sm" id="spinPanRightBtn" data-tip="Move right" aria-label="Move right">›</button>
+                  <button type="button" class="secondary sm" id="spinZoomResetBtn" data-tip="Reset zoom">Reset</button>
+                </div>
+                <button type="button" class="secondary sm" id="spinViewJsonBtn" data-tip="Open response JSON for the hovered / selected spin" disabled>Spin JSON</button>
+                <button type="button" class="sm" id="spinDownloadReportBtn" data-tip="Download a simple session report">⬇ Report</button>
+              </div>
+            </div>
+            <canvas id="spinChart" aria-label="Session spin bet and win chart"></canvas>
+            <div class="spin-chart-scroll-wrap hidden" id="spinChartScrollWrap">
+              <input type="range" id="spinChartScroller" min="0" max="0" value="0" step="1" aria-label="Pan spin graph" />
+            </div>
+            <div class="chart-tooltip hidden" id="spinChartTooltip"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card hidden" id="jsonCard">
+        <div class="card-head"><h2>Raw JSON</h2></div>
+        <pre class="json-view" id="jsonView"></pre>
+      </section>
+    </section>
+  </div>
+
+  <script src="js/datetime.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/dashboard-tables.js"></script>
+  <script src="js/drill-down.js"></script>
+  <script src="js/spin-chart.js"></script>
+  <script src="js/user-gameplay.js"></script>
+  <script src="js/maintenance.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+/* User Game Play page: sticky lookup header and table cells unique to this page. */
+
+#userGameplayCard { overflow: visible; }
+
+#userGameplayCard .ugp-sticky-chrome {
+  position: sticky;
+  top: var(--app-header-sticky-height, 0px);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: -1rem -1.15rem 1rem;
+  padding: 1rem 1.15rem 0.9rem;
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+#userGameplayCard .page-head { margin-bottom: 0; }
+
+.ugp-status-line { overflow-wrap: anywhere; }
+
+.ugp-clock {
+  max-width: 340px;
+  text-align: right;
+  line-height: 1.4;
+}
+
+.ugp-id-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+#userGameplaySummary .ugp-id {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  word-break: break-all;
+}
+
+button.ugp-daily-spins-link {
+  min-height: 1.7rem;
+  padding: 0 0.5rem;
+  gap: 0.3rem;
+  border-color: rgba(144, 202, 249, 0.4);
+  background: rgba(47, 143, 230, 0.1);
+  color: var(--c-info);
+  font-variant-numeric: tabular-nums;
+}
+
+button.ugp-daily-spins-link:hover:not(:disabled) {
+  background: rgba(47, 143, 230, 0.22);
+  color: #e3f2fd;
+}
+
+button.ugp-daily-spins-link svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 1100px) {
+  .ugp-clock { max-width: none; text-align: left; flex-basis: 100%; }
+}
+
+@media (max-width: 720px) {
+  #userGameplayCard .ugp-sticky-chrome { position: static; margin: -0.85rem -0.85rem 1rem; padding: 0.85rem; }
+}
